@@ -2,6 +2,7 @@
 #include <wbmqtt/mqtt_wrapper.h>
 #include <getopt.h>
 #include <unistd.h>
+#include <eibclient.h>
 using namespace std;
 
 bool debug;
@@ -36,10 +37,26 @@ void TMQTTKnxObserver::OnMessage(const mosquitto_message *message) {
     std::string topic = message->topic;
     std::string payload = static_cast<const char *>(message->payload);
     if(debug) cout << "KNX observer topic: " << topic << " message: " << payload << "\n";
+    //EIBConnection * conn = EIBSocketRemote("localhost", 6720);
+    EIBConnection * conn = EIBSocketLocal("/tmp/eib");
+    if(debug) cout << (conn != NULL) << "\n";
+    eibaddr_t addr = 2309;
+    uint8_t val[] = {'t','r','u','e', 0};
+    int res = EIBOpenT_Group(conn, addr, 0);
+    if(debug) cout << res << "\n";
 
+    res = EIBSendAPDU(conn, 5, val);
+    if(debug) cout << res << "\n";
+    res = EIBComplete(conn);
+    if(debug) cout << res << "\n";
+    res = EIBClose(conn);
+    if(debug) cout << res << "\n";
 }
 void TMQTTKnxObserver::Loop(){
     sleep(10);
+}
+void TMQTTKnxObserver::OnSubscribe(int mid, int qos_count, const int *granted_qos) {
+    if(debug) cout << "KNS subscription succeeded\n";
 }
 
 typedef shared_ptr<TMQTTKnxObserver> PMQTTKnxObserver;
