@@ -1,6 +1,7 @@
 #include <iostream>
 #include <wbmqtt/mqtt_wrapper.h>
 #include <getopt.h>
+#include <unistd.h>
 using namespace std;
 
 bool debug;
@@ -19,10 +20,33 @@ private:
     PMQTTClientBase MQTTClient;
 };
 
+TMQTTKnxObserver::TMQTTKnxObserver(PMQTTClientBase mqtt_client) : MQTTClient(mqtt_client) {}
+
+void TMQTTKnxObserver::SetUp() {
+    MQTTClient->Observe(shared_from_this());
+    MQTTClient->Connect();
+}
+
+void TMQTTKnxObserver::OnConnect(int rc) {
+    if(debug) cout << "KNX observer on connect\n";
+    MQTTClient->Subscribe(NULL, "/devices/knx/#");
+}
+
+void TMQTTKnxObserver::OnMessage(const mosquitto_message *message) {
+    std::string topic = message->topic;
+    std::string payload = static_cast<const char *>(message->payload);
+    if(debug) cout << "KNX observer topic: " << topic << " message: " << payload << "\n";
+
+}
+void TMQTTKnxObserver::Loop(){
+    sleep(10);
+}
+
 typedef shared_ptr<TMQTTKnxObserver> PMQTTKnxObserver;
 
 int main(int argc, char ** argv)
 {
+    debug = true;
     TMQTTClient::TConfig mqtt_config;
     mqtt_config.Host = "localhost";
     mqtt_config.Port = 1883;
