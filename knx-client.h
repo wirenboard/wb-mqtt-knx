@@ -9,6 +9,9 @@ public:
     TKNXClient();
     void Send(std::string topic, std::string payload);
     void Loop();
+private:
+    EIBConnection * out;
+    EIBConnection * in;
 };
 typedef std::shared_ptr<TKNXClient> PKNXClient;
 

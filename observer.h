@@ -6,7 +6,7 @@
 #define OBSERVER_H
 class TMQTTKnxObserver : public IMQTTObserver, public std::enable_shared_from_this<TMQTTKnxObserver> {
 public:
-    TMQTTKnxObserver(PMQTTClientBase mqtt_client);
+    TMQTTKnxObserver(PMQTTClientBase mqtt_client, PKNXClient knx_client);
     void SetUp();
     void OnConnect(int rc);
     void OnMessage(const mosquitto_message *message);

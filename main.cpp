@@ -6,6 +6,7 @@
 #include <eibloadresult.h>
 #include <eibtypes.h>
 #include "observer.h"
+#include "knx-client.h"
 
 bool debug;
 
@@ -35,8 +36,9 @@ int main(int argc, char ** argv)
     mqtt_config.Id = "wb-knx";
 
     PMQTTClient mqtt_client(new TMQTTClient(mqtt_config));
+    PKNXClient knx_client(new TKNXClient());
     try {
-        PMQTTKnxObserver observer(new TMQTTKnxObserver(mqtt_client));
+        PMQTTKnxObserver observer(new TMQTTKnxObserver(mqtt_client, knx_client));
         observer->SetUp();
         mqtt_client->StartLoop();
         observer->Loop();

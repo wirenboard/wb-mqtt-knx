@@ -6,7 +6,7 @@
 
 extern bool debug;
 
-TMQTTKnxObserver::TMQTTKnxObserver(PMQTTClientBase mqtt_client) : MQTTClient(mqtt_client) {
+TMQTTKnxObserver::TMQTTKnxObserver(PMQTTClientBase mqtt_client, PKNXClient knx_client) : MQTTClient(mqtt_client), KNXClient(knx_client){
     //
 }
 //mqtt
