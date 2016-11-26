@@ -12,6 +12,8 @@ public:
     void OnMessage(const mosquitto_message *message);
     void OnSubscribe(int mid, int qos_count, const int *granted_qos);
 
+    void OnPackage(uint8_t * package, int len);
+
     void LoopOnce();
     void Loop();
 private:

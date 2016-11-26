@@ -9,9 +9,10 @@ extern bool debug;
 TMQTTKnxObserver::TMQTTKnxObserver(PMQTTClientBase mqtt_client, PKNXClient knx_client) : MQTTClient(mqtt_client), KNXClient(knx_client){
     //
 }
-//mqtt
+
 void TMQTTKnxObserver::SetUp() {
     MQTTClient->Observe(shared_from_this());
+    KNXClient->Observe(shared_from_this());
     MQTTClient->Connect();
 }
 
@@ -26,11 +27,16 @@ void TMQTTKnxObserver::OnMessage(const mosquitto_message *message) {
     if(debug) std::cout << "KNX observer topic: " << topic << " message: " << payload << "\n";
     KNXClient->Send(topic, payload);
 }
-//knx
+
 void TMQTTKnxObserver::Loop(){
-    // TODO run main cycle of KNX client
     KNXClient->Loop();
 }
+
 void TMQTTKnxObserver::OnSubscribe(int mid, int qos_count, const int *granted_qos) {
     if(debug) std::cout << "KNS subscription succeeded\n";
+}
+
+void TMQTTKnxObserver::OnPackage(uint8_t * buf, int len){
+    if(debug) std::cout << "KNX package received\n";
+    // we may need to post something to mqtt here, but it is dependent on device
 }
