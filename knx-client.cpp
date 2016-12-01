@@ -8,10 +8,11 @@
 #include <sys/select.h>
 #include <unistd.h>
 
-TKnxClient::TKnxClient() : Debug(false)
+TKnxClient::TKnxClient(std::string url) : Debug(false)
 {
-    Out = EIBSocketLocal("/tmp/eib");
-    In = EIBSocketRemote("localhost", 6720);
+    Out = EIBSocketURL(url.c_str());
+    In = EIBSocketURL(url.c_str());
+    if (!Out || !In) throw TKnxException("failed to open url: " + url);
 }
 
 bool TKnxClient::SetDebug(bool debug)
@@ -56,27 +57,33 @@ void TKnxClient::SendTelegram(std::string payload)
 
     int res;
     res = EIBOpen_GroupSocket(Out, 0);
+    if (res == -1) throw TKnxException("failed to open GroupSocket");
     res = EIBSendGroup(Out, destAddr, data.size() + 2, telegram);
+    if (res == -1) throw TKnxException("failed to send group telegram");
     res = EIBReset(Out);
+    if (res == -1) throw TKnxException("failed to reset connection");
 }
 
 void TKnxClient::Loop()
 {
 
-    EIBOpenVBusmonitor(In);
-
+    int res = EIBOpenVBusmonitor(In);
+    if (res == -1) throw TKnxException("failed to open Busmonitor connection");
     while (true) {
         int fd = EIB_Poll_FD(In);
+        if (fd == -1) throw TKnxException("failed to get Poll fd");
 
         fd_set set;
         FD_ZERO(&set);
         FD_SET(fd, &set);
 
-        int ret = select(fd + 1, &set, NULL, NULL, NULL);
+        res = select(fd + 1, &set, NULL, NULL, NULL);
+        if (res == -1) throw TKnxException(std::string("select failed: ") + std::strerror(errno));
 
         uint8_t telegram[MAX_TELEGRAM_LENGTH] = {0};
 
         int len = EIBGetBusmonitorPacket(In, 255, telegram);
+        if (len == -1) throw TKnxException("failed to read Busmonitor packet");
         if (Debug) {
             std::cout << "KNX Client received telegram: ";
             std::cout << std::hex << std::noshowbase;

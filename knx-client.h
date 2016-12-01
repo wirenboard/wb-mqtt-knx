@@ -10,9 +10,23 @@ typedef std::shared_ptr<TMqttKnxObserver> PMqttKnxObserver;
 
 #define MAX_TELEGRAM_LENGTH 254
 
+class TKnxException : public std::exception {
+public:
+    TKnxException(std::string message) : Message("KNX error: " + message)
+    {
+    }
+    const char* what() const throw()
+    {
+        return Message.c_str();
+    }
+
+private:
+    std::string Message;
+};
+
 class TKnxClient {
 public:
-    TKnxClient();
+    TKnxClient(std::string url);
     void SendTelegram(std::string payload);
     void Loop();
     virtual ~TKnxClient();
