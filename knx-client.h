@@ -12,7 +12,7 @@ typedef std::shared_ptr<TMQTTKnxObserver> PMQTTKnxObserver;
 class TKNXClient {
 public:
     TKNXClient();
-    void Send(std::string topic, std::string payload);
+    void Send(std::string payload);
     void Loop();
     ~TKNXClient();
     int PreparePayload(uint8_t * buf, std::string payload);
