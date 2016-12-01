@@ -1,0 +1,6 @@
+wb-mqtt-knx (0.1) stable; urgency=medium
+
+  * Initial release. (Closes: #XXXXXX)
+
+ -- Yury Usishchev <y.usishchev@contactless.ru>  Thu, 1 Dec 2016 23:04:28 +0400
+
