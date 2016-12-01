@@ -22,7 +22,7 @@ mosquitto_pub -t '/devices/knx/controls/data/on' -m "${DstAddr} ${ACPI} ${Data}"
 ${SrcAddr} ${DstAddr} ${ACPI} ${Data}
 ```
 
-* `SrcAddr`, `DstAddr` - 16-ти битное значение адреса KNX устройства[1]
+* `SrcAddr`, `DstAddr` - адреса KNX устройств
 * `ACPI` - 4-x битный тип сообщения[1]
 * `Data` - сообщение
 

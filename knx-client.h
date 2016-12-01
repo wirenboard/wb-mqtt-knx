@@ -32,6 +32,7 @@ public:
     virtual ~TKnxClient();
     void Observe(PMqttKnxObserver observer);
     bool SetDebug(bool debug);
+    static eibaddr_t ParseKnxAddress(const std::string& addr);
 
 private:
     EIBConnection* Out;

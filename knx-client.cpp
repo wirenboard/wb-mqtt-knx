@@ -33,15 +33,35 @@ TKnxClient::~TKnxClient()
     if (In) EIBClose(In);
 }
 
+eibaddr_t TKnxClient::ParseKnxAddress(const std::string& addr)
+{
+    std::vector<std::string> tokens = StringSplit(addr, "/");
+    if (tokens.size() == 2) {
+        uint16_t main = std::stoi(tokens[0]);
+        uint16_t sub = std::stoi(tokens[1]);
+
+        return ((main & 0xf) << 11) | (sub & 0x7ff);
+    } else if (tokens.size() == 3) {
+        uint16_t main = std::stoi(tokens[0]);
+        uint16_t middle = std::stoi(tokens[1]);
+        uint16_t sub = std::stoi(tokens[2]);
+
+        return ((main & 0xf) << 11) | ((middle & 0x7) << 8) | (sub & 0xff);
+    }
+
+    throw TKnxException("invalid address: " + addr);
+}
+
 void TKnxClient::SendTelegram(std::string payload)
 {
     // payload should be in form of DestAddr ACPI data
     std::stringstream ss(payload);
-    eibaddr_t destAddr;
+    std::string destAddrStr;
     std::string data;
     uint8_t acpi;
-    ss >> destAddr >> acpi >> data;
+    ss >> destAddrStr >> acpi >> data;
     acpi &= 0x7;
+    eibaddr_t destAddr = ParseKnxAddress(destAddrStr);
 
     if (Debug) {
         std::cout << "KNX Client send telegram to: " << std::hex << std::showbase << destAddr;
