@@ -1,51 +1,49 @@
-#include <iostream>
-#include <wbmqtt/mqtt_wrapper.h>
-#include <getopt.h>
-#include <unistd.h>
+#include "knx-client.h"
+#include "observer.h"
 #include <eibclient.h>
 #include <eibloadresult.h>
 #include <eibtypes.h>
-#include "observer.h"
-#include "knx-client.h"
+#include <getopt.h>
+#include <iostream>
+#include <unistd.h>
+#include <wbmqtt/mqtt_wrapper.h>
 
-bool debug;
-
-int main(int argc, char ** argv)
+int main(int argc, char** argv)
 {
-    debug = true;
-    TMQTTClient::TConfig mqtt_config;
-    mqtt_config.Host = "localhost";
-    mqtt_config.Port = 1883;
+    TMQTTClient::TConfig mqttConfig;
+    mqttConfig.Host = "localhost";
+    mqttConfig.Port = 1883;
+    bool debug = false;
     int c;
-    while ((c = getopt(argc, argv, "dp:h:"))!=-1) {
-        switch (c){
+    while ((c = getopt(argc, argv, "dp:h:")) != -1) {
+        switch (c) {
         case 'd':
             debug = true;
             break;
         case 'p':
-            mqtt_config.Port = std::stoi(optarg);
+            mqttConfig.Port = std::stoi(optarg);
             break;
         case 'h':
-            mqtt_config.Host = optarg;
+            mqttConfig.Host = optarg;
             break;
         default:
             break;
         }
     }
     mosqpp::lib_init();
-    mqtt_config.Id = "wb-knx";
 
-    PMQTTClient mqtt_client(new TMQTTClient(mqtt_config));
-    PKNXClient knx_client(new TKNXClient());
+    PMQTTClient mqttClient(new TMQTTClient(mqttConfig));
+    PKnxClient knxClient(new TKnxClient());
+    knxClient->SetDebug(debug);
     try {
-        PMQTTKnxObserver observer(new TMQTTKnxObserver(mqtt_client, knx_client));
+        PMqttKnxObserver observer(new TMqttKnxObserver(mqttClient, knxClient));
+        observer->SetDebug(debug);
         observer->SetUp();
-        mqtt_client->StartLoop();
+        mqttClient->StartLoop();
         observer->Loop();
-    } catch(...){
-        std::cout << "exception found\n";
+    } catch (...) {
+        // std::cout << "exception found\n";
     }
 
     return 0;
 }
-

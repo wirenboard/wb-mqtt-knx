@@ -1,29 +1,30 @@
-#include <string>
-#include <memory>
 #include <eibclient.h>
+#include <memory>
+#include <string>
 
 #ifndef KNX_CLIENT_H
 #define KNX_CLIENT_H
 
-class TMQTTKnxObserver;
-typedef std::shared_ptr<TMQTTKnxObserver> PMQTTKnxObserver;
+class TMqttKnxObserver;
+typedef std::shared_ptr<TMqttKnxObserver> PMqttKnxObserver;
 
-#define MAX_PAYLOAD_SIZE 254
-class TKNXClient {
+#define MAX_TELEGRAM_LENGTH 254
+
+class TKnxClient {
 public:
-    TKNXClient();
-    void Send(std::string payload);
+    TKnxClient();
+    void SendTelegram(std::string payload);
     void Loop();
-    ~TKNXClient();
-    int PreparePayload(uint8_t * buf, std::string payload);
-    void HandlePacket(uint8_t * buf, int len);
-    void Observe(PMQTTKnxObserver observer);
+    virtual ~TKnxClient();
+    void Observe(PMqttKnxObserver observer);
+    bool SetDebug(bool debug);
+
 private:
-    EIBConnection * out;
-    EIBConnection * in;
-    eibaddr_t src_addr;
-    PMQTTKnxObserver Observer;
+    EIBConnection* Out;
+    EIBConnection* In;
+    PMqttKnxObserver Observer;
+    bool Debug;
 };
-typedef std::shared_ptr<TKNXClient> PKNXClient;
+typedef std::shared_ptr<TKnxClient> PKnxClient;
 
 #endif // KNX_CLIENT_H

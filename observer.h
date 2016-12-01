@@ -1,26 +1,31 @@
-#include <wbmqtt/mqtt_wrapper.h>
-#include <memory>
 #include "knx-client.h"
+#include <memory>
+#include <wbmqtt/mqtt_wrapper.h>
 
 #ifndef OBSERVER_H
 #define OBSERVER_H
-class TMQTTKnxObserver : public IMQTTObserver, public std::enable_shared_from_this<TMQTTKnxObserver> {
+
+class TMqttKnxObserver : public IMQTTObserver,
+                         public std::enable_shared_from_this<TMqttKnxObserver> {
 public:
-    TMQTTKnxObserver(PMQTTClientBase mqtt_client, PKNXClient knx_client);
+    TMqttKnxObserver(PMQTTClientBase mqttClient, PKnxClient knxClient);
     void SetUp();
     void OnConnect(int rc);
-    void OnMessage(const mosquitto_message *message);
-    void OnSubscribe(int mid, int qos_count, const int *granted_qos);
+    void OnMessage(const mosquitto_message* message);
+    void OnSubscribe(int mid, int qosCount, const int* grantedQos);
+    bool SetDebug(bool debug);
 
-    void OnPackage(uint8_t * package, int len);
+    void OnTelegram(uint8_t* package, int len);
 
     void LoopOnce();
     void Loop();
+
 private:
-    PMQTTClientBase MQTTClient;
-    PKNXClient KNXClient;
+    PMQTTClientBase MqttClient;
+    PKnxClient KnxClient;
+    bool Debug;
 };
 
-typedef std::shared_ptr<TMQTTKnxObserver> PMQTTKnxObserver;
+typedef std::shared_ptr<TMqttKnxObserver> PMqttKnxObserver;
 
 #endif // OBSERVER_H
