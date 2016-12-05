@@ -71,8 +71,12 @@ void TKnxClient::SendTelegram(std::string payload)
     uint8_t acpi;
     eibaddr_t srcAddr;
     eibaddr_t destAddr;
-    ss >> addrStr >> acpi >> data;
+    ss >> addrStr >> acpi;
     acpi &= 0x7;
+
+    ss.ignore(1); // Ignore one space that delimits ACPI and data
+    std::getline(ss, data);
+
     bool isGroup = (addrStr[0] == 'g');
     if (isGroup) {
         destAddr = ParseKnxAddress(addrStr.substr(2), isGroup);
