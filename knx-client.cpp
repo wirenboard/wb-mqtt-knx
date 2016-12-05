@@ -33,20 +33,32 @@ TKnxClient::~TKnxClient()
     if (In) EIBClose(In);
 }
 
-eibaddr_t TKnxClient::ParseKnxAddress(const std::string& addr)
+eibaddr_t TKnxClient::ParseKnxAddress(const std::string& addr, bool isGroup)
 {
-    std::vector<std::string> tokens = StringSplit(addr, "/");
-    if (tokens.size() == 2) {
-        uint16_t main = std::stoi(tokens[0]);
-        uint16_t sub = std::stoi(tokens[1]);
+    std::vector<std::string> tokens;
+    if (isGroup) {
+        tokens = StringSplit(addr, "/"); // Group address
+        if (tokens.size() == 2) {
+            uint16_t main = std::stoi(tokens[0]);
+            uint16_t sub = std::stoi(tokens[1]);
 
-        return ((main & 0xf) << 11) | (sub & 0x7ff);
-    } else if (tokens.size() == 3) {
-        uint16_t main = std::stoi(tokens[0]);
-        uint16_t middle = std::stoi(tokens[1]);
-        uint16_t sub = std::stoi(tokens[2]);
+            return ((main & 0xf) << 11) | (sub & 0x7ff);
+        } else if (tokens.size() == 3) {
+            uint16_t main = std::stoi(tokens[0]);
+            uint16_t middle = std::stoi(tokens[1]);
+            uint16_t sub = std::stoi(tokens[2]);
 
-        return ((main & 0xf) << 11) | ((middle & 0x7) << 8) | (sub & 0xff);
+            return ((main & 0xf) << 11) | ((middle & 0x7) << 8) | (sub & 0xff);
+        }
+    } else {
+        tokens = StringSplit(addr, "."); // Individual address
+        if(tokens.size() == 3){
+            uint16_t area = std::stoi(tokens[0]);
+            uint16_t line = std::stoi(tokens[1]);
+            uint16_t device = std::stoi(tokens[2]);
+
+            return ((area & 0xf) << 12) | ((line & 0xf) << 8) | (device & 0xff);
+        }
     }
 
     throw TKnxException("invalid address: " + addr);
@@ -56,16 +68,24 @@ void TKnxClient::SendTelegram(std::string payload)
 {
     // payload should be in form of DestAddr ACPI data
     std::stringstream ss(payload);
-    std::string destAddrStr;
+    std::string addrStr;
     std::string data;
     uint8_t acpi;
-    ss >> destAddrStr >> acpi >> data;
+    eibaddr_t srcAddr;
+    eibaddr_t destAddr;
+    ss >> addrStr >> acpi >> data;
     acpi &= 0x7;
-    eibaddr_t destAddr = ParseKnxAddress(destAddrStr);
-
+    bool isGroup = (addrStr.find(".") == std::string::npos);
+    if (isGroup) {
+        destAddr = ParseKnxAddress(addrStr, isGroup);
+    } else {
+        std::vector<std::string> addresses = StringSplit(addrStr, "/");
+        srcAddr = ParseKnxAddress(addresses[0], isGroup);
+        destAddr = ParseKnxAddress(addresses[1], isGroup);
+    }
     if (Debug) {
         std::cout << "KNX Client send telegram to: " << std::hex << std::showbase << destAddr;
-        std::cout << " with ACPI: " << acpi << " with data: " << data << std::endl;
+        std::cout << " with ACPI: " << (unsigned)acpi << " with data: " << data << std::endl;
     }
 
     uint8_t telegram[MAX_TELEGRAM_LENGTH] = {0};
@@ -76,10 +96,17 @@ void TKnxClient::SendTelegram(std::string payload)
     std::memcpy(telegram + 2, data.c_str(), data.size());
 
     int res;
-    res = EIBOpen_GroupSocket(Out, 0);
-    if (res == -1) throw TKnxException("failed to open GroupSocket");
-    res = EIBSendGroup(Out, destAddr, data.size() + 2, telegram);
-    if (res == -1) throw TKnxException("failed to send group telegram");
+    if (isGroup) {
+        res = EIBOpen_GroupSocket(Out, 0);
+        if (res == -1) throw TKnxException("failed to open GroupSocket");
+        res = EIBSendGroup(Out, destAddr, data.size() + 2, telegram);
+        if (res == -1) throw TKnxException("failed to send group telegram");
+     } else {
+        res = EIBOpenT_TPDU(Out, srcAddr);
+        if (res == -1) throw TKnxException("failed to open TPDU connection");
+        res = EIBSendTPDU(Out, destAddr, data.size() + 2, telegram);
+        if (res == -1) throw TKnxException("failed to send group telegram");
+    }
     res = EIBReset(Out);
     if (res == -1) throw TKnxException("failed to reset connection");
 }
