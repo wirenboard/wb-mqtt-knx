@@ -35,9 +35,8 @@ TKnxClient::~TKnxClient()
 
 eibaddr_t TKnxClient::ParseKnxAddress(const std::string& addr, bool isGroup)
 {
-    std::vector<std::string> tokens;
+    std::vector<std::string> tokens = StringSplit(addr, "/");
     if (isGroup) {
-        tokens = StringSplit(addr, "/"); // Group address
         if (tokens.size() == 2) {
             uint16_t main = std::stoi(tokens[0]);
             uint16_t sub = std::stoi(tokens[1]);
@@ -51,8 +50,7 @@ eibaddr_t TKnxClient::ParseKnxAddress(const std::string& addr, bool isGroup)
             return ((main & 0xf) << 11) | ((middle & 0x7) << 8) | (sub & 0xff);
         }
     } else {
-        tokens = StringSplit(addr, "."); // Individual address
-        if(tokens.size() == 3){
+        if (tokens.size() == 3) {
             uint16_t area = std::stoi(tokens[0]);
             uint16_t line = std::stoi(tokens[1]);
             uint16_t device = std::stoi(tokens[2]);
@@ -75,13 +73,13 @@ void TKnxClient::SendTelegram(std::string payload)
     eibaddr_t destAddr;
     ss >> addrStr >> acpi >> data;
     acpi &= 0x7;
-    bool isGroup = (addrStr.find(".") == std::string::npos);
+    bool isGroup = (addrStr[0] == 'g');
     if (isGroup) {
-        destAddr = ParseKnxAddress(addrStr, isGroup);
+        destAddr = ParseKnxAddress(addrStr.substr(2), isGroup);
     } else {
-        std::vector<std::string> addresses = StringSplit(addrStr, "/");
-        srcAddr = ParseKnxAddress(addresses[0], isGroup);
-        destAddr = ParseKnxAddress(addresses[1], isGroup);
+        std::string::size_type pos = addrStr.find(':', 2);
+        srcAddr = ParseKnxAddress(addrStr.substr(2, pos - 2), isGroup);
+        destAddr = ParseKnxAddress(addrStr.substr(pos + 1), isGroup);
     }
     if (Debug) {
         std::cout << "KNX Client send telegram to: " << std::hex << std::showbase << destAddr;
@@ -101,7 +99,7 @@ void TKnxClient::SendTelegram(std::string payload)
         if (res == -1) throw TKnxException("failed to open GroupSocket");
         res = EIBSendGroup(Out, destAddr, data.size() + 2, telegram);
         if (res == -1) throw TKnxException("failed to send group telegram");
-     } else {
+    } else {
         res = EIBOpenT_TPDU(Out, srcAddr);
         if (res == -1) throw TKnxException("failed to open TPDU connection");
         res = EIBSendTPDU(Out, destAddr, data.size() + 2, telegram);
