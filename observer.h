@@ -13,7 +13,6 @@ public:
     void OnConnect(int rc);
     void OnMessage(const mosquitto_message* message);
     void OnSubscribe(int mid, int qosCount, const int* grantedQos);
-    bool SetDebug(bool debug);
 
     void OnTelegram(uint8_t* package, int len);
 
@@ -23,7 +22,6 @@ public:
 private:
     PMQTTClientBase MqttClient;
     PKnxClient KnxClient;
-    bool Debug;
 };
 
 typedef std::shared_ptr<TMqttKnxObserver> PMqttKnxObserver;

@@ -31,14 +31,12 @@ public:
     void Loop();
     virtual ~TKnxClient();
     void Observe(PMqttKnxObserver observer);
-    bool SetDebug(bool debug);
     static eibaddr_t ParseKnxAddress(const std::string& addr, bool isGroup);
 
 private:
     EIBConnection* Out;
     EIBConnection* In;
     PMqttKnxObserver Observer;
-    bool Debug;
 };
 typedef std::shared_ptr<TKnxClient> PKnxClient;
 

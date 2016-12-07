@@ -5,10 +5,11 @@
 #include <unistd.h>
 #include <wbmqtt/utils.h>
 
+#include "logging.h"
 extern bool debug;
 
 TMqttKnxObserver::TMqttKnxObserver(PMQTTClientBase mqttClient, PKnxClient knxClient)
-    : MqttClient(mqttClient), KnxClient(knxClient), Debug(false)
+    : MqttClient(mqttClient), KnxClient(knxClient)
 {
 }
 
@@ -21,9 +22,7 @@ void TMqttKnxObserver::SetUp()
 
 void TMqttKnxObserver::OnConnect(int rc)
 {
-    if (Debug) {
-        std::cout << "KNX Observer OnConnect handler" << std::endl;
-    }
+    LOG(INFO) << "Observer OnConnect handler";
 
     std::string prefix = "/devices/knx/controls/data";
     MqttClient->Publish(NULL, prefix + "/meta/type", "data", 0, true);
@@ -32,9 +31,13 @@ void TMqttKnxObserver::OnConnect(int rc)
 
 void TMqttKnxObserver::OnMessage(const mosquitto_message* message)
 {
-    std::string topic = message->topic;
     std::string payload = static_cast<const char*>(message->payload);
-    KnxClient->SendTelegram(payload);
+    LOG(INFO) << "Mosquitto message: " << payload;
+    try {
+        KnxClient->SendTelegram(payload);
+    } catch (TKnxException& e) {
+        LOG(ERROR) << "Failed to send telegram: " << e.what();
+    }
 }
 
 void TMqttKnxObserver::Loop()
@@ -48,6 +51,10 @@ void TMqttKnxObserver::OnSubscribe(int mid, int qosCount, const int* grantedQos)
 
 void TMqttKnxObserver::OnTelegram(uint8_t* buf, int len)
 {
+    if (len < 8) {
+        LOG(WARN) << "KNX telegram is not long enough";
+        return;
+    }
     std::string prefix = "/devices/knx/controls/data";
     std::stringstream ss;
     unsigned acpi = (buf[6] & 0x3) << 2 | (buf[7] >> 6);
@@ -69,15 +76,12 @@ void TMqttKnxObserver::OnTelegram(uint8_t* buf, int len)
     if (dataLen == 2) {
         ss << (buf[7] & 0x7f);
     } else {
+        if (len != dataLen + 8) {
+            LOG(WARN) << "KNX telegram has inconsistent length";
+            return;
+        }
         buf[dataLen + 7] = 0;
         ss << (const char*)(buf + 8);
     }
     MqttClient->Publish(NULL, prefix, ss.str());
-}
-
-bool TMqttKnxObserver::SetDebug(bool debug)
-{
-    bool ret = Debug;
-    Debug = debug;
-    return ret;
 }
