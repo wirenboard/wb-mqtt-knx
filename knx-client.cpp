@@ -12,9 +12,7 @@
 
 TKnxClient::TKnxClient(std::string url)
 {
-    Out = EIBSocketURL(url.c_str());
-    In = EIBSocketURL(url.c_str());
-    if (!Out || !In) throw TKnxException("failed to open url: " + url);
+    Url = url;
 }
 
 void TKnxClient::Observe(PMqttKnxObserver observer)
@@ -24,8 +22,6 @@ void TKnxClient::Observe(PMqttKnxObserver observer)
 
 TKnxClient::~TKnxClient()
 {
-    if (Out) EIBClose(Out);
-    if (In) EIBClose(In);
 }
 
 eibaddr_t TKnxClient::ParseKnxAddress(const std::string& addr, bool isGroup)
@@ -94,10 +90,10 @@ void TKnxClient::SendTelegram(std::string payload)
     telegram[1] |= ((acpi & 0x3) << 6);
     std::memcpy(telegram + 2, data.c_str(), data.size());
 
-    int res;
-    res = EIBReset(Out);
-    if (res == -1) throw TKnxException("failed to reset connection");
+    TKnxConnection Out(Url);
+    if (!Out) throw TKnxException("failed to open Url: " + Url + ". Is KNXD running?");
 
+    int res;
     if (isGroup) {
         res = EIBOpen_GroupSocket(Out, 0);
         if (res == -1) throw TKnxException("failed to open GroupSocket");
@@ -111,35 +107,63 @@ void TKnxClient::SendTelegram(std::string payload)
     }
 }
 
+void TKnxClient::HandleLoopError(std::string what, unsigned int timeout)
+{
+    LOG(ERROR) << "Error in KNX loop: " << what;
+    sleep(timeout);
+}
+
 void TKnxClient::Loop()
 {
 
-    int res = EIBOpenVBusmonitor(In);
-    if (res == -1) throw TKnxException("failed to open Busmonitor connection");
     while (true) {
-        int fd = EIB_Poll_FD(In);
-        if (fd == -1) throw TKnxException("failed to get Poll fd");
-
-        fd_set set;
-        FD_ZERO(&set);
-        FD_SET(fd, &set);
-
-        res = select(fd + 1, &set, NULL, NULL, NULL);
-        if (res == -1) throw TKnxException(std::string("select failed: ") + std::strerror(errno));
-
-        uint8_t telegram[MAX_TELEGRAM_LENGTH] = {0};
-
-        int len = EIBGetBusmonitorPacket(In, MAX_TELEGRAM_LENGTH, telegram);
-        if (len == -1) throw TKnxException("failed to read Busmonitor packet");
-        std::stringstream ss;
-        ss << "KNX Client received a telegram: ";
-        ss << std::hex << std::noshowbase;
-        for (int i = 0; i < len; i++) {
-            ss << "0x" << std::setw(2) << std::setfill('0');
-            ss << (unsigned)telegram[i] << " ";
+        TKnxConnection In(Url);
+        if (!In) {
+            HandleLoopError("failed to open Url: " + Url + ". Is KNXD running?", ERROR_TIMEOUT);
+            continue;
         }
-        LOG(INFO) << ss.str();
+        LOG(INFO) << "KNX connection succeessfull";
 
-        Observer->OnTelegram(telegram, len);
+        int res = EIBOpenVBusmonitor(In);
+        if (res == -1) {
+            HandleLoopError("failed to open Busmonitor connection", 0);
+            continue;
+        }
+
+        int fd = EIB_Poll_FD(In);
+        if (fd == -1) {
+            HandleLoopError("failed to get Poll fd", 0);
+            continue;
+        }
+
+        while (true) {
+            fd_set set;
+            FD_ZERO(&set);
+            FD_SET(fd, &set);
+
+            res = select(fd + 1, &set, NULL, NULL, NULL);
+            if (res == -1) {
+                HandleLoopError(std::string("select failed: ") + std::strerror(errno), 0);
+                break;
+            }
+
+            uint8_t telegram[MAX_TELEGRAM_LENGTH] = {0};
+            int len = EIBGetBusmonitorPacket(In, MAX_TELEGRAM_LENGTH, telegram);
+            if (len == -1) {
+                HandleLoopError("failed to read Busmonitor packet", 0);
+                break;
+            }
+
+            std::stringstream ss;
+            ss << "KNX Client received a telegram: ";
+            ss << std::hex << std::noshowbase;
+            for (int i = 0; i < len; i++) {
+                ss << "0x" << std::setw(2) << std::setfill('0');
+                ss << (unsigned)telegram[i] << " ";
+            }
+            LOG(INFO) << ss.str();
+
+            Observer->OnTelegram(telegram, len);
+        }
     }
 }

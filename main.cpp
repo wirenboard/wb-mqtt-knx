@@ -81,7 +81,7 @@ int main(int argc, char** argv)
         mqttClient->StartLoop();
         observer->Loop();
     } catch (std::exception& e) {
-        LOG(FATAL) << e.what();
+        LOG(ERROR) << e.what();
         exit(1);
     }
 

@@ -9,6 +9,7 @@ class TMqttKnxObserver;
 typedef std::shared_ptr<TMqttKnxObserver> PMqttKnxObserver;
 
 #define MAX_TELEGRAM_LENGTH 254
+#define ERROR_TIMEOUT 30
 
 class TKnxException : public std::exception {
 public:
@@ -25,6 +26,34 @@ private:
 };
 
 class TKnxClient {
+
+    // wrapper for EIBConnection
+    class TKnxConnection {
+    public:
+        TKnxConnection(std::string url)
+        {
+            Connection = EIBSocketURL(url.c_str());
+        }
+
+        operator EIBConnection*()
+        {
+            return Connection;
+        }
+
+        bool operator!()
+        {
+            return !Connection;
+        }
+
+        ~TKnxConnection()
+        {
+            EIBClose(Connection);
+        }
+
+    private:
+        EIBConnection* Connection;
+    };
+
 public:
     TKnxClient(std::string url);
     void SendTelegram(std::string payload);
@@ -32,10 +61,10 @@ public:
     virtual ~TKnxClient();
     void Observe(PMqttKnxObserver observer);
     static eibaddr_t ParseKnxAddress(const std::string& addr, bool isGroup);
+    void HandleLoopError(std::string what, unsigned int timeout);
 
 private:
-    EIBConnection* Out;
-    EIBConnection* In;
+    std::string Url;
     PMqttKnxObserver Observer;
 };
 typedef std::shared_ptr<TKnxClient> PKnxClient;
