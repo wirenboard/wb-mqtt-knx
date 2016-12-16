@@ -23,9 +23,10 @@ void TMqttKnxObserver::SetUp()
 void TMqttKnxObserver::OnConnect(int rc)
 {
     LOG(INFO) << "Observer OnConnect handler";
-
-    std::string prefix = "/devices/knx/controls/data";
+    std::string device = "/devices/knx";
+    std::string prefix = device + "/controls/data";
     MqttClient->Publish(NULL, prefix + "/meta/type", "data", 0, true);
+    MqttClient->Publish(NULL, device + "/meta/name", "wb-knx", 0, true);
     MqttClient->Subscribe(NULL, prefix + "/on");
 }
 
