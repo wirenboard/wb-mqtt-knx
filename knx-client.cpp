@@ -58,19 +58,36 @@ eibaddr_t TKnxClient::ParseKnxAddress(const std::string& addr, bool isGroup)
 
 void TKnxClient::SendTelegram(std::string payload)
 {
+    std::vector<std::string> names = {"GroupValueRead",
+                                      "GroupValueResponse",
+                                      "GroupValueWrite",
+                                      "IndividualAddrWrite",
+                                      "IndividualAddrRequest",
+                                      "IndividualAddrResponse",
+                                      "AdcRead",
+                                      "AdcResponse",
+                                      "MemoryRead",
+                                      "MemoryRead",
+                                      "MemoryWrite",
+                                      "UserMessage",
+                                      "MaskVersionRead",
+                                      "MaskVersionResponse",
+                                      "Restart",
+                                      "Escape"};
     // payload should be in form of DestAddr ACPI data
     std::stringstream ss(payload);
     std::string addrStr;
-    std::string data;
-    uint8_t acpi;
+    std::string acpiStr;
     eibaddr_t srcAddr = 0;
     eibaddr_t destAddr = 0;
-    ss >> addrStr >> acpi;
-    acpi &= 0x7;
-
-    ss.ignore(1); // Ignore one space that delimits ACPI and data
-    std::getline(ss, data);
-
+    ss >> addrStr >> acpiStr;
+    unsigned acpi = 0;
+    for (; acpi < names.size(); acpi++) {
+        if (names[acpi] == acpiStr) break;
+    }
+    if (acpi == names.size()) {
+        throw TKnxException("Unknown telegram type: " + acpiStr);
+    }
     bool isGroup = (addrStr[0] == 'g');
     if (isGroup) {
         destAddr = ParseKnxAddress(addrStr.substr(2), isGroup);
@@ -80,16 +97,29 @@ void TKnxClient::SendTelegram(std::string payload)
         destAddr = ParseKnxAddress(addrStr.substr(pos + 1), isGroup);
     }
 
-    LOG(INFO) << "KNX Client send telegram to: " << std::hex << std::showbase << destAddr
-              << " with ACPI: " << (unsigned)acpi << " with data: " << data;
-
     uint8_t telegram[MAX_TELEGRAM_LENGTH] = {0};
     telegram[0] = 0x0; // UDP (Unnumbered Data Packet (0b00) and 0b0000 as unused number)
     telegram[0] |= acpi >> 2;
     telegram[1] = 0x0;
     telegram[1] |= ((acpi & 0x3) << 6);
-    std::memcpy(telegram + 2, data.c_str(), data.size());
+    unsigned shortdata;
+    if (!(ss >> std::hex >> shortdata)) {
+        shortdata = 0;
+    }
 
+    telegram[1] |= (shortdata & 0x3f);
+    int size = 2;
+    unsigned data;
+    while (ss >> std::hex >> data) {
+        telegram[size++] = (data & 0xff);
+    }
+    std::stringstream ss1;
+    ss1 << "Sending telegram: ";
+    for (int i = 0; i < size; i++) {
+        ss1 << "0x" << std::hex << std::setfill('0') << std::setw(2) << (unsigned)telegram[i]
+            << " ";
+    }
+    LOG(INFO) << ss1.str();
     TKnxConnection Out(Url);
     if (!Out) throw TKnxException("failed to open Url: " + Url + ". Is KNXD running?");
 
@@ -97,12 +127,12 @@ void TKnxClient::SendTelegram(std::string payload)
     if (isGroup) {
         res = EIBOpen_GroupSocket(Out, 0);
         if (res == -1) throw TKnxException("failed to open GroupSocket");
-        res = EIBSendGroup(Out, destAddr, data.size() + 2, telegram);
+        res = EIBSendGroup(Out, destAddr, size, telegram);
         if (res == -1) throw TKnxException("failed to send group telegram");
     } else {
         res = EIBOpenT_TPDU(Out, srcAddr);
         if (res == -1) throw TKnxException("failed to open TPDU connection");
-        res = EIBSendTPDU(Out, destAddr, data.size() + 2, telegram);
+        res = EIBSendTPDU(Out, destAddr, size, telegram);
         if (res == -1) throw TKnxException("failed to send group telegram");
     }
 }

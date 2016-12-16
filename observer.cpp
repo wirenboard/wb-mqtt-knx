@@ -1,5 +1,6 @@
 #include "observer.h"
 #include <eibclient.h>
+#include <iomanip>
 #include <iostream>
 #include <sstream>
 #include <unistd.h>
@@ -52,6 +53,22 @@ void TMqttKnxObserver::OnSubscribe(int mid, int qosCount, const int* grantedQos)
 
 void TMqttKnxObserver::OnTelegram(uint8_t* buf, int len)
 {
+    std::vector<std::string> names = {"GroupValueRead",
+                                      "GroupValueResponse",
+                                      "GroupValueWrite",
+                                      "IndividualAddrWrite",
+                                      "IndividualAddrRequest",
+                                      "IndividualAddrResponse",
+                                      "AdcRead",
+                                      "AdcResponse",
+                                      "MemoryRead",
+                                      "MemoryRead",
+                                      "MemoryWrite",
+                                      "UserMessage",
+                                      "MaskVersionRead",
+                                      "MaskVersionResponse",
+                                      "Restart",
+                                      "Escape"};
     if (len < 8) {
         LOG(WARN) << "KNX telegram is not long enough";
         return;
@@ -73,16 +90,19 @@ void TMqttKnxObserver::OnTelegram(uint8_t* buf, int len)
         // individual address
         ss << "i:" << (dstAddr >> 12) << "." << ((dstAddr >> 8) & 0xf) << "." << (dstAddr & 0xff);
     }
-    ss << " " << acpi << " ";
+    ss << std::hex << std::setfill('0');
+    ss << " " << names[acpi] << " ";
     if (dataLen == 2) {
-        ss << (buf[7] & 0x7f);
+        ss << "0x" << std::setw(2) << (buf[7] & 0x3f);
     } else {
         if (len != dataLen + 8) {
             LOG(WARN) << "KNX telegram has inconsistent length";
             return;
         }
-        buf[dataLen + 7] = 0;
-        ss << (const char*)(buf + 8);
+        ss << "0x" << std::setw(2) << (buf[7] & 0x3f) << " ";
+        for (int i = 8; i < dataLen + 7; i++) {
+            ss << "0x" << std::setw(2) << (unsigned)buf[i] << " ";
+        }
     }
     MqttClient->Publish(NULL, prefix, ss.str());
 }
