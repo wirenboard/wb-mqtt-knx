@@ -14,20 +14,20 @@ KNX to MQTT gateway (C++)
 
 Чтобы отправить групповую телеграмму в KNX необходимо отправить подготовленное сообщение в MQTT топик:
 ```
-mosquitto_pub -t '/devices/knx/controls/data/on' -m "g:${DstAddr} ${ACPI} ${Data}"
+mosquitto_pub -t '/devices/knx/controls/data/on' -m "g:${DstAddr} ${APCI} ${Data}"
 ```
 Чтобы отправить индивидуальную телеграмму в KNX необходимо отправить:
 ```
-mosquitto_pub -t '/devices/knx/controls/data/on' -m "i:${SrcAddr}:${DstAddr} ${ACPI} ${Data}"
+mosquitto_pub -t '/devices/knx/controls/data/on' -m "i:${SrcAddr}:${DstAddr} ${APCI} ${Data}"
 ```
 
 Все сообщения из KNX будут доставлены в MQTT топик `/devices/knx/controls/data` в виде:
 ```
-i:${SrcAddr} [i,g]:${DstAddr} ${ACPI} ${Data}
+i:${SrcAddr} [i,g]:${DstAddr} ${APCI} ${Data}
 ```
 
 * `SrcAddr`, `DstAddr` - адреса KNX устройств в формате "n/n/n" или "n/n".
-* `ACPI` - 4-x битный тип сообщения[1]
+* `APCI` - 4-x битный тип сообщения[1]
 * `Data` - сообщение
 
 Пример MQTT лога:

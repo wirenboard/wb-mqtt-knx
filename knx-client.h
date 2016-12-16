@@ -1,3 +1,4 @@
+#include "Exception.h"
 #include <eibclient.h>
 #include <memory>
 #include <string>
@@ -10,23 +11,6 @@ typedef std::shared_ptr<TMqttKnxObserver> PMqttKnxObserver;
 
 #define MAX_TELEGRAM_LENGTH 254
 #define ERROR_TIMEOUT 30
-
-class TKnxException : public std::exception {
-public:
-    TKnxException(std::string message) : Message("KNX error: " + message)
-    {
-    }
-    const char* what() const throw()
-    {
-        return Message.c_str();
-    }
-    ~TKnxException() throw()
-    {
-    }
-
-private:
-    std::string Message;
-};
 
 class TKnxClient {
 
@@ -63,7 +47,6 @@ public:
     void Loop();
     virtual ~TKnxClient();
     void Observe(PMqttKnxObserver observer);
-    static eibaddr_t ParseKnxAddress(const std::string& addr, bool isGroup);
     void HandleLoopError(std::string what, unsigned int timeout);
 
 private:
