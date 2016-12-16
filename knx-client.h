@@ -20,6 +20,9 @@ public:
     {
         return Message.c_str();
     }
+    ~TKnxException() throw()
+    {
+    }
 
 private:
     std::string Message;
