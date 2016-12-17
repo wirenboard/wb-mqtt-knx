@@ -1,6 +1,6 @@
 #include "Exception.h"
 
-TKnxException::TKnxException(std::__cxx11::string message) : Message("KNX error: " + message)
+TKnxException::TKnxException(std::string message) : Message("KNX error: " + message)
 {
 }
 
