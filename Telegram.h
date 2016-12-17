@@ -22,7 +22,7 @@ public:
     std::string GetMqttPayload();
 
 private:
-    static eibaddr_t ParseKnxAddress(const std::string& addr, bool isGroup);
+    eibaddr_t ParseKnxAddress(const std::string& addr);
     static unsigned ParseByte(std::string byte);
 
     bool GroupBit;

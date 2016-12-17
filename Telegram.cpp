@@ -21,11 +21,13 @@ std::vector<std::string> TKnxTelegram::ApciNames = {"GroupValueRead",
                                                     "Restart",
                                                     "Escape"};
 
-eibaddr_t TKnxTelegram::ParseKnxAddress(const std::string& addr, bool isGroup)
+eibaddr_t TKnxTelegram::ParseKnxAddress(const std::string& addr)
 {
+    std::vector<std::string> tokens;
+
     try {
-        std::vector<std::string> tokens = StringSplit(addr, "/");
-        if (isGroup) {
+        tokens = StringSplit(addr, "/");
+        if (GroupBit) {
             if (tokens.size() == 2) {
                 uint16_t main = std::stoi(tokens[0]);
                 uint16_t sub = std::stoi(tokens[1]);
@@ -60,9 +62,9 @@ unsigned TKnxTelegram::ParseByte(std::string byte)
     try {
         if (byte.substr(0, 2) == "0b" || byte.substr(0, 2) == "0B") {
             if (byte.length() == 2) throw TKnxException("invalid byte: " + byte);
-            char* str_end;
-            int res = std::strtol(byte.c_str() + 2, &str_end, 2);
-            if (*str_end != 0) throw TKnxException("invalid byte: " + byte);
+            char* strEnd;
+            unsigned res = std::strtoul(byte.c_str() + 2, &strEnd, 2);
+            if (*strEnd != 0) throw TKnxException("invalid byte: " + byte);
             return res;
         }
 
@@ -90,35 +92,39 @@ TKnxTelegram::TKnxTelegram(std::string mqttPayload)
         if (ApciNames[apci] == apciStr) break;
     }
     if (apci == ApciNames.size()) {
-        throw TKnxException("Unknown telegram type: " + apciStr);
+        // try to read APCI as number
+        try {
+            apci = (ParseByte(apciStr)) & 0xf;
+        } catch (TKnxException& e) {
+            throw TKnxException("Unknown telegram type: " + apciStr);
+        }
     }
     GroupBit = (addrStr[0] == 'g');
     if (GroupBit) {
-        DstAddr = ParseKnxAddress(addrStr.substr(2), GroupBit);
+        DstAddr = ParseKnxAddress(addrStr.substr(2));
     } else {
         std::string::size_type pos = addrStr.find(':', 2);
-        SrcAddr = ParseKnxAddress(addrStr.substr(2, pos - 2), GroupBit);
-        DstAddr = ParseKnxAddress(addrStr.substr(pos + 1), GroupBit);
+        SrcAddr = ParseKnxAddress(addrStr.substr(2, pos - 2));
+        DstAddr = ParseKnxAddress(addrStr.substr(pos + 1));
     }
 
-    uint8_t* telegram = PayloadData;
-    telegram[0] = 0x0; // UDP (Unnumbered Data Packet (0b00) and 0b0000 as unused number)
-    telegram[0] |= apci >> 2;
-    telegram[1] = 0x0;
-    telegram[1] |= ((apci & 0x3) << 6);
+    PayloadData[0] = 0x0; // UDP (Unnumbered Data Packet (0b00) and 0b0000 as unused number)
+    PayloadData[0] |= apci >> 2;
+    PayloadData[1] = 0x0;
+    PayloadData[1] |= ((apci & 0x3) << 6);
     unsigned shortdata = 0;
     std::string shortDataStr;
     if (ss >> shortDataStr) {
         shortdata = ParseByte(shortDataStr);
     }
 
-    telegram[1] |= (shortdata & 0x3f);
+    PayloadData[1] |= (shortdata & 0x3f);
     Size = 2;
     unsigned data;
     std::string dataStr;
     while (ss >> std::hex >> dataStr) {
         data = ParseByte(dataStr);
-        telegram[Size++] = (data & 0xff);
+        PayloadData[Size++] = (data & 0xff);
         if (Size == MAX_PAYLOAD_SIZE) throw TKnxException("Telegram is too long.");
     }
 }
@@ -133,17 +139,23 @@ TKnxTelegram::TKnxTelegram(uint8_t* knxBuffer, int len)
     int dataLen = ((knxBuffer[5] & 0xf));
     SrcAddr = (knxBuffer[1] << 8 | knxBuffer[2]);
     DstAddr = (knxBuffer[3] << 8 | knxBuffer[4]);
+
     // Source address is always individual
     ss << "i:" << (SrcAddr >> 12) << "/" << ((SrcAddr >> 8) & 0xf);
     ss << "/" << (SrcAddr & 0xff) << " ";
-    if (knxBuffer[5] >> 7) {
+
+    GroupBit = knxBuffer[5] >> 7;
+
+    if (GroupBit) {
         // group address
         ss << "g:" << ((DstAddr >> 11) & 0xf) << "/" << ((DstAddr >> 8) & 0x7);
         ss << "/" << (DstAddr & 0xff);
     } else {
         // individual address
-        ss << "i:" << (DstAddr >> 12) << "/" << ((DstAddr >> 8) & 0xf) << "/" << (DstAddr & 0xff);
+        ss << "i:" << (DstAddr >> 12) << "/" << ((DstAddr >> 8) & 0xf);
+        ss << "/" << (DstAddr & 0xff);
     }
+
     ss << " " << ApciNames[apci] << " ";
 
     ss << std::hex << std::setfill('0');
@@ -154,7 +166,8 @@ TKnxTelegram::TKnxTelegram(uint8_t* knxBuffer, int len)
             throw TKnxException("KNX telegram has inconsistent length");
         }
         ss << "0x" << std::setw(2) << (knxBuffer[7] & 0x3f) << " ";
-        for (int i = 8; i < dataLen + 7; i++) {
+
+        for (int i = 8; i < len - 1; i++) {
             ss << "0x" << std::setw(2) << (unsigned)knxBuffer[i] << " ";
         }
     }
