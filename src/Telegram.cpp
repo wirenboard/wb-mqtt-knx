@@ -101,6 +101,7 @@ TKnxTelegram::TKnxTelegram(std::string mqttPayload)
     }
     GroupBit = (addrStr[0] == 'g');
     if (GroupBit) {
+        SrcAddr = 0;
         DstAddr = ParseKnxAddress(addrStr.substr(2));
     } else {
         std::string::size_type pos = addrStr.find(':', 2);
@@ -136,7 +137,7 @@ TKnxTelegram::TKnxTelegram(uint8_t* knxBuffer, int len)
     }
     std::stringstream ss;
     unsigned apci = (knxBuffer[6] & 0x3) << 2 | (knxBuffer[7] >> 6);
-    int dataLen = ((knxBuffer[5] & 0xf));
+    Size = ((knxBuffer[5] & 0xf));
     SrcAddr = (knxBuffer[1] << 8 | knxBuffer[2]);
     DstAddr = (knxBuffer[3] << 8 | knxBuffer[4]);
 
@@ -159,10 +160,10 @@ TKnxTelegram::TKnxTelegram(uint8_t* knxBuffer, int len)
     ss << " " << ApciNames[apci] << " ";
 
     ss << std::hex << std::setfill('0');
-    if (dataLen == 2) {
+    if (Size == 2) {
         ss << "0x" << std::setw(2) << (knxBuffer[7] & 0x3f);
     } else {
-        if (len != dataLen + 8) {
+        if (len != Size + 8) {
             throw TKnxException("KNX telegram has inconsistent length");
         }
         ss << "0x" << std::setw(2) << (knxBuffer[7] & 0x3f) << " ";
@@ -172,6 +173,7 @@ TKnxTelegram::TKnxTelegram(uint8_t* knxBuffer, int len)
         }
     }
     PayloadString = ss.str();
+    Size++;
 }
 
 bool TKnxTelegram::IsGroup()
