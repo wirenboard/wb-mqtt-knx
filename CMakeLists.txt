@@ -1,0 +1,15 @@
+project(wb-mqtt-knx)
+enable_testing()
+cmake_minimum_required(VERSION 2.8)
+aux_source_directory(src/ SRC_LIST)
+aux_source_directory(test/ TEST_LIST)
+set(CMAKE_CXX_FLAGS "-std=c++0x -O2 -Wall -Werror -pedantic ")
+add_executable(${PROJECT_NAME} ${SRC_LIST})
+add_executable(${PROJECT_NAME}_test ${TEST_LIST} src/Telegram.cpp src/Exception.cpp)
+target_link_libraries(${PROJECT_NAME} -lwbmqtt -lmosquitto -lmosquittopp -leibclient -llog4cpp)
+target_link_libraries(${PROJECT_NAME}_test -lgtest -lgtest_main -lwbmqtt -pthread)
+install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
+
+add_test(telegram_test ${PROJECT_NAME}_test)
+add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND}
+                  DEPENDS ${PROJECT_NAME}_test)
