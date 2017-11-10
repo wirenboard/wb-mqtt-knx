@@ -3,7 +3,7 @@ Maintainer: Yury Usishchev <y.usishchev@contactless.ru>
 Section: misc
 Priority: optional
 Standards-Version: 3.9.2
-Build-Depends: debhelper (>= 9), pkg-config, g++, libwbmqtt-dev (>= 1.4), knxd-dev (>= 0.11.14), knxd-tools (>= 0.11.14)
+Build-Depends: debhelper (>= 9), pkg-config, g++, libwbmqtt-dev (>= 1.4), knxd-dev (>= 0.11.14), knxd-tools (>= 0.11.14), liblog4cpp5v5 | liblog4cpp5, liblog4cpp5-dev
 
 Package: wb-mqtt-knx
 Architecture: any
