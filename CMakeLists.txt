@@ -1,3 +1,13 @@
+execute_process (COMMAND /usr/bin/which gcc-4.7 RESULT_VARIABLE IS_GCC47)
+
+if (${IS_GCC47} STREQUAL "0")
+    set(CMAKE_C_COMPILER gcc-4.7)
+    set(CMAKE_CXX_COMPILER g++-4.7)
+else()
+    set(CMAKE_C_COMPILER gcc)
+    set(CMAKE_CXX_COMPILER g++)
+endif()
+
 project(wb-mqtt-knx)
 enable_testing()
 cmake_minimum_required(VERSION 2.8)

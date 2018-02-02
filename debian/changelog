@@ -1,3 +1,9 @@
+wb-mqtt-knx (0.1.1) unstable; urgency=medium
+
+  * default gcc version is fixed
+
+ -- Attila Door <a.door@contactless.ru>  Fri, 2 Feb 2018 15:36:28 +0400
+
 wb-mqtt-knx (0.1) unstable; urgency=medium
 
   * Initial release.
