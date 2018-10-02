@@ -160,14 +160,15 @@ TKnxTelegram::TKnxTelegram(uint8_t* knxBuffer, int len)
     ss << " " << ApciNames[apci] << " ";
 
     ss << std::hex << std::setfill('0');
-    if (Size == 2) {
+    if (Size == 1) {
+        // Short data, return last 6 bit of the last octet
         ss << "0x" << std::setw(2) << (knxBuffer[7] & 0x3f);
     } else {
         if (len != Size + 8) {
             throw TKnxException("KNX telegram has inconsistent length");
         }
-        ss << "0x" << std::setw(2) << (knxBuffer[7] & 0x3f) << " ";
 
+        // "Long" format skip that 6 bits and store data starting from the next octet
         for (int i = 8; i < len - 1; i++) {
             ss << "0x" << std::setw(2) << (unsigned)knxBuffer[i] << " ";
         }
