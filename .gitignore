@@ -70,4 +70,7 @@ Thumbs.db
 *.dll
 *.exe
 
+obj-arm-linux-gnueabihf/
+obj-arm-linux-gnueabi/
+*.debhelper.log
 
