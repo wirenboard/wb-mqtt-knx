@@ -41,7 +41,7 @@ i:${SrcAddr} [i,g]:${DstAddr} ${APCI} ${Data}
 * `AdcRead`
 * `AdcResponse`
 * `MemoryRead`
-* `MemoryRead`
+* `MemoryResponse`
 * `MemoryWrite`
 * `UserMessage`
 * `MaskVersionRead`
