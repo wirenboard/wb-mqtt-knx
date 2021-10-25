@@ -36,11 +36,10 @@ TEST(KnxTelegramTest, FromKnxThrow)
         {0xbc, 0x00, 0x01, 0x97, 0x37, 0x74, 0x00, 0x80, 0xcf, 0x0e, 0xff, 0x23},
         {},
         {0xbc, 0x00, 0x01, 0x97, 0x37, 0x73, 0x00, 0x80, 0xcf, 0x0e, 0xff, 0x28},
-        {0xbc}
-    };
+        {0xbc}};
 
     uint32_t dataNum = 0;
-    for (const auto& knxData : failedKnxDataSet) {
+    for (const auto& knxData: failedKnxDataSet) {
         EXPECT_THROW(knx::TTelegram telegram(knxData), knx::TKnxException) << "KnxDataIndex: " << dataNum;
         ++dataNum;
     }
@@ -49,8 +48,7 @@ TEST(KnxTelegramTest, FromKnxThrow)
 TEST(KnxTelegramTest, FalseKnxApci)
 {
     knx::TTelegram telegram;
-    EXPECT_THROW(telegram.SetTypeOfTransportLayer(knx::telegram::TTypeOfTransportLayer::UCD),
-                 knx::TKnxException);
+    EXPECT_THROW(telegram.SetTypeOfTransportLayer(knx::telegram::TTypeOfTransportLayer::UCD), knx::TKnxException);
     EXPECT_THROW(telegram.SetPriority(static_cast<knx::telegram::TPriority>(435)), knx::TKnxException);
     EXPECT_THROW(telegram.SetAPCI(static_cast<knx::telegram::TApci>(34)), knx::TKnxException);
 }
