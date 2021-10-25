@@ -1,12 +1,12 @@
 #!/bin/sh
 ### BEGIN INIT INFO
 # Provides:          wb-mqtt-knx
+# Required-Start:    $remote_fs mosquitto knxd
+# Required-Stop:     $remote_fs mosquitto
 # Default-Start:     2 3 4 5
 # Default-Stop:      0 1 6
-# Required-Start: $remote_fs, mosquitto, knxd
-# Required-Stop: $remote_fs, mosqutto
-# Short-Description: : Wiren Board MQTT KNX bridge
-# Description:       : Wiren Board MQTT KNX bridge
+# Short-Description: Wiren Board MQTT KNX bridge
+# Description:       Wiren Board MQTT KNX bridge
 ### END INIT INFO
 
 # Author: Yury Usishchev <y.usishchev@contactless.ru>
