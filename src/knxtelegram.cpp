@@ -7,14 +7,14 @@ using namespace knx;
 
 namespace
 {
-    constexpr auto POSITION_CONTROL_FIELD      = 0;
-    constexpr auto POSITION_SOURCE_ADDRESS_H   = 1;
-    constexpr auto POSITION_SOURCE_ADDRESS_L   = 2;
+    constexpr auto POSITION_CONTROL_FIELD = 0;
+    constexpr auto POSITION_SOURCE_ADDRESS_H = 1;
+    constexpr auto POSITION_SOURCE_ADDRESS_L = 2;
     constexpr auto POSITION_RECEIVER_ADDRESS_H = 3;
     constexpr auto POSITION_RECEIVER_ADDRESS_L = 4;
-    constexpr auto POSITION_NPDU_FIRST         = 5;
-    constexpr auto POSITION_TPDU_FIRST         = 6;
-    constexpr auto POSITION_APDU_FIRST         = 7;
+    constexpr auto POSITION_NPDU_FIRST = 5;
+    constexpr auto POSITION_TPDU_FIRST = 6;
+    constexpr auto POSITION_APDU_FIRST = 7;
 } // namespace
 
 TTelegram::TTelegram(const std::vector<uint8_t>& knxBuffer)
@@ -161,8 +161,8 @@ std::vector<uint8_t> TTelegram::GetRawTelegram() const
 {
     std::vector<uint8_t> telegram(SizeWithoutPayload - 2, 0);
 
-    telegram[POSITION_CONTROL_FIELD] = ((static_cast<uint8_t>(Priority) & 0x3) << 2) |
-                                       (!IsRepeatedTelegram ? (1 << 5) : 0) | (1 << 7) | (1 << 4);
+    telegram[POSITION_CONTROL_FIELD] =
+        ((static_cast<uint8_t>(Priority) & 0x3) << 2) | (!IsRepeatedTelegram ? (1 << 5) : 0) | (1 << 7) | (1 << 4);
 
     telegram[POSITION_SOURCE_ADDRESS_H] = (GetSourceAddress() >> 8) & 0xFF;
     telegram[POSITION_SOURCE_ADDRESS_L] = GetSourceAddress() & 0xFF;
@@ -170,8 +170,8 @@ std::vector<uint8_t> TTelegram::GetRawTelegram() const
     telegram[POSITION_RECEIVER_ADDRESS_H] = (GetReceiverAddress() >> 8) & 0xFF;
     telegram[POSITION_RECEIVER_ADDRESS_L] = GetReceiverAddress() & 0xFF;
 
-    telegram[POSITION_NPDU_FIRST] = IsGroupAddressed() ? telegram[POSITION_NPDU_FIRST] | (1 << 7)
-                                                       : telegram[POSITION_NPDU_FIRST] & ~(1 << 7);
+    telegram[POSITION_NPDU_FIRST] =
+        IsGroupAddressed() ? telegram[POSITION_NPDU_FIRST] | (1 << 7) : telegram[POSITION_NPDU_FIRST] & ~(1 << 7);
 
     telegram[POSITION_NPDU_FIRST] &= ~(0x7 << 4);
     telegram[POSITION_NPDU_FIRST] |= (GetRoutingCounter() & 0x7) << 4;
@@ -190,13 +190,13 @@ bool TTelegram::SetRawTelegram(const std::vector<uint8_t>& knxBuffer)
 {
     const auto knxBufferSize = knxBuffer.size();
 
-    if ((knxBufferSize <= SizeWithoutPayload) || (knxBufferSize > (SizeWithoutPayload + MaxPayloadSize))){
+    if ((knxBufferSize <= SizeWithoutPayload) || (knxBufferSize > (SizeWithoutPayload + MaxPayloadSize))) {
         wb_throw(TKnxException, "Invalid KNX raw data length");
-    } else if (knxBufferSize != (SizeWithoutPayload + (knxBuffer[POSITION_NPDU_FIRST] & 0x0F))){
+    } else if (knxBufferSize != (SizeWithoutPayload + (knxBuffer[POSITION_NPDU_FIRST] & 0x0F))) {
         wb_throw(TKnxException, "Wrong APDU payload length");
     }
 
-    if ((knxBuffer[POSITION_CONTROL_FIELD] & ~(1<<5 | 1<<3 | 1<<2)) != (1<<7 | 1<<4)){
+    if ((knxBuffer[POSITION_CONTROL_FIELD] & ~(1 << 5 | 1 << 3 | 1 << 2)) != (1 << 7 | 1 << 4)) {
         wb_throw(TKnxException, "Incorrect control field");
     }
 
@@ -218,8 +218,7 @@ bool TTelegram::SetRawTelegram(const std::vector<uint8_t>& knxBuffer)
 
     SetRoutingCounter((knxBuffer[POSITION_NPDU_FIRST] & ~(1 << 7)) >> 4);
 
-    SetTypeOfTransportLayer(
-        static_cast<telegram::TTypeOfTransportLayer>(knxBuffer[POSITION_TPDU_FIRST] >> 6));
+    SetTypeOfTransportLayer(static_cast<telegram::TTypeOfTransportLayer>(knxBuffer[POSITION_TPDU_FIRST] >> 6));
 
     SetSequenceNumber((knxBuffer[POSITION_TPDU_FIRST] >> 2) & 0x0F);
 
@@ -236,7 +235,7 @@ bool TTelegram::SetRawTelegram(const std::vector<uint8_t>& knxBuffer)
 uint8_t TTelegram::CalculateParity(const std::vector<uint8_t>& data)
 {
     uint8_t parity = 0;
-    for (const auto& val : data) {
+    for (const auto& val: data) {
         parity ^= val;
     }
     return ~parity;

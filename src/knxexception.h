@@ -5,7 +5,7 @@
 
 namespace knx
 {
-    class TKnxException : public WBMQTT::TBaseException
+    class TKnxException: public WBMQTT::TBaseException
     {
     public:
         explicit TKnxException() = delete;

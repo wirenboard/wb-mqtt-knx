@@ -6,25 +6,27 @@ using namespace knx;
 
 namespace
 {
-    constexpr auto DEVICE_ID    = "knx";
-    constexpr auto CONTROL_ID   = "data";
+    constexpr auto DEVICE_ID = "knx";
+    constexpr auto CONTROL_ID = "data";
     constexpr auto CONTROL_TYPE = "text";
 } // namespace
 
 TKnxDevice::TKnxDevice(std::shared_ptr<WBMQTT::TDeviceDriver> pMqttDriver,
-                       std::shared_ptr<knx::IKnxClient>       pKnxClient,
-                       WBMQTT::TLogger&                       errorLogger,
-                       WBMQTT::TLogger&                       debugLogger,
-                       WBMQTT::TLogger&                       infoLogger)
-    : DeviceDriver(std::move(pMqttDriver)), KnxClient(std::move(pKnxClient)), ErrorLogger(errorLogger),
-      DebugLogger(debugLogger), InfoLogger(infoLogger)
+                       std::shared_ptr<knx::IKnxClient> pKnxClient,
+                       WBMQTT::TLogger& errorLogger,
+                       WBMQTT::TLogger& debugLogger,
+                       WBMQTT::TLogger& infoLogger)
+    : DeviceDriver(std::move(pMqttDriver)),
+      KnxClient(std::move(pKnxClient)),
+      ErrorLogger(errorLogger),
+      DebugLogger(debugLogger),
+      InfoLogger(infoLogger)
 {
 
     auto tx = DeviceDriver->BeginTx();
 
     LocalDevice =
-        tx->CreateDevice(
-              WBMQTT::TLocalDeviceArgs{}.SetId(DEVICE_ID).SetIsVirtual(true).SetDoLoadPrevious(false))
+        tx->CreateDevice(WBMQTT::TLocalDeviceArgs{}.SetId(DEVICE_ID).SetIsVirtual(true).SetDoLoadPrevious(false))
             .GetValue();
 
     Control = LocalDevice

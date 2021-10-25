@@ -8,8 +8,8 @@
 
 namespace
 {
-    constexpr auto DRIVER_ID                 = "wb-mqtt-knx";
-    const auto     KNX_DRIVER_INIT_TIMEOUT_S = std::chrono::seconds(30);
+    constexpr auto DRIVER_ID = "wb-mqtt-knx";
+    const auto KNX_DRIVER_INIT_TIMEOUT_S = std::chrono::seconds(30);
     const auto KNX_DRIVER_STOP_TIMEOUT_S = std::chrono::seconds(60); // topic cleanup can take a lot of time
 
     WBMQTT::TLogger ErrorLogger("ERROR: [knx] ", WBMQTT::TLogger::StdErr, WBMQTT::TLogger::RED);
@@ -20,30 +20,30 @@ namespace
 int main(int argc, char** argv)
 {
     WBMQTT::TMosquittoMqttConfig mqttConfig;
-    std::string                  knxUrl = "ip:localhost:6720";
-    mqttConfig.Host                     = "localhost";
-    mqttConfig.Port                     = 1883;
+    std::string knxUrl = "ip:localhost:6720";
+    mqttConfig.Host = "localhost";
+    mqttConfig.Port = 1883;
 
     int c;
     int verboseLevel = 0;
     while ((c = getopt(argc, argv, "vdp:H:k:")) != -1) {
         switch (c) {
-        case 'v':
-            verboseLevel++;
-            break;
-        case 'd':
-            break;
-        case 'p':
-            mqttConfig.Port = std::stoi(optarg);
-            break;
-        case 'H':
-            mqttConfig.Host = optarg;
-            break;
-        case 'k':
-            knxUrl = optarg;
-            break;
-        default:
-            break;
+            case 'v':
+                verboseLevel++;
+                break;
+            case 'd':
+                break;
+            case 'p':
+                mqttConfig.Port = std::stoi(optarg);
+                break;
+            case 'H':
+                mqttConfig.Host = optarg;
+                break;
+            case 'k':
+                knxUrl = optarg;
+                break;
+            default:
+                break;
         }
     }
 
@@ -99,11 +99,8 @@ int main(int argc, char** argv)
 
         auto knxClientService =
             std::make_shared<knx::TKnxClientService>(knxUrl, ErrorLogger, VerboseLogger, InfoLogger);
-        auto knxDevice = std::make_shared<knx::TKnxDevice>(mqttDriver,
-                                                           knxClientService,
-                                                           ErrorLogger,
-                                                           VerboseLogger,
-                                                           InfoLogger);
+        auto knxDevice =
+            std::make_shared<knx::TKnxDevice>(mqttDriver, knxClientService, ErrorLogger, VerboseLogger, InfoLogger);
 
         WBMQTT::SignalHandling::OnSignals({SIGINT, SIGTERM}, [&] {
             knxClientService->Stop();

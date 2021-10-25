@@ -8,7 +8,7 @@
 
 namespace knx
 {
-    class TKnxClientService : public IKnxClient, public IKnxService
+    class TKnxClientService: public IKnxClient, public IKnxService
     {
         // wrapper for EIBConnection
         class TKnxConnection
@@ -39,7 +39,7 @@ namespace knx
         };
 
     public:
-        explicit TKnxClientService(std::string      knxServerUrl,
+        explicit TKnxClientService(std::string knxServerUrl,
                                    WBMQTT::TLogger& errorLogger,
                                    WBMQTT::TLogger& debugLogger,
                                    WBMQTT::TLogger& infoLogger);
@@ -56,12 +56,12 @@ namespace knx
         void Loop();
         void HandleLoopError(const std::string& what, unsigned int timeout);
 
-        std::string                           KnxServerUrl;
+        std::string KnxServerUrl;
         std::function<void(const TTelegram&)> OnReceiveTelegramHandler;
 
-        bool                         IsStarted = false;
-        std::mutex                   IsStartedMutex;
-        std::mutex                   SetterMutex;
+        bool IsStarted = false;
+        std::mutex IsStartedMutex;
+        std::mutex SetterMutex;
         std::unique_ptr<std::thread> Worker;
 
         WBMQTT::TLogger& ErrorLogger;

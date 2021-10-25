@@ -11,26 +11,28 @@ namespace
 {
     constexpr auto MAX_TELEGRAM_LENGTH = knx::TTelegram::SizeWithoutPayload + knx::TTelegram::MaxPayloadSize;
     constexpr auto CLIENT_RECONNECT_PERIOD_S = 30;
-    constexpr auto RECEIVER_LOOP_TIMEOUT_S   = 2;
+    constexpr auto RECEIVER_LOOP_TIMEOUT_S = 2;
 } // namespace
 
 namespace knx
 {
 
-    TKnxClientService::TKnxClientService(std::string      knxServerUrl,
+    TKnxClientService::TKnxClientService(std::string knxServerUrl,
                                          WBMQTT::TLogger& errorLogger,
                                          WBMQTT::TLogger& debugLogger,
                                          WBMQTT::TLogger& infoLogger)
-        : KnxServerUrl{std::move(knxServerUrl)}, ErrorLogger(errorLogger), DebugLogger(debugLogger),
+        : KnxServerUrl{std::move(knxServerUrl)},
+          ErrorLogger(errorLogger),
+          DebugLogger(debugLogger),
           InfoLogger(infoLogger)
-    {
-    }
+    {}
 
     void TKnxClientService::Send(const TTelegram& telegram)
     {
         {
             std::lock_guard<std::mutex> lg(IsStartedMutex);
-            if (!IsStarted) return;
+            if (!IsStarted)
+                return;
         }
         TKnxConnection Out(KnxServerUrl);
         if (!Out)
@@ -83,7 +85,7 @@ namespace knx
 
             while (IsStarted) {
                 struct timeval tv = {RECEIVER_LOOP_TIMEOUT_S, 0};
-                fd_set         set;
+                fd_set set;
                 FD_ZERO(&set);
                 FD_SET(fd, &set);
 
@@ -101,8 +103,7 @@ namespace knx
                                                                  static_cast<int32_t>(telegram.size()),
                                                                  telegram.data());
                 if (packetLen == -1) {
-                    HandleLoopError(std::string("failed to read Busmonitor packet: ") + std::strerror(errno),
-                                    0);
+                    HandleLoopError(std::string("failed to read Busmonitor packet: ") + std::strerror(errno), 0);
                     break;
                 }
 

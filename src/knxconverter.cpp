@@ -42,7 +42,6 @@ std::string TKnxConverter::KnxTelegramToMqtt(const TTelegram& telegram)
     return ss.str();
 }
 
-
 std::string TKnxConverter::KnxApciToString(const TTelegram& telegram)
 {
     return ApciString.at(static_cast<uint32_t>(telegram.GetAPCI()));
@@ -51,7 +50,7 @@ std::string TKnxConverter::KnxApciToString(const TTelegram& telegram)
 std::string TKnxConverter::KnxSourceAddressToString(const TTelegram& telegram)
 {
     std::stringstream ss;
-    auto              address = telegram.GetSourceAddress();
+    auto address = telegram.GetSourceAddress();
 
     // Source address is always individual
     ss << "i:" << (address >> 12) << "/" << ((address >> 8) & 0xf);
@@ -82,7 +81,7 @@ std::string TKnxConverter::KnxPayloadToString(const TTelegram& telegram)
 {
     std::stringstream ss;
     ss << std::hex << std::setfill('0');
-    auto payload     = telegram.GetAPDUPayload();
+    auto payload = telegram.GetAPDUPayload();
     auto payloadSize = payload.size();
 
     if (payload.size() == 1) {
@@ -105,8 +104,8 @@ std::shared_ptr<TTelegram> TKnxConverter::MqttToKnxTelegram(const std::string& p
 
     // payload should be in form of DestAddr APCI data
     std::stringstream ss(payload);
-    std::string       addrStr;
-    std::string       apciStr;
+    std::string addrStr;
+    std::string apciStr;
     ss >> addrStr >> apciStr;
 
     const auto apciConvertResult = StringToKnxApci(apciStr);
@@ -137,7 +136,7 @@ std::shared_ptr<TTelegram> TKnxConverter::MqttToKnxTelegram(const std::string& p
     }
 
     std::vector<uint8_t> knxPayload = {0};
-    std::string          dataStr;
+    std::string dataStr;
 
     if (ss >> dataStr) {
         knxPayload[0] = StringToByte(dataStr) & 0x3F;
@@ -164,20 +163,20 @@ eibaddr_t TKnxConverter::StringToKnxAddress(const std::string& addr, bool groupB
         if (groupBit) {
             if (tokens.size() == 2) {
                 uint16_t main = std::stoi(tokens[0]);
-                uint16_t sub  = std::stoi(tokens[1]);
+                uint16_t sub = std::stoi(tokens[1]);
 
                 return ((main & 0xf) << 11) | (sub & 0x7ff);
             } else if (tokens.size() == 3) {
-                uint16_t main   = std::stoi(tokens[0]);
+                uint16_t main = std::stoi(tokens[0]);
                 uint16_t middle = std::stoi(tokens[1]);
-                uint16_t sub    = std::stoi(tokens[2]);
+                uint16_t sub = std::stoi(tokens[2]);
 
                 return ((main & 0xf) << 11) | ((middle & 0x7) << 8) | (sub & 0xff);
             }
         } else {
             if (tokens.size() == 3) {
-                uint16_t area   = std::stoi(tokens[0]);
-                uint16_t line   = std::stoi(tokens[1]);
+                uint16_t area = std::stoi(tokens[0]);
+                uint16_t line = std::stoi(tokens[1]);
                 uint16_t device = std::stoi(tokens[2]);
 
                 return ((area & 0xf) << 12) | ((line & 0xf) << 8) | (device & 0xff);
@@ -198,14 +197,14 @@ uint8_t TKnxConverter::StringToByte(const std::string& byte)
         if (byte.substr(0, 2) == "0b" || byte.substr(0, 2) == "0B") {
             if (byte.length() == 2)
                 wb_throw(TKnxException, "invalid byte: " + byte);
-            char*    strEnd;
+            char* strEnd;
             unsigned res = std::strtoul(byte.c_str() + 2, &strEnd, 2);
             if (*strEnd != 0)
                 wb_throw(TKnxException, "invalid byte: " + byte);
             return res;
         } else {
             std::size_t num;
-            int         ret = std::stoi(byte, &num, 0);
+            int ret = std::stoi(byte, &num, 0);
             if (num != byte.length())
                 wb_throw(TKnxException, "invalid byte: " + byte);
             return ret;
