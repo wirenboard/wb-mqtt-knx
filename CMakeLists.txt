@@ -1,18 +1,17 @@
-execute_process(COMMAND /usr/bin/which gcc-4.7 RESULT_VARIABLE IS_GCC47)
+cmake_minimum_required(VERSION 3.7)
 
-if (${IS_GCC47} STREQUAL "0")
-    set(CMAKE_C_COMPILER gcc-4.7)
-    set(CMAKE_CXX_COMPILER g++-4.7)
+project(wb-mqtt-knx VERSION 1.0.0)
+
+# specify the C++ standard
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+
+if (CMAKE_BUILD_TYPE MATCHES Debug)
+    add_compile_options(-O0 -Wall -Werror -pedantic -gdwarf-3 --coverage)
 else ()
-    set(CMAKE_C_COMPILER gcc)
-    set(CMAKE_CXX_COMPILER g++)
+    add_compile_options(-O2 -Wall -Werror -pedantic -DNDEBUG)
 endif ()
 
-message("CMAKE_BUILD_TYPE = " ${CMAKE_BUILD_TYPE})
-
-project(wb-mqtt-knx)
-
-cmake_minimum_required(VERSION 2.8)
 aux_source_directory(src/ SRC_LIST)
 add_executable(${PROJECT_NAME} ${SRC_LIST})
 target_link_libraries(${PROJECT_NAME} -lwbmqtt1 -leibclient -lpthread)
@@ -29,11 +28,5 @@ target_link_libraries(${PROJECT_NAME}_test -lgtest -lgtest_main -lwbmqtt1 -lpthr
 add_test(telegram_test ${PROJECT_NAME}_test)
 add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND}
         DEPENDS ${PROJECT_NAME}_test)
-
-
-set(CMAKE_CXX_FLAGS_RELEASE "-std=c++1y -O2 -Wall -Werror -pedantic -DNDEBUG")
-set(CMAKE_CXX_FLAGS_DEBUG "-std=c++1y -O0 -Wall -Werror -pedantic -gdwarf-3 --coverage")
-set(CMAKE_CXX_FLAGS ${CMAKE_CXX_FLAGS_RELEASE})
-
 
 install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)

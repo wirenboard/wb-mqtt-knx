@@ -3,7 +3,7 @@ Maintainer: Yury Usishchev <y.usishchev@contactless.ru>
 Section: misc
 Priority: optional
 Standards-Version: 3.9.2
-Build-Depends: debhelper (>= 9), pkg-config, libwbmqtt1-3-dev (>= 3.2.0), knxd-dev (>= 0.14.51-1), knxd-tools (>= 0.14.51-1)
+Build-Depends: debhelper (>= 10), pkg-config, libwbmqtt1-3-dev (>= 3.2.0), knxd-dev (>= 0.14.51-1), knxd-tools (>= 0.14.51-1)
 
 Package: wb-mqtt-knx
 Architecture: any
