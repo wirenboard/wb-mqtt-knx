@@ -9,9 +9,15 @@
 
 namespace
 {
+    constexpr auto CLIENT_RECONNECT_PERIOD = std::chrono::seconds(30);
+    constexpr auto RECEIVER_LOOP_TIMEOUT = std::chrono::seconds(2);
+    constexpr auto IN_CONNECTION_REQUEST_TICK = std::chrono::seconds(1);
+
     constexpr auto MAX_TELEGRAM_LENGTH = knx::TTelegram::SizeWithoutPayload + knx::TTelegram::MaxPayloadSize;
-    constexpr auto CLIENT_RECONNECT_PERIOD_S = 30;
-    constexpr auto RECEIVER_LOOP_TIMEOUT_S = 2;
+    constexpr auto EIB_ERROR_RETURN_VALUE = -1;
+    constexpr auto SELECT_TIMEOUT_RETURN_VALUE = 0;
+    constexpr auto SELECT_ERROR_RETURN_VALUE = -1;
+
 } // namespace
 
 namespace knx
@@ -38,19 +44,18 @@ namespace knx
         if (!Out)
             wb_throw(TKnxException, "Failed to open Url: " + KnxServerUrl + ". Is knxd running?");
 
-        int res;
         if (telegram.IsGroupAddressed()) {
-            res = EIBOpen_GroupSocket(Out.GetEIBConnection(), 0);
-            if (res == -1)
+            const int32_t openResult = EIBOpen_GroupSocket(Out.GetEIBConnection(), 0);
+            if (openResult == EIB_ERROR_RETURN_VALUE)
                 wb_throw(TKnxException, "Failed to open GroupSocket");
 
             auto tpduPayload = telegram.GetTPDUPayload();
 
-            res = EIBSendGroup(Out.GetEIBConnection(),
-                               telegram.GetReceiverAddress(),
-                               static_cast<int32_t>(tpduPayload.size()),
-                               tpduPayload.data());
-            if (res == -1)
+            const int32_t sendResult = EIBSendGroup(Out.GetEIBConnection(),
+                                                    telegram.GetReceiverAddress(),
+                                                    static_cast<int32_t>(tpduPayload.size()),
+                                                    tpduPayload.data());
+            if (sendResult == EIB_ERROR_RETURN_VALUE)
                 wb_throw(TKnxException, "failed to send group telegram");
 
         } else {
@@ -64,36 +69,43 @@ namespace knx
             TKnxConnection In(KnxServerUrl);
 
             if (!In) {
-                HandleLoopError("Failed to open KnxServerUrl: " + KnxServerUrl + ". Is knxd running?",
-                                CLIENT_RECONNECT_PERIOD_S);
+                HandleLoopError("Failed to open KnxServerUrl: " + KnxServerUrl + ". Is knxd running?");
+
+                auto tick = std::chrono::microseconds(0);
+                while (IsStarted && (tick < CLIENT_RECONNECT_PERIOD)) {
+                    usleep(std::chrono::duration_cast<std::chrono::microseconds>(IN_CONNECTION_REQUEST_TICK).count());
+                    tick += IN_CONNECTION_REQUEST_TICK;
+                }
                 continue;
             }
 
             InfoLogger.Log() << "KNX connection successful";
 
             const int32_t eibOpenResult = EIBOpenVBusmonitor(In.GetEIBConnection());
-            if (eibOpenResult == -1) {
-                HandleLoopError("failed to open Busmonitor connection", 0);
+            if (eibOpenResult == EIB_ERROR_RETURN_VALUE) {
+                HandleLoopError("failed to open Busmonitor connection");
                 continue;
             }
 
             const int32_t fd = EIB_Poll_FD(In.GetEIBConnection());
-            if (fd == -1) {
-                HandleLoopError("failed to get Poll fd", 0);
+            if (fd == EIB_ERROR_RETURN_VALUE) {
+                HandleLoopError("failed to get Poll fd");
                 continue;
             }
 
             while (IsStarted) {
-                struct timeval tv = {RECEIVER_LOOP_TIMEOUT_S, 0};
+                struct timeval tv = {
+                    0,
+                    std::chrono::duration_cast<std::chrono::microseconds>(RECEIVER_LOOP_TIMEOUT).count()};
                 fd_set set;
                 FD_ZERO(&set);
                 FD_SET(fd, &set);
 
                 const int32_t selectResult = select(fd + 1, &set, nullptr, nullptr, &tv);
-                if (selectResult == 0) {
+                if (selectResult == SELECT_TIMEOUT_RETURN_VALUE) {
                     continue;
-                } else if (selectResult == -1) {
-                    HandleLoopError(std::string("select failed: ") + std::strerror(errno), 0);
+                } else if (selectResult == SELECT_ERROR_RETURN_VALUE) {
+                    HandleLoopError(std::string("select failed: ") + std::strerror(errno));
                     break;
                 }
 
@@ -102,8 +114,8 @@ namespace knx
                 const int32_t packetLen = EIBGetBusmonitorPacket(In.GetEIBConnection(),
                                                                  static_cast<int32_t>(telegram.size()),
                                                                  telegram.data());
-                if (packetLen == -1) {
-                    HandleLoopError(std::string("failed to read Busmonitor packet: ") + std::strerror(errno), 0);
+                if (packetLen == EIB_ERROR_RETURN_VALUE) {
+                    HandleLoopError(std::string("failed to read Busmonitor packet: ") + std::strerror(errno));
                     break;
                 }
 
@@ -127,10 +139,9 @@ namespace knx
         }
     }
 
-    void TKnxClientService::HandleLoopError(const std::string& what, unsigned int timeout)
+    void TKnxClientService::HandleLoopError(const std::string& what)
     {
         ErrorLogger.Log() << "Error in KNX loop: " << what;
-        sleep(timeout);
     }
 
     void TKnxClientService::SetOnReceive(const std::function<void(const TTelegram&)>& handler)

@@ -19,12 +19,12 @@ namespace knx
                 Connection = EIBSocketURL(knxServerUrl.c_str());
             }
 
-            EIBConnection* GetEIBConnection()
+            EIBConnection* GetEIBConnection() const
             {
                 return Connection;
             }
 
-            bool operator!()
+            bool operator!() const
             {
                 return !Connection;
             }
@@ -54,7 +54,7 @@ namespace knx
 
     private:
         void Loop();
-        void HandleLoopError(const std::string& what, unsigned int timeout);
+        void HandleLoopError(const std::string& what);
 
         std::string KnxServerUrl;
         std::function<void(const TTelegram&)> OnReceiveTelegramHandler;

@@ -11,18 +11,6 @@ namespace knx
     public:
         static std::string KnxTelegramToMqtt(const TTelegram& telegram);
         static std::shared_ptr<TTelegram> MqttToKnxTelegram(const std::string& payload);
-
-    private:
-        static std::string KnxSourceAddressToString(const TTelegram& telegram);
-        static std::string KnxReceiverAddressToString(const TTelegram& telegram);
-        static std::string KnxApciToString(const TTelegram& telegram);
-        static std::string KnxPayloadToString(const TTelegram& telegram);
-
-        static eibaddr_t StringToKnxAddress(const std::string& addr, bool groupBit);
-
-        static std::tuple<bool, knx::telegram::TApci> StringToKnxApci(const std::string& apciString);
-
-        static uint8_t StringToByte(const std::string& byte);
     };
 } // namespace knx
 

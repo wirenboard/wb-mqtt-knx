@@ -1,5 +1,4 @@
 #include "knxconverter.h"
-//#include "Telegram.h"
 #include "knxexception.h"
 #include <algorithm>
 #include <array>
@@ -28,9 +27,139 @@ namespace
                                                     "Restart",
                                                     "Escape"};
 
-}
+    // KnxTelegram Convertors
 
-// KnxTelegram Convertors
+    std::string KnxApciToString(const TTelegram& telegram)
+    {
+        return ApciString.at(static_cast<uint32_t>(telegram.GetAPCI()));
+    }
+
+    std::string KnxSourceAddressToString(const TTelegram& telegram)
+    {
+        std::stringstream ss;
+        auto address = telegram.GetSourceAddress();
+
+        // Source address is always individual
+        ss << "i:" << (address >> 12) << "/" << ((address >> 8) & 0xf);
+        ss << "/" << (address & 0xff);
+        return ss.str();
+    }
+
+    std::string KnxReceiverAddressToString(const TTelegram& telegram)
+    {
+        std::stringstream ss;
+
+        auto receiverAddress = telegram.GetReceiverAddress();
+
+        if (telegram.IsGroupAddressed()) {
+            // group address
+            ss << "g:" << ((receiverAddress >> 11) & 0xf) << "/" << ((receiverAddress >> 8) & 0x7);
+            ss << "/" << (receiverAddress & 0xff);
+        } else {
+            // individual address
+            ss << "i:" << (receiverAddress >> 12) << "/" << ((receiverAddress >> 8) & 0xf);
+            ss << "/" << (receiverAddress & 0xff);
+        }
+
+        return ss.str();
+    }
+
+    std::string KnxPayloadToString(const TTelegram& telegram)
+    {
+        std::stringstream ss;
+        ss << std::hex << std::setfill('0');
+        auto payload = telegram.GetAPDUPayload();
+        auto payloadSize = payload.size();
+
+        if (payload.size() == 1) {
+            // Short data, return last 6 bit of the last octet
+            ss << "0x" << std::setw(2) << static_cast<uint32_t>(payload[0]);
+        } else {
+            // "Long" format skip that 6 bits and store data starting from the next octet
+            for (uint32_t i = 1; i < payloadSize; ++i) {
+                ss << "0x" << std::setw(2) << static_cast<uint32_t>(payload[i]) << " ";
+            }
+        }
+        return ss.str();
+    }
+
+    // String convertors
+
+    eibaddr_t StringToKnxAddress(const std::string& addr, bool groupBit)
+    {
+        std::vector<std::string> tokens;
+
+        try {
+            tokens = WBMQTT::StringSplit(addr, "/");
+            if (groupBit) {
+                if (tokens.size() == 2) {
+                    uint16_t main = std::stoi(tokens[0]);
+                    uint16_t sub = std::stoi(tokens[1]);
+
+                    return ((main & 0xf) << 11) | (sub & 0x7ff);
+                } else if (tokens.size() == 3) {
+                    uint16_t main = std::stoi(tokens[0]);
+                    uint16_t middle = std::stoi(tokens[1]);
+                    uint16_t sub = std::stoi(tokens[2]);
+
+                    return ((main & 0xf) << 11) | ((middle & 0x7) << 8) | (sub & 0xff);
+                }
+            } else {
+                if (tokens.size() == 3) {
+                    uint16_t area = std::stoi(tokens[0]);
+                    uint16_t line = std::stoi(tokens[1]);
+                    uint16_t device = std::stoi(tokens[2]);
+
+                    return ((area & 0xf) << 12) | ((line & 0xf) << 8) | (device & 0xff);
+                }
+            }
+        } catch (std::exception& e) {
+        }
+
+        wb_throw(TKnxException, "invalid address: " + addr);
+    }
+
+    uint8_t StringToByte(const std::string& byte)
+    {
+        if (byte.empty())
+            wb_throw(TKnxException, "Trying to read a byte from empty string");
+
+        try {
+            if (byte.substr(0, 2) == "0b" || byte.substr(0, 2) == "0B") {
+                if (byte.length() == 2)
+                    wb_throw(TKnxException, "invalid byte: " + byte);
+                char* strEnd;
+                unsigned res = std::strtoul(byte.c_str() + 2, &strEnd, 2);
+                if (*strEnd != 0)
+                    wb_throw(TKnxException, "invalid byte: " + byte);
+                return res;
+            } else {
+                std::size_t num;
+                int ret = std::stoi(byte, &num, 0);
+                if (num != byte.length())
+                    wb_throw(TKnxException, "invalid byte: " + byte);
+                return ret;
+            }
+        } catch (TKnxException& e) {
+            throw;
+        } catch (std::exception& e) {
+            wb_throw(TKnxException, "invalid byte: " + byte);
+        }
+    }
+
+    std::tuple<bool, knx::telegram::TApci> StringToKnxApci(const std::string& apciString)
+    {
+        auto it = std::find(ApciString.begin(), ApciString.end(), apciString);
+
+        if (it != ApciString.end()) {
+            return {true, static_cast<telegram::TApci>(std::distance(ApciString.begin(), it))};
+        } else {
+            return {false, {}};
+        }
+    }
+
+} // namespace
+
 
 std::string TKnxConverter::KnxTelegramToMqtt(const TTelegram& telegram)
 {
@@ -41,62 +170,6 @@ std::string TKnxConverter::KnxTelegramToMqtt(const TTelegram& telegram)
 
     return ss.str();
 }
-
-std::string TKnxConverter::KnxApciToString(const TTelegram& telegram)
-{
-    return ApciString.at(static_cast<uint32_t>(telegram.GetAPCI()));
-}
-
-std::string TKnxConverter::KnxSourceAddressToString(const TTelegram& telegram)
-{
-    std::stringstream ss;
-    auto address = telegram.GetSourceAddress();
-
-    // Source address is always individual
-    ss << "i:" << (address >> 12) << "/" << ((address >> 8) & 0xf);
-    ss << "/" << (address & 0xff);
-    return ss.str();
-}
-
-std::string TKnxConverter::KnxReceiverAddressToString(const TTelegram& telegram)
-{
-    std::stringstream ss;
-
-    auto receiverAddress = telegram.GetReceiverAddress();
-
-    if (telegram.IsGroupAddressed()) {
-        // group address
-        ss << "g:" << ((receiverAddress >> 11) & 0xf) << "/" << ((receiverAddress >> 8) & 0x7);
-        ss << "/" << (receiverAddress & 0xff);
-    } else {
-        // individual address
-        ss << "i:" << (receiverAddress >> 12) << "/" << ((receiverAddress >> 8) & 0xf);
-        ss << "/" << (receiverAddress & 0xff);
-    }
-
-    return ss.str();
-}
-
-std::string TKnxConverter::KnxPayloadToString(const TTelegram& telegram)
-{
-    std::stringstream ss;
-    ss << std::hex << std::setfill('0');
-    auto payload = telegram.GetAPDUPayload();
-    auto payloadSize = payload.size();
-
-    if (payload.size() == 1) {
-        // Short data, return last 6 bit of the last octet
-        ss << "0x" << std::setw(2) << static_cast<uint32_t>(payload[0]);
-    } else {
-        // "Long" format skip that 6 bits and store data starting from the next octet
-        for (uint32_t i = 1; i < payloadSize; ++i) {
-            ss << "0x" << std::setw(2) << static_cast<uint32_t>(payload[i]) << " ";
-        }
-    }
-    return ss.str();
-}
-
-// String convertors
 
 std::shared_ptr<TTelegram> TKnxConverter::MqttToKnxTelegram(const std::string& payload)
 {
@@ -152,77 +225,4 @@ std::shared_ptr<TTelegram> TKnxConverter::MqttToKnxTelegram(const std::string& p
     telegram->SetAPDUPayload(knxPayload);
 
     return telegram;
-}
-
-eibaddr_t TKnxConverter::StringToKnxAddress(const std::string& addr, bool groupBit)
-{
-    std::vector<std::string> tokens;
-
-    try {
-        tokens = WBMQTT::StringSplit(addr, "/");
-        if (groupBit) {
-            if (tokens.size() == 2) {
-                uint16_t main = std::stoi(tokens[0]);
-                uint16_t sub = std::stoi(tokens[1]);
-
-                return ((main & 0xf) << 11) | (sub & 0x7ff);
-            } else if (tokens.size() == 3) {
-                uint16_t main = std::stoi(tokens[0]);
-                uint16_t middle = std::stoi(tokens[1]);
-                uint16_t sub = std::stoi(tokens[2]);
-
-                return ((main & 0xf) << 11) | ((middle & 0x7) << 8) | (sub & 0xff);
-            }
-        } else {
-            if (tokens.size() == 3) {
-                uint16_t area = std::stoi(tokens[0]);
-                uint16_t line = std::stoi(tokens[1]);
-                uint16_t device = std::stoi(tokens[2]);
-
-                return ((area & 0xf) << 12) | ((line & 0xf) << 8) | (device & 0xff);
-            }
-        }
-    } catch (std::exception& e) {
-    }
-
-    wb_throw(TKnxException, "invalid address: " + addr);
-}
-
-uint8_t TKnxConverter::StringToByte(const std::string& byte)
-{
-    if (byte.empty())
-        wb_throw(TKnxException, "Trying to read a byte from empty string");
-
-    try {
-        if (byte.substr(0, 2) == "0b" || byte.substr(0, 2) == "0B") {
-            if (byte.length() == 2)
-                wb_throw(TKnxException, "invalid byte: " + byte);
-            char* strEnd;
-            unsigned res = std::strtoul(byte.c_str() + 2, &strEnd, 2);
-            if (*strEnd != 0)
-                wb_throw(TKnxException, "invalid byte: " + byte);
-            return res;
-        } else {
-            std::size_t num;
-            int ret = std::stoi(byte, &num, 0);
-            if (num != byte.length())
-                wb_throw(TKnxException, "invalid byte: " + byte);
-            return ret;
-        }
-    } catch (TKnxException& e) {
-        throw;
-    } catch (std::exception& e) {
-        wb_throw(TKnxException, "invalid byte: " + byte);
-    }
-}
-
-std::tuple<bool, knx::telegram::TApci> TKnxConverter::StringToKnxApci(const std::string& apciString)
-{
-    auto it = std::find(ApciString.begin(), ApciString.end(), apciString);
-
-    if (it != ApciString.end()) {
-        return {true, static_cast<telegram::TApci>(std::distance(ApciString.begin(), it))};
-    } else {
-        return {false, {}};
-    }
 }
