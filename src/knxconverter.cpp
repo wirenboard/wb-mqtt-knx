@@ -157,9 +157,7 @@ namespace
             return {false, {}};
         }
     }
-
-} // namespace
-
+}
 
 std::string TKnxConverter::KnxTelegramToMqtt(const TTelegram& telegram)
 {
