@@ -1,7 +1,6 @@
 [Unit]
 Description=Wiren Board MQTT KNX bridge
-Wants=wb-hwconf-manager.service wb-modules.service
-After=network.target wb-hwconf-manager.service wb-modules.service
+After=mosquitto.target
 
 [Service]
 Type=simple
