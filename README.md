@@ -4,9 +4,9 @@ KNX to MQTT gateway (C++)
 Зависимости
 -----------
 
-* libwbmqtt0 (>= 1.4)
-* knxd-tools (>= 0.11.14)
-* knxd (>= 0.11.14)
+* libwbmqtt1-3 (>= 3.2.0)
+* knxd-tools (>= 0.14.51-1)
+* knxd (>= 0.14.51-1)
 
 Использование
 -------------
@@ -17,10 +17,8 @@ KNX to MQTT gateway (C++)
 ```
 mosquitto_pub -t '/devices/knx/controls/data/on' -m "g:${DstAddr} ${APCI} ${Data}"
 ```
-Чтобы отправить индивидуальную телеграмму в KNX необходимо отправить:
-```
-mosquitto_pub -t '/devices/knx/controls/data/on' -m "i:${SrcAddr}:${DstAddr} ${APCI} ${Data}"
-```
+
+Отправка телеграм с индивидуальным адресом получателя не поддерживается.
 
 Все сообщения из KNX будут доставлены в MQTT топик `/devices/knx/controls/data` в виде:
 ```
@@ -31,7 +29,9 @@ i:${SrcAddr} [i,g]:${DstAddr} ${APCI} ${Data}
 * `APCI` - Тип сообщения, строка или 4х-битное число.
 * `Data` - Сообщение в виде байт, разделенных пробелами. Первый байт сообщения должен иметь длину не более 6 бит.
 
-Поддерживаемые типы сообщений(`APCI`):
+При отправке сообщений для полей `ACPI` и `Data` допускаются форматы: `0xAA`, `0XAA`, `0b10101010`, `0B10101010`, `170`  
+
+Поддерживаемые типы сообщений(`APCI`) при приёме телеграмм с индивидуальным и групповым адресом:
 * `GroupValueRead`
 * `GroupValueResponse`
 * `GroupValueWrite`
@@ -50,17 +50,26 @@ i:${SrcAddr} [i,g]:${DstAddr} ${APCI} ${Data}
 * `Escape`
 * любое 4х-битное числовое значение
 
+Поддерживаемые типы сообщений(`APCI`) при отправке телеграмм c групповым адресом получателя:
+* `GroupValueRead`
+* `GroupValueResponse`
+* `GroupValueWrite`
+
 Пример MQTT лога:
 ```
-$ mosquitto_pub -t '/devices/knx/controls/data/on' -m "i:0/0/1:9/7/55 GroupValueWrite 0b110111 0xcf 14 0xff"
-
-/devices/knx/controls/data/on i:0/0/1:9/7/55 GroupValueWrite 0b110111 0xcf 14 0xff
-/devices/knx/controls/data i:0/0/1 i:9/7/55 GroupValueWrite 0x37 0xcf 0x0e 0xff
-
 $ mosquitto_pub -t '/devices/knx/controls/data/on' -m "g:9/7/55 GroupValueRead"
 
 /devices/knx/controls/data/on g:9/7/55 GroupValueRead
 /devices/knx/controls/data i:0/0/0 g:9/7/55 GroupValueRead 0x00
+
+$ mosquitto_pub -t '/devices/knx/controls/data/on' -m "g:9/7/55 GroupValueWrite 0x04"
+
+/devices/knx/controls/data/on g:9/7/55 GroupValueWrite 0x04
+/devices/knx/controls/data i:1/1/22 g:9/7/55 GroupValueWrite 0x04
+
+$ mosquitto_pub -t '/devices/knx/controls/data/on' -m "g:9/7/55 GroupValueWrite 0x00 0xAA 0xBB"
+
+/devices/knx/controls/data/on g:9/7/55 GroupValueWrite 0x00 0xAA 0xBB
+/devices/knx/controls/data i:1/1/23 g:9/7/55 GroupValueWrite 0xaa 0xbb
 ```
 
-[1] [KNX Protocol](http://www.knx.org/fileadmin/template/documents/downloads_support_menu/KNX_tutor_seminar_page/tutor_documentation/05_Serial%20Data%20Transmission_E0808f.pdf) pp20,28
