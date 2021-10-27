@@ -23,6 +23,7 @@ int main(int argc, char** argv)
     std::string knxUrl = "ip:localhost:6720";
     mqttConfig.Host = "localhost";
     mqttConfig.Port = 1883;
+    mqttConfig.Id = "wb-knx";
 
     int c;
     int verboseLevel = 0;
