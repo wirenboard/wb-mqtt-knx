@@ -1,0 +1,14 @@
+[Unit]
+Description=Wiren Board MQTT KNX bridge
+Wants=wb-hwconf-manager.service wb-modules.service
+After=network.target wb-hwconf-manager.service wb-modules.service
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=root
+ExecStart=/usr/bin/wb-mqtt-knx
+
+[Install]
+WantedBy=multi-user.target
