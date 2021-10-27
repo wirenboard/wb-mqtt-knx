@@ -159,7 +159,7 @@ namespace
     }
 }
 
-std::string TKnxConverter::KnxTelegramToMqtt(const TTelegram& telegram)
+std::string converter::KnxTelegramToMqtt(const TTelegram& telegram)
 {
     std::stringstream ss;
 
@@ -169,7 +169,7 @@ std::string TKnxConverter::KnxTelegramToMqtt(const TTelegram& telegram)
     return ss.str();
 }
 
-std::shared_ptr<TTelegram> TKnxConverter::MqttToKnxTelegram(const std::string& payload)
+std::shared_ptr<TTelegram> converter::MqttToKnxTelegram(const std::string& payload)
 {
     auto telegram = std::make_shared<knx::TTelegram>();
 
@@ -179,10 +179,13 @@ std::shared_ptr<TTelegram> TKnxConverter::MqttToKnxTelegram(const std::string& p
     std::string apciStr;
     ss >> addrStr >> apciStr;
 
-    const auto apciConvertResult = StringToKnxApci(apciStr);
+    bool isFoundAcpi;
+    knx::telegram::TApci acpiCode;
 
-    if (std::get<0>(apciConvertResult)) {
-        telegram->SetAPCI(std::get<1>(apciConvertResult));
+    std::tie(isFoundAcpi,acpiCode) = StringToKnxApci(apciStr);
+
+    if (isFoundAcpi) {
+        telegram->SetAPCI(acpiCode);
     } else {
         // try to read APCI as number
         try {

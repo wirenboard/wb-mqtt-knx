@@ -6,12 +6,11 @@
 
 namespace knx
 {
-    class TKnxConverter
+    namespace converter
     {
-    public:
-        static std::string KnxTelegramToMqtt(const TTelegram& telegram);
-        static std::shared_ptr<TTelegram> MqttToKnxTelegram(const std::string& payload);
-    };
+        std::string KnxTelegramToMqtt(const TTelegram& telegram);
+        std::shared_ptr<TTelegram> MqttToKnxTelegram(const std::string& payload);
+    }
 } // namespace knx
 
 #endif // WB_MQTT_KNX_KNXCONVERTER_H

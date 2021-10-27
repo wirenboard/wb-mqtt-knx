@@ -73,7 +73,7 @@ namespace knx
 
                 auto tick = std::chrono::microseconds(0);
                 while (IsStarted && (tick < CLIENT_RECONNECT_PERIOD)) {
-                    usleep(std::chrono::duration_cast<std::chrono::microseconds>(IN_CONNECTION_REQUEST_TICK).count());
+                    std::this_thread::sleep_for(IN_CONNECTION_REQUEST_TICK);
                     tick += IN_CONNECTION_REQUEST_TICK;
                 }
                 continue;

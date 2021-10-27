@@ -41,7 +41,7 @@ TKnxDevice::TKnxDevice(std::shared_ptr<WBMQTT::TDeviceDriver> pMqttDriver,
 
     KnxClient->SetOnReceive([this](const TTelegram& telegram) {
         try {
-            const auto mqttData = knx::TKnxConverter::KnxTelegramToMqtt(telegram);
+            const auto mqttData = converter::KnxTelegramToMqtt(telegram);
             Control->UpdateRawValue(DeviceDriver->BeginTx(), mqttData).Wait();
         } catch (const TKnxException& e) {
             ErrorLogger.Log() << e.what();
@@ -55,7 +55,7 @@ TKnxDevice::TKnxDevice(std::shared_ptr<WBMQTT::TDeviceDriver> pMqttDriver,
             DebugLogger.Log() << "On event message:\"" << event.RawValue << "\""
                               << " from control: " << event.Control->GetId();
             try {
-                auto telegram = knx::TKnxConverter::MqttToKnxTelegram(event.RawValue);
+                auto telegram = knx::converter::MqttToKnxTelegram(event.RawValue);
                 KnxClient->Send(*telegram);
             } catch (const TKnxException& e) {
                 ErrorLogger.Log() << e.what();
