@@ -12,7 +12,7 @@ TEST(KnxConverterTest, FromKnxDataSetCheck)
 
     for (const auto& knxData: knxDataSet) {
         knx::TTelegram telegram(knxData.first);
-        auto mqttString = knx::TKnxConverter::KnxTelegramToMqtt(telegram);
+        auto mqttString = knx::converter::KnxTelegramToMqtt(telegram);
 
         EXPECT_EQ(mqttString, knxData.second);
     }
@@ -26,7 +26,7 @@ TEST(KnxConverterTest, FromMqttDataSetCheck)
         {"g:9/7/50 GroupValueWrite", {0x00, 0x80}, true, 0x00, 0x4f32}};
 
     for (const auto& mqttData: mqttDataSet) {
-        auto telegram = knx::TKnxConverter::MqttToKnxTelegram(std::get<0>(mqttData));
+        auto telegram = knx::converter::MqttToKnxTelegram(std::get<0>(mqttData));
 
         EXPECT_EQ(telegram->GetTPDUPayload(), std::get<1>(mqttData));
         EXPECT_EQ(telegram->IsGroupAddressed(), std::get<2>(mqttData));
@@ -42,7 +42,7 @@ TEST(KnxConverterTest, FromMqttDataSetFail)
                                                   "g:9/7/50 GroupValueWrite er eer ewr"};
 
     for (const auto& mqttData: mqttDataSet) {
-        EXPECT_THROW(knx::TKnxConverter::MqttToKnxTelegram(mqttData), knx::TKnxException)
+        EXPECT_THROW(knx::converter::MqttToKnxTelegram(mqttData), knx::TKnxException)
             << "No throw set: " << mqttData;
     }
 }
