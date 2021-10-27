@@ -42,7 +42,6 @@ TEST(KnxConverterTest, FromMqttDataSetFail)
                                                   "g:9/7/50 GroupValueWrite er eer ewr"};
 
     for (const auto& mqttData: mqttDataSet) {
-        EXPECT_THROW(knx::converter::MqttToKnxTelegram(mqttData), knx::TKnxException)
-            << "No throw set: " << mqttData;
+        EXPECT_THROW(knx::converter::MqttToKnxTelegram(mqttData), knx::TKnxException) << "No throw set: " << mqttData;
     }
 }
