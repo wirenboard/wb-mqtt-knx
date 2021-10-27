@@ -37,8 +37,6 @@ if (CMAKE_BUILD_TYPE MATCHES Debug)
     target_link_libraries(${PROJECT_NAME}_test gcov)
 endif()
 
-add_test(telegram_test ${PROJECT_NAME}_test)
-add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND}
-        DEPENDS ${PROJECT_NAME}_test)
+add_test(${PROJECT_NAME}_test ${PROJECT_NAME}_test)
 
 install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
