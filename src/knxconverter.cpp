@@ -182,7 +182,7 @@ std::shared_ptr<TTelegram> converter::MqttToKnxTelegram(const std::string& paylo
     bool isFoundAcpi;
     knx::telegram::TApci acpiCode;
 
-    std::tie(isFoundAcpi,acpiCode) = StringToKnxApci(apciStr);
+    std::tie(isFoundAcpi, acpiCode) = StringToKnxApci(apciStr);
 
     if (isFoundAcpi) {
         telegram->SetAPCI(acpiCode);
