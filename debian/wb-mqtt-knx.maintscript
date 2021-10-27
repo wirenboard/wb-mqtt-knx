@@ -1,0 +1,1 @@
+rm_conffile /etc/init.d/wb-mqtt-knx 1.0.0~

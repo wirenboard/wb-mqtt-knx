@@ -3,3 +3,5 @@
 %:
 	dh $@ --parallel
 
+override_dh_installinit:
+	dh_installinit --noscripts
