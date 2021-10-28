@@ -2,13 +2,12 @@
 #define WB_MQTT_KNX_KNXCLIENTSERVICE_H
 
 #include "iknxclient.h"
-#include "iknxservice.h"
 #include "knxtelegram.h"
 #include "wblib/log.h"
 
 namespace knx
 {
-    class TKnxClientService: public IKnxClient, public IKnxService
+    class TKnxClientService: public IKnxClient
     {
         // wrapper for EIBConnection
         class TKnxConnection
@@ -47,8 +46,8 @@ namespace knx
         void Send(const TTelegram& telegram) override;
         void SetOnReceive(const std::function<void(const TTelegram&)>& handler) override;
 
-        void Start() override;
-        void Stop() override;
+        void Start();
+        void Stop();
 
         ~TKnxClientService() override = default;
 
