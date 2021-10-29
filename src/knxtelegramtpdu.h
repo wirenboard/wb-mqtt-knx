@@ -51,6 +51,9 @@ namespace knx
     class TTpdu
     {
     public:
+        explicit TTpdu() = default;
+        explicit TTpdu(const std::vector<uint8_t>& tpduBuffer);
+
         uint8_t GetPayloadLength() const;
 
         telegram::TCommunicationType GetCommunicationType() const;
@@ -82,7 +85,7 @@ namespace knx
         uint8_t SequenceNumber{0};
         telegram::TApci Apci{telegram::TApci::GroupValueRead};
         std::vector<uint8_t> ApduPayload{0};
-        telegram::TControlDataType CDataType;
+        telegram::TControlDataType CDataType{telegram::TControlDataType::Connect};
     };
 }
 

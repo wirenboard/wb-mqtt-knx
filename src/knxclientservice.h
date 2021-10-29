@@ -2,6 +2,7 @@
 #define WB_MQTT_KNX_KNXCLIENTSERVICE_H
 
 #include "iknxclient.h"
+#include "knxconnection.h"
 #include "knxtelegram.h"
 #include "wblib/log.h"
 
@@ -9,36 +10,8 @@ namespace knx
 {
     class TKnxClientService: public IKnxClient
     {
-        // wrapper for EIBConnection
-        class TKnxConnection
-        {
-        public:
-            explicit TKnxConnection(const std::string& knxServerUrl)
-            {
-                Connection = EIBSocketURL(knxServerUrl.c_str());
-            }
-
-            EIBConnection* GetEIBConnection() const
-            {
-                return Connection;
-            }
-
-            bool operator!() const
-            {
-                return !Connection;
-            }
-
-            ~TKnxConnection()
-            {
-                EIBClose(Connection);
-            }
-
-        private:
-            EIBConnection* Connection;
-        };
-
     public:
-        explicit TKnxClientService(std::string knxServerUrl,
+        explicit TKnxClientService(const std::string& knxServerUrl,
                                    WBMQTT::TLogger& errorLogger,
                                    WBMQTT::TLogger& debugLogger,
                                    WBMQTT::TLogger& infoLogger);
@@ -52,8 +25,9 @@ namespace knx
         ~TKnxClientService() override = default;
 
     private:
-        void Loop();
+        void ReceiveLoop();
         void HandleLoopError(const std::string& what);
+        void ReceiveProcessing(const knx::TKnxConnection& In);
 
         std::string KnxServerUrl;
         std::function<void(const TTelegram&)> OnReceiveTelegramHandler;

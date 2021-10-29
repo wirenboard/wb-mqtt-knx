@@ -1,7 +1,9 @@
 #include "knxclientservice.h"
+#include "knxconnection.h"
 #include "knxexception.h"
 #include "wblib/utils.h"
 #include <cstring>
+#include <eibclient.h>
 #include <iomanip>
 #include <sstream>
 #include <unistd.h>
@@ -22,12 +24,11 @@ namespace
 
 namespace knx
 {
-
-    TKnxClientService::TKnxClientService(std::string knxServerUrl,
+    TKnxClientService::TKnxClientService(const std::string& knxServerUrl,
                                          WBMQTT::TLogger& errorLogger,
                                          WBMQTT::TLogger& debugLogger,
                                          WBMQTT::TLogger& infoLogger)
-        : KnxServerUrl{std::move(knxServerUrl)},
+        : KnxServerUrl{knxServerUrl},
           ErrorLogger(errorLogger),
           DebugLogger(debugLogger),
           InfoLogger(infoLogger)
@@ -63,7 +64,7 @@ namespace knx
         }
     }
 
-    void TKnxClientService::Loop()
+    void TKnxClientService::ReceiveLoop()
     {
         while (IsStarted) {
             TKnxConnection In(KnxServerUrl);
@@ -87,62 +88,7 @@ namespace knx
                 continue;
             }
 
-            const int32_t fd = EIB_Poll_FD(In.GetEIBConnection());
-            if (fd == EIB_ERROR_RETURN_VALUE) {
-                HandleLoopError("failed to get Poll fd");
-                continue;
-            }
-
-            while (IsStarted) {
-                struct timeval tv = {
-                    0,
-                    std::chrono::duration_cast<std::chrono::microseconds>(RECEIVER_LOOP_TIMEOUT).count()};
-                fd_set set;
-                FD_ZERO(&set);
-                FD_SET(fd, &set);
-
-                const int32_t selectResult = select(fd + 1, &set, nullptr, nullptr, &tv);
-                if (selectResult == SELECT_TIMEOUT_RETURN_VALUE) {
-                    continue;
-                } else if (selectResult == SELECT_ERROR_RETURN_VALUE) {
-                    HandleLoopError(std::string("select failed: ") + std::strerror(errno));
-                    break;
-                }
-
-                std::vector<uint8_t> telegram(MAX_TELEGRAM_LENGTH, 0);
-
-                const int32_t packetLen = EIBGetBusmonitorPacket(In.GetEIBConnection(),
-                                                                 static_cast<int32_t>(telegram.size()),
-                                                                 telegram.data());
-                if (packetLen == EIB_ERROR_RETURN_VALUE) {
-                    HandleLoopError(std::string("failed to read Busmonitor packet: ") + std::strerror(errno));
-                    break;
-                }
-
-                telegram.resize(packetLen);
-
-                if (DebugLogger.IsEnabled()) {
-                    std::stringstream ss;
-                    ss << "KNX Client received a telegram: ";
-                    ss << packetLen << " ";
-                    ss << std::hex << std::noshowbase;
-                    for (int i = 0; i < packetLen; i++) {
-                        ss << "0x" << std::setw(2) << std::setfill('0');
-                        ss << (unsigned)telegram[i] << " ";
-                    }
-                    DebugLogger.Log() << ss.str();
-                }
-
-                try {
-                    TTelegram knxTelegram(telegram);
-                    if (OnReceiveTelegramHandler)
-                        OnReceiveTelegramHandler(knxTelegram);
-                } catch (const TKnxException& e) {
-                    ErrorLogger.Log() << e.what();
-                } catch (const std::exception& e) {
-                    ErrorLogger.Log() << e.what();
-                }
-            }
+            ReceiveProcessing(In);
         }
     }
 
@@ -167,7 +113,7 @@ namespace knx
             IsStarted = true;
         }
 
-        Worker = WBMQTT::MakeThread("KnxClient thread", {[this] { Loop(); }});
+        Worker = WBMQTT::MakeThread("KnxClient thread", {[this] { ReceiveLoop(); }});
     }
 
     void TKnxClientService::Stop()
@@ -184,6 +130,63 @@ namespace knx
             Worker->join();
         }
         Worker.reset();
+    }
+
+    void TKnxClientService::ReceiveProcessing(const TKnxConnection& In)
+    {
+        const int32_t linuxFileDescriptor = EIB_Poll_FD(In.GetEIBConnection());
+        if (linuxFileDescriptor == EIB_ERROR_RETURN_VALUE) {
+            HandleLoopError("failed to get Poll fd");
+            return;
+        }
+        while (IsStarted) {
+            struct timeval tv = {0,
+                                 std::chrono::duration_cast<std::chrono::microseconds>(RECEIVER_LOOP_TIMEOUT).count()};
+            fd_set set;
+            FD_ZERO(&set);
+            FD_SET(linuxFileDescriptor, &set);
+
+            const int32_t selectResult = select(linuxFileDescriptor + 1, &set, nullptr, nullptr, &tv);
+            if (selectResult == SELECT_TIMEOUT_RETURN_VALUE) {
+                continue;
+            } else if (selectResult == SELECT_ERROR_RETURN_VALUE) {
+                HandleLoopError(std::string("select failed: ") + std::strerror(errno));
+                break;
+            }
+
+            std::vector<uint8_t> telegram(MAX_TELEGRAM_LENGTH, 0);
+
+            const int32_t packetLen =
+                EIBGetBusmonitorPacket(In.GetEIBConnection(), static_cast<int32_t>(telegram.size()), telegram.data());
+            if (packetLen == EIB_ERROR_RETURN_VALUE) {
+                HandleLoopError(std::string("failed to read Busmonitor packet: ") + std::strerror(errno));
+                break;
+            }
+
+            telegram.resize(packetLen);
+
+            if (DebugLogger.IsEnabled()) {
+                std::stringstream ss;
+                ss << "KNX Client received a telegram: ";
+                ss << packetLen << " ";
+                ss << std::hex << std::noshowbase;
+                for (int i = 0; i < packetLen; i++) {
+                    ss << "0x" << std::setw(2) << std::setfill('0');
+                    ss << (unsigned)telegram[i] << " ";
+                }
+                DebugLogger.Log() << ss.str();
+            }
+
+            try {
+                TTelegram knxTelegram(telegram);
+                if (OnReceiveTelegramHandler)
+                    OnReceiveTelegramHandler(knxTelegram);
+            } catch (const TKnxException& e) {
+                ErrorLogger.Log() << e.what();
+            } catch (const std::exception& e) {
+                ErrorLogger.Log() << e.what();
+            }
+        }
     }
 
 } // namespace knx

@@ -122,3 +122,8 @@ uint32_t TTpdu::Size() const
 {
     return ApduPayload.size() + 1;
 }
+
+TTpdu::TTpdu(const std::vector<uint8_t>& tpduBuffer)
+{
+    SetRaw(tpduBuffer);
+}

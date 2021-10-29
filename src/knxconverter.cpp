@@ -95,6 +95,8 @@ namespace
     eibaddr_t StringToKnxAddress(const std::string& addr, bool groupBit)
     {
         std::vector<std::string> tokens;
+        eibaddr_t address = 0;
+        std::string errorMessage = "Invalid address: " + addr;
 
         try {
             tokens = WBMQTT::StringSplit(addr, "/");
@@ -103,13 +105,15 @@ namespace
                     uint16_t main = std::stoi(tokens[0]);
                     uint16_t sub = std::stoi(tokens[1]);
 
-                    return ((main & 0xf) << 11) | (sub & 0x7ff);
+                    address = ((main & 0xf) << 11) | (sub & 0x7ff);
                 } else if (tokens.size() == 3) {
                     uint16_t main = std::stoi(tokens[0]);
                     uint16_t middle = std::stoi(tokens[1]);
                     uint16_t sub = std::stoi(tokens[2]);
 
-                    return ((main & 0xf) << 11) | ((middle & 0x7) << 8) | (sub & 0xff);
+                    address = ((main & 0xf) << 11) | ((middle & 0x7) << 8) | (sub & 0xff);
+                } else {
+                    wb_throw(TKnxException, errorMessage);
                 }
             } else {
                 if (tokens.size() == 3) {
@@ -117,13 +121,16 @@ namespace
                     uint16_t line = std::stoi(tokens[1]);
                     uint16_t device = std::stoi(tokens[2]);
 
-                    return ((area & 0xf) << 12) | ((line & 0xf) << 8) | (device & 0xff);
+                    address = ((area & 0xf) << 12) | ((line & 0xf) << 8) | (device & 0xff);
+                } else {
+                    wb_throw(TKnxException, errorMessage);
                 }
             }
         } catch (std::exception& e) {
+            wb_throw(TKnxException, errorMessage);
         }
 
-        wb_throw(TKnxException, "invalid address: " + addr);
+        return address;
     }
 
     uint8_t StringToByte(const std::string& byte)
