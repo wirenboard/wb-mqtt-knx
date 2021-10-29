@@ -36,11 +36,10 @@ namespace knx
 
     void TKnxClientService::Send(const TTelegram& telegram)
     {
-        {
-            std::lock_guard<std::mutex> lg(IsStartedMutex);
-            if (!IsStarted)
-                return;
-        }
+
+        if (!IsStarted)
+            return;
+
         TKnxConnection Out(KnxServerUrl);
         if (!Out)
             wb_throw(TKnxException, "Failed to open Url: " + KnxServerUrl + ". Is knxd running?");
@@ -50,7 +49,7 @@ namespace knx
             if (openResult == EIB_ERROR_RETURN_VALUE)
                 wb_throw(TKnxException, "Failed to open GroupSocket");
 
-            auto tpduPayload = telegram.Tpdu().GetPayload();
+            auto tpduPayload = telegram.Tpdu().GetRaw();
 
             const int32_t sendResult = EIBSendGroup(Out.GetEIBConnection(),
                                                     telegram.GetReceiverAddress(),
