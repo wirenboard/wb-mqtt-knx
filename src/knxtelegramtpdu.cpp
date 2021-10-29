@@ -76,6 +76,13 @@ void TTpdu::SetControlDataType(telegram::TControlDataType type)
 
 std::vector<uint8_t> TTpdu::GetRaw() const
 {
+    std::vector<uint8_t> tpdu;
+    GetRawPushBack(tpdu);
+    return tpdu;
+}
+
+void TTpdu::GetRawPushBack(std::vector<uint8_t>& buf) const
+{
     uint8_t tpduFirstByte = 0;
 
     tpduFirstByte |= static_cast<uint8_t>(CommunicationType) << 6;
@@ -84,17 +91,11 @@ std::vector<uint8_t> TTpdu::GetRaw() const
     if ((CommunicationType == telegram::TCommunicationType::UDP) ||
         (CommunicationType == telegram::TCommunicationType::NDP))
     {
-        std::vector<uint8_t> tpdu(ApduPayload.size() + 1, 0);
-        tpdu[0] = tpduFirstByte;
-        tpdu[0] |= (static_cast<uint8_t>(Apci) >> 2) & 0x03;
-        tpdu[1] = ((static_cast<uint8_t>(Apci) & 0x03) << 6) | (ApduPayload[0] & 0x3F);
-        std::copy(ApduPayload.begin() + 1, ApduPayload.end(), tpdu.begin() + 2);
-        return tpdu;
+        buf.push_back(tpduFirstByte | ((static_cast<uint8_t>(Apci) >> 2) & 0x03));
+        buf.push_back(((static_cast<uint8_t>(Apci) & 0x03) << 6) | (ApduPayload[0] & 0x3F));
+        std::copy(ApduPayload.begin() + 1, ApduPayload.end(), std::back_inserter(buf));
     } else {
-        std::vector<uint8_t> tpdu(1, 0);
-        tpdu[0] = tpduFirstByte;
-        tpdu[0] |= static_cast<uint8_t>(CDataType) & 0x03;
-        return tpdu;
+        buf.push_back(tpduFirstByte | (static_cast<uint8_t>(CDataType) & 0x03));
     }
 }
 

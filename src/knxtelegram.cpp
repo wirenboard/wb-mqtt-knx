@@ -105,8 +105,7 @@ std::vector<uint8_t> TTelegram::GetRawTelegram() const
     telegram[POSITION_NPDU_FIRST] &= ~(0x0F);
     telegram[POSITION_NPDU_FIRST] |= Mtpdu.GetPayloadLength();
 
-    auto tpdu = Mtpdu.GetRaw();
-    std::copy(tpdu.begin(), tpdu.end(), std::back_inserter(telegram));
+    Mtpdu.GetRawPushBack(telegram);
 
     telegram.push_back(CalculateParity(telegram));
     return telegram;

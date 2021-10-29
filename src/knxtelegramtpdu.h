@@ -73,6 +73,8 @@ namespace knx
         void SetPayload(std::vector<uint8_t>::const_iterator beginIt, std::vector<uint8_t>::const_iterator endIt);
 
         std::vector<uint8_t> GetRaw() const;
+        void GetRawPushBack(std::vector<uint8_t>& buf) const;
+
         void SetRaw(const std::vector<uint8_t>& tpduBuffer);
         void SetRaw(std::vector<uint8_t>::const_iterator beginIt, std::vector<uint8_t>::const_iterator endIt);
 
