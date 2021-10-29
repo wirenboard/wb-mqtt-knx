@@ -103,6 +103,13 @@ namespace knx
         OnReceiveTelegramHandler = handler;
     }
 
+    void TKnxClientService::OnReceive(const TTelegram& telegram) const
+    {
+        std::lock_guard<std::mutex> lg(SetterMutex);
+        if (OnReceiveTelegramHandler)
+            OnReceiveTelegramHandler(telegram);
+    }
+
     void TKnxClientService::Start()
     {
         {
@@ -125,7 +132,7 @@ namespace knx
             }
             IsStarted = false;
         }
-        OnReceiveTelegramHandler = {};
+        SetOnReceive({});
         if (Worker->joinable()) {
             Worker->join();
         }
@@ -179,8 +186,7 @@ namespace knx
 
             try {
                 TTelegram knxTelegram(telegram);
-                if (OnReceiveTelegramHandler)
-                    OnReceiveTelegramHandler(knxTelegram);
+                OnReceive(knxTelegram);
             } catch (const TKnxException& e) {
                 ErrorLogger.Log() << e.what();
             } catch (const std::exception& e) {

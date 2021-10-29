@@ -28,13 +28,14 @@ namespace knx
         void ReceiveLoop();
         void HandleLoopError(const std::string& what);
         void ReceiveProcessing(const knx::TKnxConnection& In);
+        void OnReceive(const TTelegram& telegram) const;
 
         std::string KnxServerUrl;
         std::function<void(const TTelegram&)> OnReceiveTelegramHandler;
 
-        bool IsStarted = false;
+        std::atomic<bool> IsStarted{false};
         std::mutex IsStartedMutex;
-        std::mutex SetterMutex;
+        mutable std::mutex SetterMutex;
         std::unique_ptr<std::thread> Worker;
 
         WBMQTT::TLogger& ErrorLogger;
