@@ -27,11 +27,18 @@ namespace
                                                     "Restart",
                                                     "Escape"};
 
+    const std::array<const char*, 4> CommunicationTypeString = {"Connect", "Disconnect", "Ack", "Nack"};
+
     // KnxTelegram Convertors
 
     std::string KnxApciToString(const TTelegram& telegram)
     {
-        return ApciString.at(static_cast<uint32_t>(telegram.GetAPCI()));
+        return ApciString.at(static_cast<uint32_t>(telegram.Tpdu().GetAPCI()));
+    }
+
+    std::string KnxCommunicationTypeToString(const TTelegram& telegram)
+    {
+        return CommunicationTypeString.at(static_cast<uint32_t>(telegram.Tpdu().GetControlDataType()));
     }
 
     std::string KnxSourceAddressToString(const TTelegram& telegram)
@@ -68,10 +75,10 @@ namespace
     {
         std::stringstream ss;
         ss << std::hex << std::setfill('0');
-        auto payload = telegram.GetAPDUPayload();
+        auto payload = telegram.Tpdu().GetPayload();
         auto payloadSize = payload.size();
 
-        if (payload.size() == 1) {
+        if (payloadSize == 1) {
             // Short data, return last 6 bit of the last octet
             ss << "0x" << std::setw(2) << static_cast<uint32_t>(payload[0]);
         } else {
@@ -163,8 +170,16 @@ std::string converter::KnxTelegramToMqtt(const TTelegram& telegram)
 {
     std::stringstream ss;
 
-    ss << KnxSourceAddressToString(telegram) << " " << KnxReceiverAddressToString(telegram) << " "
-       << KnxApciToString(telegram) << " " << KnxPayloadToString(telegram);
+    ss << KnxSourceAddressToString(telegram) << " " << KnxReceiverAddressToString(telegram) << " ";
+
+    auto transportLayerType = telegram.Tpdu().GetCommunicationType();
+    if ((transportLayerType == telegram::TCommunicationType::UDP) ||
+        (transportLayerType == telegram::TCommunicationType::NDP))
+    {
+        ss << KnxApciToString(telegram) << " " << KnxPayloadToString(telegram);
+    } else {
+        ss << KnxCommunicationTypeToString(telegram);
+    }
 
     return ss.str();
 }
@@ -185,12 +200,12 @@ std::shared_ptr<TTelegram> converter::MqttToKnxTelegram(const std::string& paylo
     std::tie(isFoundAcpi, acpiCode) = StringToKnxApci(apciStr);
 
     if (isFoundAcpi) {
-        telegram->SetAPCI(acpiCode);
+        telegram->Tpdu().SetAPCI(acpiCode);
     } else {
         // try to read APCI as number
         try {
             const auto apci = static_cast<telegram::TApci>((StringToByte(apciStr)) & 0xf);
-            telegram->SetAPCI(apci);
+            telegram->Tpdu().SetAPCI(apci);
         } catch (TKnxException& e) {
             wb_throw(TKnxException, "Unknown telegram type: " + apciStr);
         }
@@ -220,10 +235,10 @@ std::shared_ptr<TTelegram> converter::MqttToKnxTelegram(const std::string& paylo
     while (ss >> std::hex >> dataStr) {
         knxPayload.push_back(StringToByte(dataStr));
         ++size;
-        if (size > knx::TTelegram::MaxPayloadSize)
+        if (size > knx::TTpdu::MaxPayloadSize)
             wb_throw(TKnxException, "Telegram payload is too long.");
     }
-    telegram->SetAPDUPayload(knxPayload);
+    telegram->Tpdu().SetPayload(knxPayload);
 
     return telegram;
 }

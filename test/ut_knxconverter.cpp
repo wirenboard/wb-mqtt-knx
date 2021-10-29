@@ -8,7 +8,10 @@ TEST(KnxConverterTest, FromKnxDataSetCheck)
         {{0xbc, 0x00, 0x01, 0x97, 0x37, 0x74, 0x00, 0x80, 0xcf, 0x0e, 0xff, 0x28},
          "i:0/0/1 i:9/7/55 GroupValueWrite 0xcf 0x0e 0xff "},
         {{0xbc, 0x00, 0x00, 0x4f, 0x37, 0xf1, 0x00, 0x00, 0xca}, "i:0/0/0 g:9/7/55 GroupValueRead 0x00"},
-        {{0xbc, 0x11, 0x02, 0x09, 0x64, 0xe1, 0x00, 0x81, 0x5d}, "i:1/1/2 g:1/1/100 GroupValueWrite 0x01"}};
+        {{0xbc, 0x11, 0x02, 0x09, 0x64, 0xe1, 0x00, 0x81, 0x5d}, "i:1/1/2 g:1/1/100 GroupValueWrite 0x01"},
+        {{0xB0, 0x11, 0x22, 0x11, 0x02, 0x60, 0x80, 0x8F}, "i:1/1/34 i:1/1/2 Connect"},
+        {{0xB0, 0x11, 0x02, 0x11, 0x28, 0x60, 0x81, 0x84}, "i:1/1/2 i:1/1/40 Disconnect"},
+        {{0xB0, 0x11, 0x28, 0x11, 0x02, 0x60, 0xFE, 0xFB}, "i:1/1/40 i:1/1/2 Ack"}};
 
     for (const auto& knxData: knxDataSet) {
         knx::TTelegram telegram(knxData.first);
@@ -28,7 +31,7 @@ TEST(KnxConverterTest, FromMqttDataSetCheck)
     for (const auto& mqttData: mqttDataSet) {
         auto telegram = knx::converter::MqttToKnxTelegram(std::get<0>(mqttData));
 
-        EXPECT_EQ(telegram->GetTPDUPayload(), std::get<1>(mqttData));
+        EXPECT_EQ(telegram->Tpdu().GetRaw(), std::get<1>(mqttData));
         EXPECT_EQ(telegram->IsGroupAddressed(), std::get<2>(mqttData));
         EXPECT_EQ(telegram->GetSourceAddress(), std::get<3>(mqttData));
         EXPECT_EQ(telegram->GetReceiverAddress(), std::get<4>(mqttData));

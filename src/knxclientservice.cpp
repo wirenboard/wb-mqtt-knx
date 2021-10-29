@@ -13,7 +13,7 @@ namespace
     constexpr auto RECEIVER_LOOP_TIMEOUT = std::chrono::seconds(2);
     constexpr auto IN_CONNECTION_REQUEST_TICK = std::chrono::seconds(1);
 
-    constexpr auto MAX_TELEGRAM_LENGTH = knx::TTelegram::SizeWithoutPayload + knx::TTelegram::MaxPayloadSize;
+    constexpr auto MAX_TELEGRAM_LENGTH = knx::TTelegram::SizeWithoutPayload + knx::TTpdu::MaxPayloadSize;
     constexpr auto EIB_ERROR_RETURN_VALUE = -1;
     constexpr auto SELECT_TIMEOUT_RETURN_VALUE = 0;
     constexpr auto SELECT_ERROR_RETURN_VALUE = -1;
@@ -49,7 +49,7 @@ namespace knx
             if (openResult == EIB_ERROR_RETURN_VALUE)
                 wb_throw(TKnxException, "Failed to open GroupSocket");
 
-            auto tpduPayload = telegram.GetTPDUPayload();
+            auto tpduPayload = telegram.Tpdu().GetPayload();
 
             const int32_t sendResult = EIBSendGroup(Out.GetEIBConnection(),
                                                     telegram.GetReceiverAddress(),
@@ -133,8 +133,15 @@ namespace knx
                     DebugLogger.Log() << ss.str();
                 }
 
-                if (OnReceiveTelegramHandler)
-                    OnReceiveTelegramHandler(TTelegram(telegram));
+                try {
+                    TTelegram knxTelegram(telegram);
+                    if (OnReceiveTelegramHandler)
+                        OnReceiveTelegramHandler(knxTelegram);
+                } catch (const TKnxException& e) {
+                    ErrorLogger.Log() << e.what();
+                } catch (const std::exception& e) {
+                    ErrorLogger.Log() << e.what();
+                }
             }
         }
     }

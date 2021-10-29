@@ -12,10 +12,10 @@ TEST(KnxTelegramTest, FromKnx0)
     EXPECT_EQ(telegram.GetSourceAddress(), 0x01);
     EXPECT_EQ(telegram.GetReceiverAddress(), 0x9737);
     EXPECT_EQ(telegram.IsGroupAddressed(), false);
-    EXPECT_EQ(telegram.GetTPDUPayload().size(), 5);
-    EXPECT_EQ(telegram.GetAPCI(), knx::telegram::TApci::GroupValueWrite);
-    EXPECT_EQ(telegram.GetSequenceNumber(), 0);
-    EXPECT_EQ(telegram.GetTypeOfTransportLayer(), knx::telegram::TTypeOfTransportLayer::UDP);
+    EXPECT_EQ(telegram.Tpdu().Size(), 5);
+    EXPECT_EQ(telegram.Tpdu().GetAPCI(), knx::telegram::TApci::GroupValueWrite);
+    EXPECT_EQ(telegram.Tpdu().GetSequenceNumber(), 0);
+    EXPECT_EQ(telegram.Tpdu().GetCommunicationType(), knx::telegram::TCommunicationType::UDP);
     EXPECT_EQ(telegram.IsRepeated(), false);
     EXPECT_EQ(telegram.GetPriority(), knx::telegram::TPriority::Priority4_NormalMode_LowPriority);
 }
@@ -27,6 +27,12 @@ TEST(KnxTelegramTest, FromKnx1)
     knx::TTelegram telegram(knxData);
 
     EXPECT_EQ(telegram.GetRawTelegram(), knxData);
+}
+
+TEST(KnxTelegramTest, FromKnx2)
+{
+    knx::TTelegram telegram2({0xB0, 0x11, 0x02, 0x11, 0x28, 0x60, 0x81, 0x84});
+    EXPECT_EQ(telegram2.Tpdu().GetControlDataType(), knx::telegram::TControlDataType::Disconnect);
 }
 
 TEST(KnxTelegramTest, FromKnxThrow)
@@ -48,7 +54,6 @@ TEST(KnxTelegramTest, FromKnxThrow)
 TEST(KnxTelegramTest, FalseKnxApci)
 {
     knx::TTelegram telegram;
-    EXPECT_THROW(telegram.SetTypeOfTransportLayer(knx::telegram::TTypeOfTransportLayer::UCD), knx::TKnxException);
     EXPECT_THROW(telegram.SetPriority(static_cast<knx::telegram::TPriority>(435)), knx::TKnxException);
-    EXPECT_THROW(telegram.SetAPCI(static_cast<knx::telegram::TApci>(34)), knx::TKnxException);
+    EXPECT_THROW(telegram.Tpdu().SetAPCI(static_cast<knx::telegram::TApci>(34)), knx::TKnxException);
 }

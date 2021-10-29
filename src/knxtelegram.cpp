@@ -13,8 +13,6 @@ namespace
     constexpr auto POSITION_RECEIVER_ADDRESS_H = 3;
     constexpr auto POSITION_RECEIVER_ADDRESS_L = 4;
     constexpr auto POSITION_NPDU_FIRST = 5;
-    constexpr auto POSITION_TPDU_FIRST = 6;
-    constexpr auto POSITION_APDU_FIRST = 7;
 } // namespace
 
 TTelegram::TTelegram(const std::vector<uint8_t>& knxBuffer)
@@ -85,78 +83,6 @@ void TTelegram::SetRoutingCounter(uint8_t counter)
     RoutingCounter = counter;
 }
 
-uint8_t TTelegram::GetAPDULength() const
-{
-    return ApduPayload.size();
-}
-
-telegram::TTypeOfTransportLayer TTelegram::GetTypeOfTransportLayer() const
-{
-    return TypeOfTransportLayer;
-}
-
-void TTelegram::SetTypeOfTransportLayer(telegram::TTypeOfTransportLayer type)
-{
-    if (type != telegram::TTypeOfTransportLayer::UDP && type != telegram::TTypeOfTransportLayer::NDP)
-        wb_throw(TKnxException, "Unsupported type of transport layer");
-    TypeOfTransportLayer = type;
-}
-
-uint8_t TTelegram::GetSequenceNumber() const
-{
-    return SequenceNumber;
-}
-
-void TTelegram::SetSequenceNumber(uint8_t number)
-{
-    SequenceNumber = number;
-}
-
-telegram::TApci TTelegram::GetAPCI() const
-{
-    return Apci;
-}
-
-void TTelegram::SetAPCI(telegram::TApci apci)
-{
-    if (apci > telegram::TApci::Escape)
-        wb_throw(TKnxException, "Incorrect APCI");
-    Apci = apci;
-}
-
-std::vector<uint8_t> TTelegram::GetTPDUPayload() const
-{
-    std::vector<uint8_t> telegram(ApduPayload.size() + 1, 0);
-
-    telegram[0] &= ~(0x3 << 6);
-    telegram[0] |= static_cast<uint8_t>(GetTypeOfTransportLayer()) << 6;
-
-    telegram[0] &= ~(0x0F << 2);
-    telegram[0] |= (GetSequenceNumber() & 0x0F) << 2;
-
-    telegram[0] &= ~(0x03);
-    telegram[0] |= (static_cast<uint8_t>(GetAPCI()) >> 2) & 0x03;
-
-    telegram[1] = ((static_cast<uint8_t>(GetAPCI()) & 0x03) << 6) | (ApduPayload[0] & 0x3F);
-
-    std::copy(ApduPayload.begin() + 1, ApduPayload.end(), telegram.begin() + 2);
-
-    return telegram;
-}
-
-std::vector<uint8_t> TTelegram::GetAPDUPayload() const
-{
-    return ApduPayload;
-}
-
-void TTelegram::SetAPDUPayload(const std::vector<uint8_t>& payload)
-{
-    if (payload.empty() || (payload.size() > TTelegram::MaxPayloadSize))
-        wb_throw(TKnxException, "Incorrect payload size");
-    ApduPayload = payload;
-    ApduPayload[0] &= 0x3F;
-}
-
 std::vector<uint8_t> TTelegram::GetRawTelegram() const
 {
     std::vector<uint8_t> telegram(SizeWithoutPayload - 2, 0);
@@ -177,20 +103,20 @@ std::vector<uint8_t> TTelegram::GetRawTelegram() const
     telegram[POSITION_NPDU_FIRST] |= (GetRoutingCounter() & 0x7) << 4;
 
     telegram[POSITION_NPDU_FIRST] &= ~(0x0F);
-    telegram[POSITION_NPDU_FIRST] |= GetAPDULength();
+    telegram[POSITION_NPDU_FIRST] |= Mtpdu.GetPayloadLength();
 
-    auto tpdu = GetTPDUPayload();
+    auto tpdu = Mtpdu.GetRaw();
     std::copy(tpdu.begin(), tpdu.end(), std::back_inserter(telegram));
 
     telegram.push_back(CalculateParity(telegram));
     return telegram;
 }
 
-bool TTelegram::SetRawTelegram(const std::vector<uint8_t>& knxBuffer)
+void TTelegram::SetRawTelegram(const std::vector<uint8_t>& knxBuffer)
 {
     const auto knxBufferSize = knxBuffer.size();
 
-    if ((knxBufferSize <= SizeWithoutPayload) || (knxBufferSize > (SizeWithoutPayload + MaxPayloadSize))) {
+    if ((knxBufferSize < SizeWithoutPayload) || (knxBufferSize > (SizeWithoutPayload + knx::TTpdu::MaxPayloadSize))) {
         wb_throw(TKnxException, "Invalid KNX raw data length");
     } else if (knxBufferSize != (SizeWithoutPayload + (knxBuffer[POSITION_NPDU_FIRST] & 0x0F))) {
         wb_throw(TKnxException, "Wrong APDU payload length");
@@ -218,18 +144,7 @@ bool TTelegram::SetRawTelegram(const std::vector<uint8_t>& knxBuffer)
 
     SetRoutingCounter((knxBuffer[POSITION_NPDU_FIRST] & ~(1 << 7)) >> 4);
 
-    SetTypeOfTransportLayer(static_cast<telegram::TTypeOfTransportLayer>(knxBuffer[POSITION_TPDU_FIRST] >> 6));
-
-    SetSequenceNumber((knxBuffer[POSITION_TPDU_FIRST] >> 2) & 0x0F);
-
-    SetAPCI(static_cast<telegram::TApci>(((knxBuffer[POSITION_TPDU_FIRST] & 0x03) << 2) |
-                                         (knxBuffer[POSITION_APDU_FIRST] >> 6)));
-
-    std::vector<uint8_t> payload(knxBuffer.begin() + POSITION_APDU_FIRST, knxBuffer.end() - 1);
-
-    SetAPDUPayload(payload);
-
-    return true;
+    Mtpdu.SetRaw(knxBuffer.cbegin() + POSITION_NPDU_FIRST + 1, knxBuffer.cend() - 1);
 }
 
 uint8_t TTelegram::CalculateParity(const std::vector<uint8_t>& data)
@@ -239,4 +154,14 @@ uint8_t TTelegram::CalculateParity(const std::vector<uint8_t>& data)
         parity ^= val;
     }
     return ~parity;
+}
+
+const TTpdu& TTelegram::Tpdu() const
+{
+    return Mtpdu;
+}
+
+TTpdu& TTelegram::Tpdu()
+{
+    return Mtpdu;
 }

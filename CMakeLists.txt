@@ -10,9 +10,9 @@ add_compile_options(-Wall -Werror -pedantic)
 
 if (CMAKE_BUILD_TYPE MATCHES Debug)
     add_compile_options(-O0 -gdwarf-3 --coverage)
-else()
+else ()
     add_compile_options(-O2 -DNDEBUG)
-endif()
+endif ()
 
 aux_source_directory(src/ SRC_LIST)
 add_executable(${PROJECT_NAME} ${SRC_LIST})
@@ -20,7 +20,7 @@ target_link_libraries(${PROJECT_NAME} wbmqtt1 eibclient pthread)
 
 if (CMAKE_BUILD_TYPE MATCHES Debug)
     target_link_libraries(${PROJECT_NAME} gcov)
-endif()
+endif ()
 
 # Adding unit tests
 enable_testing()
@@ -29,13 +29,14 @@ add_executable(${PROJECT_NAME}_test ${TEST_LIST}
         src/knxtelegram.cpp
         src/knxexception.cpp
         src/knxconverter.cpp
+        src/knxtelegramtpdu.cpp
         )
 
 target_link_libraries(${PROJECT_NAME}_test gtest gtest_main wbmqtt1 pthread)
 
 if (CMAKE_BUILD_TYPE MATCHES Debug)
     target_link_libraries(${PROJECT_NAME}_test gcov)
-endif()
+endif ()
 
 add_test(${PROJECT_NAME}_test ${PROJECT_NAME}_test)
 
