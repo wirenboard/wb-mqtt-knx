@@ -25,17 +25,18 @@ namespace knx
         ~TKnxClientService() override = default;
 
     private:
-        void ReceiveLoop();
+        void KnxdConnectProcessing();
+        void KnxdReceiveProcessing(const knx::TKnxConnection& In);
+
         void HandleLoopError(const std::string& what);
-        void ReceiveProcessing(const knx::TKnxConnection& In);
-        void OnReceive(const TTelegram& telegram) const;
+        void OnReceive(const TTelegram& telegram);
 
         std::string KnxServerUrl;
         std::function<void(const TTelegram&)> OnReceiveTelegramHandler;
 
         std::atomic<bool> IsStarted{false};
         std::mutex IsStartedMutex;
-        mutable std::mutex SetterMutex;
+        std::mutex SetterMutex;
         std::unique_ptr<std::thread> Worker;
 
         WBMQTT::TLogger& ErrorLogger;

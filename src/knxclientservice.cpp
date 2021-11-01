@@ -63,8 +63,9 @@ namespace knx
         }
     }
 
-    void TKnxClientService::ReceiveLoop()
+    void TKnxClientService::KnxdConnectProcessing()
     {
+        //The loop responsible for connecting to the knxd server
         while (IsStarted) {
             TKnxConnection In(KnxServerUrl);
 
@@ -87,7 +88,7 @@ namespace knx
                 continue;
             }
 
-            ReceiveProcessing(In);
+            KnxdReceiveProcessing(In);
         }
     }
 
@@ -102,7 +103,7 @@ namespace knx
         OnReceiveTelegramHandler = handler;
     }
 
-    void TKnxClientService::OnReceive(const TTelegram& telegram) const
+    void TKnxClientService::OnReceive(const TTelegram& telegram)
     {
         std::lock_guard<std::mutex> lg(SetterMutex);
         if (OnReceiveTelegramHandler)
@@ -119,7 +120,7 @@ namespace knx
             IsStarted = true;
         }
 
-        Worker = WBMQTT::MakeThread("KnxClient thread", {[this] { ReceiveLoop(); }});
+        Worker = WBMQTT::MakeThread("KnxClient thread", {[this] { KnxdConnectProcessing(); }});
     }
 
     void TKnxClientService::Stop()
@@ -138,13 +139,14 @@ namespace knx
         Worker.reset();
     }
 
-    void TKnxClientService::ReceiveProcessing(const TKnxConnection& In)
+    void TKnxClientService::KnxdReceiveProcessing(const TKnxConnection& In)
     {
         const int32_t linuxFileDescriptor = EIB_Poll_FD(In.GetEIBConnection());
         if (linuxFileDescriptor == EIB_ERROR_RETURN_VALUE) {
             HandleLoopError("failed to get Poll fd");
             return;
         }
+        // The loop responsible for receiving telegrams from knxd
         while (IsStarted) {
             struct timeval tv = {0,
                                  std::chrono::duration_cast<std::chrono::microseconds>(RECEIVER_LOOP_TIMEOUT).count()};
