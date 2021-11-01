@@ -1,5 +1,4 @@
-#ifndef WB_MQTT_KNX_KNXCONVERTER_H
-#define WB_MQTT_KNX_KNXCONVERTER_H
+#pragma once
 
 #include "knxtelegram.h"
 #include <memory>
@@ -12,5 +11,3 @@ namespace knx
         std::shared_ptr<TTelegram> MqttToKnxTelegram(const std::string& payload);
     }
 } // namespace knx
-
-#endif // WB_MQTT_KNX_KNXCONVERTER_H

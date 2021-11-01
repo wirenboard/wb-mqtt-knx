@@ -1,5 +1,4 @@
-#ifndef WB_MQTT_KNX_KNXCLIENTSERVICE_H
-#define WB_MQTT_KNX_KNXCLIENTSERVICE_H
+#pragma once
 
 #include "iknxclient.h"
 #include "knxconnection.h"
@@ -43,5 +42,3 @@ namespace knx
         WBMQTT::TLogger& InfoLogger;
     };
 } // namespace knx
-
-#endif // WB_MQTT_KNX_KNXCLIENTSERVICE_H

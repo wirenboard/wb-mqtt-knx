@@ -1,5 +1,4 @@
-#ifndef WB_MQTT_KNX_KNXDEVICE_H
-#define WB_MQTT_KNX_KNXDEVICE_H
+#pragma once
 
 #include "iknxclient.h"
 #include <wblib/log.h>
@@ -34,4 +33,3 @@ namespace knx
     };
 } // namespace knx
 
-#endif // WB_MQTT_KNX_KNXDEVICE_H

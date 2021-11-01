@@ -1,5 +1,4 @@
-#ifndef WB_MQTT_KNX_KNXTELEGRAMTPDU_H
-#define WB_MQTT_KNX_KNXTELEGRAMTPDU_H
+#pragma once
 
 #include <string>
 #include <vector>
@@ -90,5 +89,3 @@ namespace knx
         telegram::TControlDataType CDataType{telegram::TControlDataType::Connect};
     };
 }
-
-#endif // WB_MQTT_KNX_KNXTELEGRAMTPDU_H

@@ -1,5 +1,4 @@
-#ifndef WB_MQTT_KNX_KNXCONNECTION_H
-#define WB_MQTT_KNX_KNXCONNECTION_H
+#pragma once
 
 #include <eibclient.h>
 #include <string>
@@ -22,5 +21,3 @@ namespace knx
         EIBConnection* Connection;
     };
 }
-
-#endif // WB_MQTT_KNX_KNXCONNECTION_H

@@ -1,5 +1,4 @@
-#ifndef WB_MQTT_KNX_IKNXCLIENT_H
-#define WB_MQTT_KNX_IKNXCLIENT_H
+#pragma once
 
 #include "knxtelegram.h"
 #include <functional>
@@ -15,5 +14,3 @@ namespace knx
         virtual ~IKnxClient() = default;
     };
 }
-
-#endif // WB_MQTT_KNX_IKNXCLIENT_H

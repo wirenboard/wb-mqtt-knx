@@ -1,5 +1,4 @@
-#ifndef WB_MQTT_KNX_EXCEPTIONS_H
-#define WB_MQTT_KNX_EXCEPTIONS_H
+#pragma once
 
 #include <wblib/exceptions.h>
 
@@ -13,4 +12,3 @@ namespace knx
     };
 } // namespace knx
 
-#endif // WB_MQTT_KNX_EXCEPTIONS_H

@@ -1,5 +1,4 @@
-#ifndef WB_MQTT_KNX_KNXTELEGRAM_H
-#define WB_MQTT_KNX_KNXTELEGRAM_H
+#pragma once
 
 #include "knxtelegramtpdu.h"
 #include <eibclient.h>
@@ -65,5 +64,3 @@ namespace knx
     };
 
 } // namespace knx
-
-#endif // WB_MQTT_KNX_KNXTELEGRAM_H
