@@ -1,25 +1,43 @@
-execute_process (COMMAND /usr/bin/which gcc-4.7 RESULT_VARIABLE IS_GCC47)
+cmake_minimum_required(VERSION 3.7)
 
-if (${IS_GCC47} STREQUAL "0")
-    set(CMAKE_C_COMPILER gcc-4.7)
-    set(CMAKE_CXX_COMPILER g++-4.7)
-else()
-    set(CMAKE_C_COMPILER gcc)
-    set(CMAKE_CXX_COMPILER g++)
-endif()
+project(wb-mqtt-knx VERSION 1.0.0)
 
-project(wb-mqtt-knx)
-enable_testing()
-cmake_minimum_required(VERSION 2.8)
+# specify the C++ standard
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+
+add_compile_options(-Wall -Werror -pedantic)
+
+if (CMAKE_BUILD_TYPE MATCHES Debug)
+    add_compile_options(-O0 -gdwarf-3 --coverage)
+else ()
+    add_compile_options(-O2 -DNDEBUG)
+endif ()
+
 aux_source_directory(src/ SRC_LIST)
-aux_source_directory(test/ TEST_LIST)
-set(CMAKE_CXX_FLAGS "-std=c++0x -O2 -Wall -Werror -pedantic ")
 add_executable(${PROJECT_NAME} ${SRC_LIST})
-add_executable(${PROJECT_NAME}_test ${TEST_LIST} src/Telegram.cpp src/Exception.cpp)
-target_link_libraries(${PROJECT_NAME} -lwbmqtt -lmosquitto -lmosquittopp -leibclient -llog4cpp)
-target_link_libraries(${PROJECT_NAME}_test -lgtest -lgtest_main -lwbmqtt -pthread)
-install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
+target_link_libraries(${PROJECT_NAME} wbmqtt1 eibclient pthread)
 
-add_test(telegram_test ${PROJECT_NAME}_test)
-add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND}
-                  DEPENDS ${PROJECT_NAME}_test)
+if (CMAKE_BUILD_TYPE MATCHES Debug)
+    target_link_libraries(${PROJECT_NAME} gcov)
+endif ()
+
+# Adding unit tests
+enable_testing()
+aux_source_directory(test/ TEST_LIST)
+add_executable(${PROJECT_NAME}_test ${TEST_LIST}
+        src/knxtelegram.cpp
+        src/knxexception.cpp
+        src/knxconverter.cpp
+        src/knxtelegramtpdu.cpp
+        )
+
+target_link_libraries(${PROJECT_NAME}_test gtest gtest_main wbmqtt1 pthread)
+
+if (CMAKE_BUILD_TYPE MATCHES Debug)
+    target_link_libraries(${PROJECT_NAME}_test gcov)
+endif ()
+
+add_test(${PROJECT_NAME}_test ${PROJECT_NAME}_test)
+
+install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)

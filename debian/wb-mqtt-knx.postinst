@@ -1,6 +1,0 @@
-#!/bin/bash
-
-if [ -x "/etc/init.d/wb-mqtt-knx" ]; then
-    update-rc.d wb-mqtt-knx defaults > /dev/null
-    invoke-rc.d wb-mqtt-knx start || true
-fi
