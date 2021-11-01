@@ -63,4 +63,4 @@ namespace knx
         TTpdu Mtpdu;
     };
 
-} // namespace knx
+}

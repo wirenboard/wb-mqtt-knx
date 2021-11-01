@@ -10,4 +10,4 @@ namespace knx
         std::string KnxTelegramToMqtt(const TTelegram& telegram);
         std::shared_ptr<TTelegram> MqttToKnxTelegram(const std::string& payload);
     }
-} // namespace knx
+}

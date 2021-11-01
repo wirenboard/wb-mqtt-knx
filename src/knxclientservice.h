@@ -41,4 +41,4 @@ namespace knx
         WBMQTT::TLogger& DebugLogger;
         WBMQTT::TLogger& InfoLogger;
     };
-} // namespace knx
+}

@@ -10,5 +10,4 @@ namespace knx
         explicit TKnxException() = delete;
         TKnxException(const char* file, int line, const std::string& message);
     };
-} // namespace knx
-
+}
