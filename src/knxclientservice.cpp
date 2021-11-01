@@ -65,7 +65,7 @@ namespace knx
 
     void TKnxClientService::KnxdConnectProcessing()
     {
-        //The loop responsible for connecting to the knxd server
+        // The loop responsible for connecting to the knxd server
         while (IsStarted) {
             TKnxConnection In(KnxServerUrl);
 
