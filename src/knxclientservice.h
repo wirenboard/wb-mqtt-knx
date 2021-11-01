@@ -35,7 +35,6 @@ namespace knx
         std::function<void(const TTelegram&)> OnReceiveTelegramHandler;
 
         std::atomic<bool> IsStarted{false};
-        std::mutex IsStartedMutex;
         std::mutex SetterMutex;
         std::unique_ptr<std::thread> Worker;
 

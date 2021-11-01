@@ -112,12 +112,10 @@ namespace knx
 
     void TKnxClientService::Start()
     {
-        {
-            std::lock_guard<std::mutex> lg(IsStartedMutex);
-            if (IsStarted) {
-                wb_throw(knx::TKnxException, "Attempt to start already started driver");
-            }
-            IsStarted = true;
+        bool expectedIsStartedValue = false;
+
+        if (!IsStarted.compare_exchange_strong(expectedIsStartedValue, true)) {
+            wb_throw(knx::TKnxException, "Attempt to start already started driver");
         }
 
         Worker = WBMQTT::MakeThread("KnxClient thread", {[this] { KnxdConnectProcessing(); }});
@@ -125,13 +123,12 @@ namespace knx
 
     void TKnxClientService::Stop()
     {
-        {
-            std::lock_guard<std::mutex> lg(IsStartedMutex);
-            if (!IsStarted) {
-                wb_throw(knx::TKnxException, "Attempt to stop already stopped TKnxDevice");
-            }
-            IsStarted = false;
+        bool expectedIsStartedValue = true;
+
+        if (!IsStarted.compare_exchange_strong(expectedIsStartedValue, false)) {
+            wb_throw(knx::TKnxException, "Attempt to stop already stopped TKnxDevice");
         }
+
         SetOnReceive({});
         if (Worker->joinable()) {
             Worker->join();
