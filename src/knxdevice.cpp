@@ -12,12 +12,12 @@ namespace
 } // namespace
 
 TKnxDevice::TKnxDevice(std::shared_ptr<WBMQTT::TDeviceDriver> pMqttDriver,
-                       std::shared_ptr<knx::IKnxClient> pKnxClient,
+                       std::shared_ptr<knx::ISender<TTelegram>> pKnxTelegramSender,
                        WBMQTT::TLogger& errorLogger,
                        WBMQTT::TLogger& debugLogger,
                        WBMQTT::TLogger& infoLogger)
     : DeviceDriver(std::move(pMqttDriver)),
-      KnxClient(std::move(pKnxClient)),
+      KnxTelegramSender(std::move(pKnxTelegramSender)),
       ErrorLogger(errorLogger),
       DebugLogger(debugLogger),
       InfoLogger(infoLogger)
@@ -39,24 +39,13 @@ TKnxDevice::TKnxDevice(std::shared_ptr<WBMQTT::TDeviceDriver> pMqttDriver,
                                       .SetReadonly(false))
                   .GetValue();
 
-    KnxClient->SetOnReceive([this](const TTelegram& telegram) {
-        try {
-            const auto mqttData = converter::KnxTelegramToMqtt(telegram);
-            Control->UpdateRawValue(DeviceDriver->BeginTx(), mqttData).Wait();
-        } catch (const TKnxException& e) {
-            ErrorLogger.Log() << e.what();
-        } catch (const std::exception& e) {
-            ErrorLogger.Log() << e.what();
-        }
-    });
-
     EventHandlerHandle =
         DeviceDriver->On<WBMQTT::TControlOnValueEvent>([this](const WBMQTT::TControlOnValueEvent& event) {
             DebugLogger.Log() << "On event message:\"" << event.RawValue << "\""
                               << " from control: " << event.Control->GetId();
             try {
                 auto telegram = knx::converter::MqttToKnxTelegram(event.RawValue);
-                KnxClient->Send(*telegram);
+                KnxTelegramSender->Send(*telegram);
             } catch (const TKnxException& e) {
                 ErrorLogger.Log() << e.what();
             } catch (const std::exception& e) {
@@ -75,5 +64,17 @@ void TKnxDevice::Deinit()
         ErrorLogger.Log() << "Exception during TKnxDevice::Deinit: " << e.what();
     } catch (...) {
         ErrorLogger.Log() << "Unknown exception during TKnxDevice::Deinit";
+    }
+}
+
+void TKnxDevice::Notify(const TTelegram& telegram)
+{
+    try {
+        const auto mqttData = converter::KnxTelegramToMqtt(telegram);
+        Control->UpdateRawValue(DeviceDriver->BeginTx(), mqttData).Wait();
+    } catch (const TKnxException& e) {
+        ErrorLogger.Log() << e.what();
+    } catch (const std::exception& e) {
+        ErrorLogger.Log() << e.what();
     }
 }

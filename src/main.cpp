@@ -100,13 +100,16 @@ int main(int argc, char** argv)
 
         auto knxClientService =
             std::make_shared<knx::TKnxClientService>(knxUrl, ErrorLogger, VerboseLogger, InfoLogger);
-        auto knxDevice =
+        auto knxLegacyDevice =
             std::make_shared<knx::TKnxDevice>(mqttDriver, knxClientService, ErrorLogger, VerboseLogger, InfoLogger);
 
         WBMQTT::SignalHandling::OnSignals({SIGINT, SIGTERM}, [&] {
+            knxClientService->Unsubscribe(knxLegacyDevice);
+            knxLegacyDevice->Deinit();
             knxClientService->Stop();
-            knxDevice->Deinit();
         });
+
+        knxClientService->Subscribe(knxLegacyDevice);
 
         knxClientService->Start();
 
