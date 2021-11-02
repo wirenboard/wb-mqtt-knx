@@ -113,7 +113,7 @@ namespace knx
         bool expectedIsStartedValue = true;
 
         if (!IsStarted.compare_exchange_strong(expectedIsStartedValue, false)) {
-            wb_throw(knx::TKnxException, "Attempt to stop already stopped TKnxDevice");
+            wb_throw(knx::TKnxException, "Attempt to stop already stopped TKnxClientService");
         }
 
         if (Worker->joinable()) {

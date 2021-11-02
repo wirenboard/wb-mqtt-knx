@@ -1,4 +1,4 @@
-#include "knxdevice.h"
+#include "knxlegacydevice.h"
 #include "knxconverter.h"
 #include "knxexception.h"
 
@@ -11,7 +11,7 @@ namespace
     constexpr auto CONTROL_TYPE = "text";
 } // namespace
 
-TKnxDevice::TKnxDevice(std::shared_ptr<WBMQTT::TDeviceDriver> pMqttDriver,
+TKnxLegacyDevice::TKnxLegacyDevice(std::shared_ptr<WBMQTT::TDeviceDriver> pMqttDriver,
                        std::shared_ptr<knx::ISender<TTelegram>> pKnxTelegramSender,
                        WBMQTT::TLogger& errorLogger,
                        WBMQTT::TLogger& debugLogger,
@@ -54,20 +54,20 @@ TKnxDevice::TKnxDevice(std::shared_ptr<WBMQTT::TDeviceDriver> pMqttDriver,
         });
 }
 
-void TKnxDevice::Deinit()
+void TKnxLegacyDevice::Deinit()
 {
     DeviceDriver->RemoveEventHandler(EventHandlerHandle);
 
     try {
         DeviceDriver->BeginTx()->RemoveDeviceById(DEVICE_ID).Sync();
     } catch (const std::exception& e) {
-        ErrorLogger.Log() << "Exception during TKnxDevice::Deinit: " << e.what();
+        ErrorLogger.Log() << "Exception during TKnxLegacyDevice::Deinit: " << e.what();
     } catch (...) {
-        ErrorLogger.Log() << "Unknown exception during TKnxDevice::Deinit";
+        ErrorLogger.Log() << "Unknown exception during TKnxLegacyDevice::Deinit";
     }
 }
 
-void TKnxDevice::Notify(const TTelegram& telegram)
+void TKnxLegacyDevice::Notify(const TTelegram& telegram)
 {
     try {
         const auto mqttData = converter::KnxTelegramToMqtt(telegram);

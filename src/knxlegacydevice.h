@@ -9,10 +9,10 @@
 namespace knx
 {
 
-    class TKnxDevice: public ISubscriber<TTelegram>
+    class TKnxLegacyDevice: public ISubscriber<TTelegram>
     {
     public:
-        explicit TKnxDevice(std::shared_ptr<WBMQTT::TDeviceDriver> pMqttDriver,
+        explicit TKnxLegacyDevice(std::shared_ptr<WBMQTT::TDeviceDriver> pMqttDriver,
                             std::shared_ptr<knx::ISender<TTelegram>> pKnxTelegramSender,
                             WBMQTT::TLogger& errorLogger,
                             WBMQTT::TLogger& debugLogger,
@@ -20,7 +20,7 @@ namespace knx
 
         void Deinit();
 
-        virtual ~TKnxDevice() = default;
+        virtual ~TKnxLegacyDevice() = default;
 
         void Notify(const TTelegram& t) override;
 

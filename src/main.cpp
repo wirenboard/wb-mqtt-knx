@@ -1,5 +1,5 @@
 #include "knxclientservice.h"
-#include "knxdevice.h"
+#include "knxlegacydevice.h"
 #include <getopt.h>
 #include <unistd.h>
 #include <wblib/log.h>
@@ -101,7 +101,7 @@ int main(int argc, char** argv)
         auto knxClientService =
             std::make_shared<knx::TKnxClientService>(knxUrl, ErrorLogger, VerboseLogger, InfoLogger);
         auto knxLegacyDevice =
-            std::make_shared<knx::TKnxDevice>(mqttDriver, knxClientService, ErrorLogger, VerboseLogger, InfoLogger);
+            std::make_shared<knx::TKnxLegacyDevice>(mqttDriver, knxClientService, ErrorLogger, VerboseLogger, InfoLogger);
 
         WBMQTT::SignalHandling::OnSignals({SIGINT, SIGTERM}, [&] {
             knxClientService->Unsubscribe(knxLegacyDevice);
