@@ -13,16 +13,16 @@ namespace knx
     {
     public:
         explicit TKnxLegacyDevice(std::shared_ptr<WBMQTT::TDeviceDriver> pMqttDriver,
-                            std::shared_ptr<knx::ISender<TTelegram>> pKnxTelegramSender,
-                            WBMQTT::TLogger& errorLogger,
-                            WBMQTT::TLogger& debugLogger,
-                            WBMQTT::TLogger& infoLogger);
+                                  std::shared_ptr<knx::ISender<TTelegram>> pKnxTelegramSender,
+                                  WBMQTT::TLogger& errorLogger,
+                                  WBMQTT::TLogger& debugLogger,
+                                  WBMQTT::TLogger& infoLogger);
 
         void Deinit();
 
-        virtual ~TKnxLegacyDevice() = default;
-
         void Notify(const TTelegram& t) override;
+
+        virtual ~TKnxLegacyDevice() = default;
 
     private:
         std::shared_ptr<WBMQTT::TDeviceDriver> DeviceDriver;

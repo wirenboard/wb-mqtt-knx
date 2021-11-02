@@ -34,7 +34,7 @@ namespace knx
           InfoLogger(infoLogger)
     {}
 
-    void TKnxClientService::Send(const TTelegram& telegram)
+    void TKnxClientService::Send(const TTelegram& telegram) const
     {
 
         if (!IsStarted)

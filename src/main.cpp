@@ -1,4 +1,6 @@
 #include "knxclientservice.h"
+#include "knxgroupobject/mqtt.h"
+#include "knxgroupobjectcontroller.h"
 #include "knxlegacydevice.h"
 #include <getopt.h>
 #include <unistd.h>
@@ -100,8 +102,12 @@ int main(int argc, char** argv)
 
         auto knxClientService =
             std::make_shared<knx::TKnxClientService>(knxUrl, ErrorLogger, VerboseLogger, InfoLogger);
-        auto knxLegacyDevice =
-            std::make_shared<knx::TKnxLegacyDevice>(mqttDriver, knxClientService, ErrorLogger, VerboseLogger, InfoLogger);
+        auto knxLegacyDevice = std::make_shared<knx::TKnxLegacyDevice>(mqttDriver,
+                                                                       knxClientService,
+                                                                       ErrorLogger,
+                                                                       VerboseLogger,
+                                                                       InfoLogger);
+        auto knxGroupObjectController = std::make_shared<knx::TKnxGroupObjectController>(knxClientService);
 
         WBMQTT::SignalHandling::OnSignals({SIGINT, SIGTERM}, [&] {
             knxClientService->Unsubscribe(knxLegacyDevice);
@@ -110,6 +116,9 @@ int main(int argc, char** argv)
         });
 
         knxClientService->Subscribe(knxLegacyDevice);
+        knxClientService->Subscribe(knxGroupObjectController);
+
+        knxGroupObjectController->AddGroupObject({1, 1, 100}, ::knx::object::TGroupObjectMqttFactory());
 
         knxClientService->Start();
 

@@ -12,10 +12,10 @@ namespace
 } // namespace
 
 TKnxLegacyDevice::TKnxLegacyDevice(std::shared_ptr<WBMQTT::TDeviceDriver> pMqttDriver,
-                       std::shared_ptr<knx::ISender<TTelegram>> pKnxTelegramSender,
-                       WBMQTT::TLogger& errorLogger,
-                       WBMQTT::TLogger& debugLogger,
-                       WBMQTT::TLogger& infoLogger)
+                                   std::shared_ptr<knx::ISender<TTelegram>> pKnxTelegramSender,
+                                   WBMQTT::TLogger& errorLogger,
+                                   WBMQTT::TLogger& debugLogger,
+                                   WBMQTT::TLogger& infoLogger)
     : DeviceDriver(std::move(pMqttDriver)),
       KnxTelegramSender(std::move(pKnxTelegramSender)),
       ErrorLogger(errorLogger),
@@ -45,7 +45,11 @@ TKnxLegacyDevice::TKnxLegacyDevice(std::shared_ptr<WBMQTT::TDeviceDriver> pMqttD
                               << " from control: " << event.Control->GetId();
             try {
                 auto telegram = knx::converter::MqttToKnxTelegram(event.RawValue);
-                KnxTelegramSender->Send(*telegram);
+                if (KnxTelegramSender)
+                    KnxTelegramSender->Send(*telegram);
+                else {
+                    ErrorLogger.Log() << "TKnxLegacyDevice: KnxTelegramSender is nullptr";
+                }
             } catch (const TKnxException& e) {
                 ErrorLogger.Log() << e.what();
             } catch (const std::exception& e) {

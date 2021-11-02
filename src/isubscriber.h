@@ -2,9 +2,9 @@
 
 namespace knx
 {
-    template<typename T> class ISubscriber
+    template<typename... Args> class ISubscriber
     {
     public:
-        virtual void Notify(const T& data) = 0;
+        virtual void Notify(const Args&... args) = 0;
     };
 }

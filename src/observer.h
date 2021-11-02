@@ -6,10 +6,10 @@
 
 namespace knx
 {
-    template<typename T> class Observer
+    template<typename... Args> class Observer
     {
     public:
-        virtual bool Subscribe(std::shared_ptr<ISubscriber<T>> subscriber) noexcept
+        virtual bool Subscribe(std::shared_ptr<ISubscriber<Args...>> subscriber) noexcept
         {
             auto it = std::find(SubscriberList.begin(), SubscriberList.end(), subscriber);
             if (it == SubscriberList.end()) {
@@ -19,7 +19,7 @@ namespace knx
             return false;
         }
 
-        virtual bool Unsubscribe(std::shared_ptr<ISubscriber<T>> subscriber) noexcept
+        virtual bool Unsubscribe(std::shared_ptr<ISubscriber<Args...>> subscriber) noexcept
         {
             auto it = std::find(SubscriberList.begin(), SubscriberList.end(), subscriber);
             if (it != SubscriberList.end()) {
@@ -32,14 +32,14 @@ namespace knx
         virtual ~Observer() = default;
 
     protected:
-        virtual void NotifyAllSubscribers(const T& data) noexcept
+        virtual void NotifyAllSubscribers(const Args&... data) noexcept
         {
             for (const auto& subscriber: SubscriberList) {
-                subscriber->Notify(data);
+                subscriber->Notify(data...);
             }
         }
 
     private:
-        std::vector<std::shared_ptr<ISubscriber<T>>> SubscriberList;
+        std::vector<std::shared_ptr<ISubscriber<Args...>>> SubscriberList;
     };
 }

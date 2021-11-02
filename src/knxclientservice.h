@@ -17,7 +17,7 @@ namespace knx
                                    WBMQTT::TLogger& debugLogger,
                                    WBMQTT::TLogger& infoLogger);
 
-        void Send(const TTelegram& telegram) override;
+        void Send(const TTelegram& telegram) const override;
 
         void Start();
         void Stop();

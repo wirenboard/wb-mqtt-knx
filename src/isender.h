@@ -1,11 +1,10 @@
 #pragma once
 
-namespace knx{
-    template<typename T>
-    class ISender{
+namespace knx
+{
+    template<typename... Args> class ISender
+    {
     public:
-        virtual void Send(const T& data) = 0;
-
-        virtual ~ISender() = default;
+        virtual void Send(const Args&... args) const = 0;
     };
 }
