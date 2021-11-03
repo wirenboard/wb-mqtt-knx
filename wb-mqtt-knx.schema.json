@@ -1,7 +1,12 @@
 {
   "type": "object",
   "title": "KNX Group Object Configuration",
-  "definitions": {},
+  "definitions": {
+    "device": {
+      "type": "object",
+      "title": "Device"
+    }
+  },
   "properties": {
     "config_version": {
       "type": "integer",
@@ -16,6 +21,20 @@
       "default": false,
       "_format": "checkbox",
       "propertyOrder": 2
+    },
+    "devices": {
+      "type": "array",
+      "title": "List of devices",
+      "items": {
+        "$ref": "#/definitions/device"
+      },
+      "minItems": 1,
+      "_format": "tabs",
+      "propertyOrder": 3,
+      "options": {
+        "disable_collapse": true,
+        "disable_array_delete_last_row": true
+      }
     }
   },
   "options": {
