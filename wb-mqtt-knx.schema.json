@@ -1,6 +1,19 @@
 {
   "type": "object",
   "title": "KNX Group Object Configuration",
+  "definitions": {},
+  "properties": {
+    "debug": {
+      "type": "boolean",
+      "title": "Enable debug logging",
+      "default": false,
+      "_format": "checkbox",
+      "propertyOrder": 1
+    }
+  },
+  "options": {
+    "disable_edit_json": false
+  },
   "configFile": {
     "path": "/etc/wb-mqtt-knx.conf",
     "service": "wb-mqtt-knx",
