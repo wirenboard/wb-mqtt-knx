@@ -1,0 +1,9 @@
+{
+  "type": "object",
+  "title": "KNX Group Object Configuration",
+  "configFile": {
+    "path": "/etc/wb-mqtt-knx.conf",
+    "service": "wb-mqtt-knx",
+    "validate": false
+  }
+}
