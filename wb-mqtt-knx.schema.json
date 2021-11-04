@@ -11,9 +11,9 @@
           "type": "string",
           "title": "Device ID",
           "minLength": "1",
-          "propertyOrder" : 1
+          "propertyOrder": 1
         },
-        "groupObjects" : {
+        "groupObjects": {
           "type": "array",
           "title": "List of group objects",
           "items": {
@@ -29,39 +29,53 @@
         }
       }
     },
-    "groupObject" : {
-      "headerTemplate" : "group_object_header_template",
-      "type" : "object",
-      "title" : "Group object",
-      "properties" : {
-        "mainGroup" : {
-          "type" : "integer",
-          "title" : "Main Group",
-          "minimum" : 0,
-          "maximum" : 15,
-          "default": 0,
-          "propertyOrder" : 1
+    "groupObject": {
+      "headerTemplate": "group_object_header_template",
+      "type": "object",
+      "title": "Group object",
+      "properties": {
+        "groupAddress": {
+          "type" : "object",
+          "title" : "Group Address",
+          "propertyOrder": 1,
+          "_format" : "grid",
+          "options":{
+            "collapsed":false,
+            "disable_collapse":true,
+            "disable_properties":true,
+            "disable_edit_json": true
+          },
+          "properties": {
+            "main": {
+              "type": "integer",
+              "title": "Main",
+              "minimum": 0,
+              "maximum": 15,
+              "default": 0,
+              "propertyOrder": 1
+            },
+            "middle": {
+              "type": "integer",
+              "title": "Middle",
+              "minimum": 0,
+              "maximum": 7,
+              "default": 0,
+              "propertyOrder": 2
+            },
+            "sub": {
+              "type": "integer",
+              "title": "Sub",
+              "minimum": 0,
+              "maximum": 255,
+              "default": 0,
+              "propertyOrder": 3
+            }
+          }
         },
-        "middleGroup" : {
-          "type" : "integer",
-          "title" : "Middle Group",
-          "minimum" : 0,
-          "maximum" : 7,
-          "default": 0,
-          "propertyOrder": 2
-        },
-        "subGroup" : {
-          "type" : "integer",
-          "title" : "Sub Group",
-          "minimum" : 0,
-          "maximum" : 255,
-          "default": 0,
-          "propertyOrder": 3
-        },
-        "dataPointType" : {
-          "type" : "string",
-          "title" : "Data point type",
-          "enum" : [
+        "dataPointType": {
+          "type": "string",
+          "title": "Data point type",
+          "enum": [
             "none",
             "1.xxx_B1",
             "2.xxx_B2",
@@ -84,8 +98,8 @@
             "19.001_DateTime",
             "TODO..."
           ],
-          "default" : "none",
-          "propertyOrder" : 4
+          "default": "none",
+          "propertyOrder": 2
         }
       }
     }
@@ -134,8 +148,8 @@
   },
   "translations": {
     "en": {
-      "device_header_template" : "Device {{self.deviceId}}",
-      "group_object_header_template" : "{{self.mainGroup}}:{{self.middleGroup}}:{{self.subGroup}}"
+      "device_header_template": "Device {{self.deviceId}}",
+      "group_object_header_template": "{{self.groupAddress.main}}:{{self.groupAddress.middle}}:{{self.groupAddress.sub}}"
     }
   }
 }
