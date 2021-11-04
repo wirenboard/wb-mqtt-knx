@@ -3,8 +3,16 @@
   "title": "KNX Group Object Configuration",
   "definitions": {
     "device": {
+      "headerTemplate": "device_header_template",
       "type": "object",
-      "title": "Device"
+      "title": "Device",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "Id",
+          "minLength": "1"
+        }
+      }
     }
   },
   "properties": {
@@ -48,5 +56,10 @@
     "path": "/etc/wb-mqtt-knx.conf",
     "service": "wb-mqtt-knx",
     "validate": false
+  },
+  "translations": {
+    "en": {
+      "device_header_template": "Device {{self.id}}"
+    }
   }
 }
