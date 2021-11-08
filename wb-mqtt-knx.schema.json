@@ -76,7 +76,7 @@
           "type": "string",
           "title": "Data point type",
           "enum": [
-            "none",
+            "Raw value",
             "1.xxx_B1",
             "2.xxx_B2",
             "3.xxx_B1U3",
