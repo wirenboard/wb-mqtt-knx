@@ -33,7 +33,7 @@
 | datapoint_field | type | range |
 | ---- | ---- | ----|
 | c | switch | 0, 1 |
-| StepCode | value |  000b ... 111b |
+| StepCode | value |  0 ... 7 |
 
 ### 4.xxx_Character_Set
 
@@ -62,7 +62,7 @@
 | c | switch | 0,1 |
 | d | switch | 0,1 |
 | e | switch | 0,1 |
-| f | value | 001b, 010b, 100b |
+| f | value | 1, 2, 4 |
 
 ### 7.xxx_2-Octet_Unsigned_Value
 
