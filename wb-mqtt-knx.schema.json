@@ -13,15 +13,20 @@
           "minLength": "1",
           "propertyOrder": 1
         },
-        "groupObjects": {
+        "deviceTitle": {
+          "type": "string",
+          "title": "Title",
+          "propertyOrder": 2
+        },
+        "controls": {
           "type": "array",
-          "title": "List of group objects",
+          "title": "List of Controls",
           "items": {
-            "$ref": "#/definitions/groupObject"
+            "$ref": "#/definitions/control"
           },
           "minItems": 1,
           "_format": "tabs",
-          "propertyOrder": 2,
+          "propertyOrder": 3,
           "options": {
             "disable_collapse": true,
             "disable_array_delete_last_row": true
@@ -29,25 +34,30 @@
         }
       }
     },
-    "groupObject": {
+    "control": {
       "headerTemplate": "group_object_header_template",
       "type": "object",
-      "title": "Group object",
+      "title": "Control",
       "properties": {
-        "group_object_id": {
+        "controlId": {
           "type": "string",
-          "title": "Group object ID",
+          "title": "Control ID",
           "minLength": "1",
           "propertyOrder": 1
+        },
+        "controlTitle": {
+          "type": "string",
+          "title": "Title",
+          "propertyOrder": 2
         },
         "groupAddress": {
           "title": "Group Address",
           "type": "string",
-          "propertyOrder": 2,
+          "propertyOrder": 3,
           "pattern": "(?!^ *0*/0*/0* *$)(?!^ *0*/0* *$)(?=(^ *(0*\\d|0*1[0-5])/(0*[0-7])/(0*\\d{1,2}|0*[0-1]\\d{1,2}|0*2[0-4]\\d|0*25[0-5]) *$)|(^ *(0*\\d|0*1[0-5])/(0*\\d{1,3}|0*[0-1]\\d{3}|0*20[0-3]\\d|0*204[0-7]) *$))",
           "options": {
             "inputAttributes": {
-              "placeholder": "[0..15]/[0..7]/[0..255] OR [0..15]/[0..2047]; NOT 0/0/0; NOT 0/0"
+              "placeholder": "Example: 7/7/140 , 7/1034"
             },
             "patternmessage": "Incorrect KNX address"
           }
@@ -80,18 +90,13 @@
             "TODO..."
           ],
           "default": "1.xxx_B1",
-          "propertyOrder": 3
-        },
-        "description": {
-          "type": "string",
-          "title": "Description",
           "propertyOrder": 4
         }
       }
     }
   },
   "properties": {
-    "config_version": {
+    "configVersion": {
       "type": "integer",
       "title": "Config version",
       "minimum": 1,
@@ -111,7 +116,7 @@
     },
     "devices": {
       "type": "array",
-      "title": "List of devices",
+      "title": "List of Devices",
       "items": {
         "$ref": "#/definitions/device"
       },
@@ -128,7 +133,7 @@
     "disable_edit_json": false
   },
   "defaultProperties": [
-    "config_version",
+    "configVersion",
     "debug"
   ],
   "configFile": {
@@ -139,7 +144,7 @@
   "translations": {
     "en": {
       "device_header_template": "{{self.deviceId}}",
-      "group_object_header_template": "{{self.group_object_id}} ({{self.groupAddress}})"
+      "group_object_header_template": "{{self.controlId}} ({{self.groupAddress}})"
     }
   }
 }
