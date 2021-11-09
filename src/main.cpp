@@ -1,3 +1,4 @@
+#include "config.h"
 #include "knxclientservice.h"
 #include "knxgroupobject/mqtt.h"
 #include "knxgroupobjectcontroller.h"
@@ -10,7 +11,6 @@
 
 namespace
 {
-    constexpr auto DRIVER_ID = "wb-mqtt-knx";
     const auto KNX_DRIVER_INIT_TIMEOUT_S = std::chrono::seconds(30);
     const auto KNX_DRIVER_STOP_TIMEOUT_S = std::chrono::seconds(60); // topic cleanup can take a lot of time
 
@@ -25,7 +25,7 @@ int main(int argc, char** argv)
     std::string knxUrl = "ip:localhost:6720";
     mqttConfig.Host = "localhost";
     mqttConfig.Port = 1883;
-    mqttConfig.Id = "wb-knx";
+    mqttConfig.Id = PROJECT_NAME;
 
     int c;
     int verboseLevel = 0;
@@ -60,7 +60,7 @@ int main(int argc, char** argv)
 
     WBMQTT::TPromise<void> initialized;
 
-    WBMQTT::SetThreadName("wb-mqtt-knx");
+    WBMQTT::SetThreadName(PROJECT_NAME);
     WBMQTT::SignalHandling::Handle({SIGINT, SIGTERM, SIGHUP});
     WBMQTT::SignalHandling::OnSignals({SIGINT, SIGTERM}, [&] {
         WBMQTT::SignalHandling::Stop();
@@ -87,7 +87,7 @@ int main(int argc, char** argv)
 
         auto mqttClient = WBMQTT::NewMosquittoMqttClient(mqttConfig);
         auto mqttDriver = WBMQTT::NewDriver(WBMQTT::TDriverArgs{}
-                                                .SetId(DRIVER_ID)
+                                                .SetId(PROJECT_NAME)
                                                 .SetBackend(WBMQTT::NewDriverBackend(mqttClient))
                                                 .SetUseStorage(false)
                                                 .SetReownUnknownDevices(true));

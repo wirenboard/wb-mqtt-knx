@@ -1,6 +1,21 @@
 cmake_minimum_required(VERSION 3.7)
 
-project(wb-mqtt-knx VERSION 1.0.0)
+project(wb-mqtt-knx)
+
+execute_process (
+        COMMAND bash -c "head -1 ${PROJECT_SOURCE_DIR}/debian/changelog | awk '{ printf $2; }' | sed 's/[\(\)]//g'"
+        OUTPUT_VARIABLE DEB_VERSION
+)
+
+# tell CMake to generate config.h
+configure_file (
+        "${PROJECT_SOURCE_DIR}/src/config.h.in"
+        "${PROJECT_BINARY_DIR}/config.h"
+)
+
+# add the binary tree to the search path for include files
+# so that we will find config.h
+include_directories("${PROJECT_BINARY_DIR}")
 
 # specify the C++ standard
 set(CMAKE_CXX_STANDARD 14)

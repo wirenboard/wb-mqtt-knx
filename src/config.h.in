@@ -1,0 +1,6 @@
+#pragma once
+
+// the configured options and settings for wb-mqtt-knx
+
+#define PROJECT_NAME "@PROJECT_NAME@"
+#define DEB_VERSION "@DEB_VERSION@"
