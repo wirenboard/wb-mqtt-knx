@@ -2,6 +2,10 @@
 
 using namespace knx;
 
+TKnxGroupObjectController::TKnxGroupObjectController(std::shared_ptr<knx::ISender<TTelegram>> pSender)
+    : Sender(std::move(pSender))
+{}
+
 bool TKnxGroupObjectController::AddGroupObject(const TKnxGroupAddress& address,
                                                const object::IGroupObjectFactory& objectFactory)
 {

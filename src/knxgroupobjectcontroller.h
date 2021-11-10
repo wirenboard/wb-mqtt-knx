@@ -14,8 +14,7 @@ namespace knx
     public:
         explicit TKnxGroupObjectController() = delete;
 
-        explicit TKnxGroupObjectController(std::shared_ptr<knx::ISender<TTelegram>> pSender): Sender(std::move(pSender))
-        {}
+        explicit TKnxGroupObjectController(std::shared_ptr<knx::ISender<TTelegram>> pSender);
 
         bool AddGroupObject(const TKnxGroupAddress& address, const object::IGroupObjectFactory& objectFactory);
         bool RemoveGroupObject(const TKnxGroupAddress& address);
