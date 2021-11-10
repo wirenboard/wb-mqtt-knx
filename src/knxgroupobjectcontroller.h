@@ -9,14 +9,16 @@
 
 namespace knx
 {
-    class TKnxGroupObjectController: public ISubscriber<TTelegram>, public object::ISenderGroupObject
+    class TKnxGroupObjectController: public ISubscriber<TTelegram>,
+                                     public object::ISenderGroupObject,
+                                     public std::enable_shared_from_this<TKnxGroupObjectController>
     {
     public:
         explicit TKnxGroupObjectController() = delete;
 
         explicit TKnxGroupObjectController(std::shared_ptr<knx::ISender<TTelegram>> pSender);
 
-        bool AddGroupObject(const TKnxGroupAddress& address, const object::IGroupObjectFactory& objectFactory);
+        bool AddGroupObject(const std::shared_ptr<object::TGroupObjectBase>& groupObject);
         bool RemoveGroupObject(const TKnxGroupAddress& address);
 
         virtual ~TKnxGroupObjectController() = default;

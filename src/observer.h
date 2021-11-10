@@ -6,7 +6,7 @@
 
 namespace knx
 {
-    template<typename... Args> class Observer
+    template<typename... Args> class TObserver
     {
     public:
         virtual bool Subscribe(std::shared_ptr<ISubscriber<Args...>> subscriber)
@@ -29,7 +29,7 @@ namespace knx
             return false;
         }
 
-        virtual ~Observer() = default;
+        virtual ~TObserver() = default;
 
     protected:
         virtual void NotifyAllSubscribers(const Args&... data)

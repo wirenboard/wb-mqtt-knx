@@ -1,28 +1,29 @@
 #pragma once
 
+#include "../mqtt/imqttcontroladapter.h"
+#include "../mqtt/imqttdeviceadapter.h"
 #include "base.h"
 #include "ifactory.h"
+#include <wblib/wbmqtt.h>
+
+#include <utility>
 
 namespace knx
 {
     namespace object
     {
-        class TGroupObjectMqtt: public TGroupObjectBase
+        class TGroupObjectMqttBase: public TGroupObjectBase
         {
         public:
-            TGroupObjectMqtt(const TKnxGroupAddress& address, const ISenderGroupObject& sender)
-                : TGroupObjectBase(address, sender)
+            TGroupObjectMqttBase(const TKnxGroupAddress& address, std::shared_ptr<mqtt::IMqttDeviceAdapter> pMqttDevice)
+                : TGroupObjectBase(address),
+                  MqttDeviceAdapter(std::move(pMqttDevice))
             {}
-            void Notify(const TGroupObjectTransaction&) override;
 
-            virtual ~TGroupObjectMqtt() = default;
-        };
+            virtual ~TGroupObjectMqttBase() = default;
 
-        class TGroupObjectMqttFactory: public IGroupObjectFactory
-        {
-        public:
-            std::shared_ptr<TGroupObjectBase> Create(const TKnxGroupAddress& address,
-                                                     const ISenderGroupObject& groupObject) const override;
+        private:
+            std::shared_ptr<mqtt::IMqttDeviceAdapter> MqttDeviceAdapter;
         };
     }
 }

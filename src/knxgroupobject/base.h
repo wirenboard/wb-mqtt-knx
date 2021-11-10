@@ -1,5 +1,7 @@
 #pragma once
 
+#include <utility>
+
 #include "../isender.h"
 #include "../isubscriber.h"
 #include "../knxgroupaddress.h"
@@ -22,19 +24,28 @@ namespace knx
         class TGroupObjectBase: public ISubscriber<TGroupObjectTransaction>
         {
         public:
-            explicit TGroupObjectBase() = delete;
-
-            explicit TGroupObjectBase(const TKnxGroupAddress& address, const ISenderGroupObject& sender)
-                : SelfKnxAddress(address),
-                  Sender(sender)
+            explicit TGroupObjectBase(const TKnxGroupAddress& address): SelfKnxAddress(address)
             {}
 
+            virtual TKnxGroupAddress GetKnxAddress()
+            {
+                return SelfKnxAddress;
+            }
+
+            virtual void SetKnxSender(std::shared_ptr<ISenderGroupObject> sender)
+            {
+                Sender = sender;
+            }
+
+            void Notify(const TGroupObjectTransaction& args) override;
+
         protected:
-            void Send(const telegram::TApci&, const std::vector<uint8_t>& data) const;
+            void KnxSend(const telegram::TApci&, const std::vector<uint8_t>& data) const;
+            virtual void KnxNotify(const std::vector<uint8_t>& payload) = 0;
 
         private:
             const TKnxGroupAddress SelfKnxAddress;
-            const ISenderGroupObject& Sender;
+            std::shared_ptr<ISenderGroupObject> Sender;
         };
     }
 }

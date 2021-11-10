@@ -9,7 +9,7 @@
 
 namespace knx
 {
-    class TKnxClientService: public ISender<TTelegram>, public Observer<TTelegram>
+    class TKnxClientService: public ISender<TTelegram>, public TObserver<TTelegram>
     {
     public:
         explicit TKnxClientService(const std::string& knxServerUrl,
