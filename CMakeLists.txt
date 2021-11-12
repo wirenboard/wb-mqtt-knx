@@ -10,11 +10,7 @@ execute_process (
         OUTPUT_VARIABLE DEB_VERSION
 )
 
-# tell CMake to generate config.h
-configure_file (
-        "${PROJECT_SOURCE_DIR}/src/config.h.in"
-        "${PROJECT_BINARY_DIR}/config.h"
-)
+
 
 # add the binary tree to the search path for include files
 # so that we will find config.h
@@ -44,5 +40,11 @@ endif ()
 
 # Adding unit tests
 add_subdirectory(test)
+
+# tell CMake to generate config.h
+configure_file (
+        "${PROJECT_SOURCE_DIR}/src/config.h.in"
+        "${PROJECT_BINARY_DIR}/config.h"
+)
 
 install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)

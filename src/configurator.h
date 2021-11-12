@@ -1,7 +1,7 @@
 #pragma once
 
 #include "knxgroupobject/dpt1.h"
-#include "knxgroupobjectcontroller.h"
+#include "iknxgroupobjectcontroller.h"
 #include "mqtt/imqttcontroladapter.h"
 #include <wblib/json_utils.h>
 #include <wblib/wbmqtt.h>
@@ -22,7 +22,7 @@ namespace knx
             WBMQTT::JSON::Validate(*ConfigRoot, *SchemaRoot);
         }
 
-        void Configure(TKnxGroupObjectController& controller)
+        void Configure(IKnxGroupObjectController& controller)
         {
             auto devices = (*SchemaRoot)["devices"];
             for (const auto& device: devices) {

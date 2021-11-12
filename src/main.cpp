@@ -1,6 +1,6 @@
 #include "config.h"
+#include "configurator.h"
 #include "knxclientservice.h"
-#include "knxconfigurator.h"
 #include "knxgroupobjectcontroller.h"
 #include "knxlegacydevice.h"
 #include "mqtt/mqttcontroladapter.h"

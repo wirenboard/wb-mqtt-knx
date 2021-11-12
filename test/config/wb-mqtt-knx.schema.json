@@ -1,0 +1,150 @@
+{
+  "type": "object",
+  "title": "KNX Group Object Configuration",
+  "definitions": {
+    "device": {
+      "headerTemplate": "device_header_template",
+      "type": "object",
+      "title": "Device",
+      "properties": {
+        "deviceId": {
+          "type": "string",
+          "title": "Device ID",
+          "minLength": "1",
+          "propertyOrder": 1
+        },
+        "deviceTitle": {
+          "type": "string",
+          "title": "Title",
+          "propertyOrder": 2
+        },
+        "controls": {
+          "type": "array",
+          "title": "List of Controls",
+          "items": {
+            "$ref": "#/definitions/control"
+          },
+          "minItems": 1,
+          "_format": "tabs",
+          "propertyOrder": 3,
+          "options": {
+            "disable_collapse": true,
+            "disable_array_delete_last_row": true
+          }
+        }
+      }
+    },
+    "control": {
+      "headerTemplate": "group_object_header_template",
+      "type": "object",
+      "title": "Control",
+      "properties": {
+        "controlId": {
+          "type": "string",
+          "title": "Control ID",
+          "minLength": "1",
+          "propertyOrder": 1
+        },
+        "controlTitle": {
+          "type": "string",
+          "title": "Title",
+          "propertyOrder": 2
+        },
+        "groupAddress": {
+          "title": "Group Address",
+          "type": "string",
+          "propertyOrder": 3,
+          "pattern": "(?!^ *0\\/0\\/0 *$)(?!^ *0\\/0 *$)(?=(^ *(\\d|1[0-5])\\/([0-7])\\/(\\d|[1-9]\\d|1\\d{1,2}|2[0-4]\\d|25[0-5]) *$)|(^ *(\\d|1[0-5])\\/(\\d|[^0]\\d{1,2}|1\\d{3}|20[0-3]\\d|204[0-7]) *$))",
+          "options": {
+            "inputAttributes": {
+              "placeholder": "Example: 7/7/140 , 7/1034"
+            },
+            "patternmessage": "Incorrect KNX address"
+          }
+        },
+        "dataPointType": {
+          "type": "string",
+          "title": "Data point type",
+          "enum": [
+            "Raw_Value",
+            "1.xxx_B1",
+            "2.xxx_B2",
+            "3.xxx_B1U3",
+            "4.xxx_Character_Set",
+            "5.xxx_8-Bit_Unsigned_Value",
+            "6.xxx_V8",
+            "6.020_Status_with_Mode",
+            "7.xxx_2-Octet_Unsigned_Value",
+            "8.xxx_2-Octet_Signed_Value",
+            "9.xxx_2-Octet_Float_Value",
+            "10.001_Time",
+            "11.001_Date",
+            "12.001_4-Octet_Unsigned_Value",
+            "13.xxx_4-Octet_Signed_Value",
+            "14.xxx_4-Octet_Float_Value",
+            "15.000_Access_Data",
+            "16.xxx_String",
+            "17.xxx_Scene_Number",
+            "18.001_Scene_Control",
+            "19.001_DateTime",
+            "TODO..."
+          ],
+          "default": "1.xxx_B1",
+          "propertyOrder": 4
+        }
+      }
+    }
+  },
+  "properties": {
+    "configVersion": {
+      "type": "integer",
+      "title": "Config version",
+      "minimum": 1,
+      "maximum": 1,
+      "default": 1,
+      "propertyOrder": 1,
+      "options": {
+        "hidden": true
+      }
+    },
+    "debug": {
+      "type": "boolean",
+      "title": "Enable debug logging",
+      "default": false,
+      "_format": "checkbox",
+      "propertyOrder": 2
+    },
+    "devices": {
+      "type": "array",
+      "title": "List of Devices",
+      "items": {
+        "$ref": "#/definitions/device"
+      },
+      "minItems": 1,
+      "_format": "tabs",
+      "propertyOrder": 3,
+      "options": {
+        "disable_collapse": true,
+        "disable_array_delete_last_row": true
+      }
+    }
+  },
+  "options": {
+    "disable_edit_json": false
+  },
+  "defaultProperties": [
+    "configVersion",
+    "debug"
+  ],
+  "configFile": {
+    "path": "/etc/wb-mqtt-knx.conf",
+    "service": "wb-mqtt-knx",
+    "validate": false
+  },
+  "translations": {
+    "en": {
+      "device_header_template": "{{self.deviceId}}",
+      "group_object_header_template": "{{self.controlId}} ({{self.groupAddress}})"
+    }
+  }
+}
