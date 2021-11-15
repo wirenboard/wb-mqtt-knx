@@ -3,7 +3,6 @@
 #include "../mqtt/imqttcontroladapter.h"
 #include "../mqtt/imqttdeviceadapter.h"
 #include "base.h"
-#include "ifactory.h"
 #include <wblib/wbmqtt.h>
 
 #include <utility>

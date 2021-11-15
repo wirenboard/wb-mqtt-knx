@@ -8,6 +8,13 @@ TKnxGroupAddress::TKnxGroupAddress(uint32_t main, uint32_t middle, uint32_t sub)
       SubGroup(sub)
 {}
 
+TKnxGroupAddress::TKnxGroupAddress(uint32_t main, uint32_t sub)
+{
+    MainGroup = main;
+    MiddleGroup = (sub >> 8) & 0x03;
+    SubGroup = sub & 0xff;
+}
+
 TKnxGroupAddress::TKnxGroupAddress(eibaddr_t eibAddress)
 {
     MainGroup = (eibAddress >> 11) & 0x0F;
@@ -23,4 +30,8 @@ eibaddr_t TKnxGroupAddress::GetEibAddress() const
 bool TKnxGroupAddress::operator<(const TKnxGroupAddress& rhs) const
 {
     return GetEibAddress() < rhs.GetEibAddress();
+}
+bool TKnxGroupAddress::operator==(const TKnxGroupAddress& rhs) const
+{
+    return ((MainGroup == rhs.MainGroup) && (MiddleGroup == rhs.MiddleGroup) && (SubGroup == rhs.SubGroup));
 }

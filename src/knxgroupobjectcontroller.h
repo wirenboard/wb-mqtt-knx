@@ -1,9 +1,8 @@
 #pragma once
+#include "iknxgroupobjectcontroller.h"
 #include "knxgroupaddress.h"
 #include "knxgroupobject/base.h"
-#include "knxgroupobject/ifactory.h"
 #include "knxtelegram.h"
-#include "iknxgroupobjectcontroller.h"
 #include <map>
 #include <memory>
 #include <utility>

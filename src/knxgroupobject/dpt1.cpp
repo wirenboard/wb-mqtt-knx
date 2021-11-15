@@ -2,10 +2,10 @@
 
 using namespace knx::object;
 
-TDpt1::TDpt1(const knx::TKnxGroupAddress& address, const std::shared_ptr<mqtt::IMqttDeviceAdapter>& pMqttDevice)
-    : TGroupObjectMqttBase(address, pMqttDevice)
+TDpt1::TDpt1(const TGroupObjectMqttParameter& parameter, const std::shared_ptr<mqtt::IMqttDeviceAdapter>& pMqttDevice)
+    : TGroupObjectMqttBase(parameter.KnxAddress, pMqttDevice)
 {
-    ControlB = pMqttDevice->CreateControl("_b", "switch", "", 0, 1);
+    ControlB = pMqttDevice->CreateControl(parameter.ControlId + "_b", "switch", parameter.ControlTitle, 0, 1);
     ControlB->SetEventHandler([this](const WBMQTT::TAny& value) { MqttControlBNotify(value); });
 }
 

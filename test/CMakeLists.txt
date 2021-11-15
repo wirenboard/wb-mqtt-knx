@@ -9,9 +9,10 @@ add_executable(${PROJECT_NAME}_test ${TEST_LIST}
         ../src/knxconverter.cpp
         ../src/knxtelegramtpdu.cpp
         ../src/configurator.cpp
+        ../src/knxgroupaddress.cpp
         )
 
-target_link_libraries(${PROJECT_NAME}_test gtest gtest_main wbmqtt1 pthread)
+target_link_libraries(${PROJECT_NAME}_test gtest gtest_main gmock wbmqtt1 pthread)
 
 
 if (CMAKE_BUILD_TYPE MATCHES Debug)

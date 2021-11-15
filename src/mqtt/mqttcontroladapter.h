@@ -14,7 +14,7 @@ namespace mqtt
         explicit MqttControlAdapter() = delete;
         virtual ~MqttControlAdapter() = default;
 
-        void Send(WBMQTT::TAny && value) override;
+        void Send(WBMQTT::TAny&& value) override;
         void SetEventHandler(const std::function<void(const WBMQTT::TAny&)>& f) override;
 
     private:

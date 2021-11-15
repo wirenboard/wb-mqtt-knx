@@ -39,6 +39,7 @@ if (CMAKE_BUILD_TYPE MATCHES Debug)
 endif ()
 
 # Adding unit tests
+enable_testing()
 add_subdirectory(test)
 
 # tell CMake to generate config.h

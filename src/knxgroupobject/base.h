@@ -24,18 +24,11 @@ namespace knx
         class TGroupObjectBase: public ISubscriber<TGroupObjectTransaction>
         {
         public:
-            explicit TGroupObjectBase(const TKnxGroupAddress& address): SelfKnxAddress(address)
-            {}
+            explicit TGroupObjectBase(const TKnxGroupAddress& address);
 
-            virtual TKnxGroupAddress GetKnxAddress()
-            {
-                return SelfKnxAddress;
-            }
+            virtual TKnxGroupAddress GetKnxAddress() const;
 
-            virtual void SetKnxSender(std::shared_ptr<ISenderGroupObject> sender)
-            {
-                Sender = sender;
-            }
+            virtual void SetKnxSender(std::shared_ptr<ISenderGroupObject> sender);
 
             void Notify(const TGroupObjectTransaction& args) override;
 

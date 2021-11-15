@@ -13,12 +13,27 @@ namespace knx
         explicit TKnxGroupAddress() = default;
 
         TKnxGroupAddress(uint32_t main, uint32_t middle, uint32_t sub);
+        TKnxGroupAddress(uint32_t main, uint32_t sub);
 
         explicit TKnxGroupAddress(eibaddr_t eibAddress);
 
+        uint32_t GetMainGroup() const
+        {
+            return MainGroup;
+        }
+        uint32_t GetMiddleGroup() const
+        {
+            return MiddleGroup;
+        }
+        uint32_t GetSubGroup() const
+        {
+            return SubGroup;
+        }
         eibaddr_t GetEibAddress() const;
 
         bool operator<(const TKnxGroupAddress& rhs) const;
+
+        bool operator==(const TKnxGroupAddress& rhs) const;
 
     private:
         uint32_t MainGroup{0};
