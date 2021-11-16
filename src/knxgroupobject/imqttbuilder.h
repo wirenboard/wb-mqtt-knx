@@ -9,7 +9,6 @@ namespace knx
     {
         struct TGroupObjectMqttParameter
         {
-            knx::TKnxGroupAddress KnxAddress;
             std::string Type;
             std::string ControlId;
             std::string ControlTitle;

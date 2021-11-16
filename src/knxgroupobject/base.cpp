@@ -2,12 +2,9 @@
 
 using namespace knx::object;
 
-TGroupObjectBase::TGroupObjectBase(const knx::TKnxGroupAddress& address): SelfKnxAddress(address)
-{}
-
-void TGroupObjectBase::KnxSend(const telegram::TApci& apci, const std::vector<uint8_t>& data) const
+void TGroupObjectBase::KnxSend(const std::vector<uint8_t>& data) const
 {
-    Sender->Send({SelfKnxAddress, apci, data});
+    Sender->Send({SelfKnxAddress, telegram::TApci::GroupValueWrite, data});
 }
 
 void TGroupObjectBase::Notify(const TGroupObjectTransaction& transaction)
@@ -18,12 +15,9 @@ void TGroupObjectBase::Notify(const TGroupObjectTransaction& transaction)
     }
 }
 
-knx::TKnxGroupAddress TGroupObjectBase::GetKnxAddress() const
+void TGroupObjectBase::SetKnxSender(const knx::TKnxGroupAddress& groupAddress,
+                                    std::shared_ptr<ISenderGroupObject> sender)
 {
-    return SelfKnxAddress;
-}
-
-void TGroupObjectBase::SetKnxSender(std::shared_ptr<ISenderGroupObject> sender)
-{
+    SelfKnxAddress = groupAddress;
     Sender = std::move(sender);
 }

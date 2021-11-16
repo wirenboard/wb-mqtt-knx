@@ -19,7 +19,8 @@ namespace knx
         explicit TKnxGroupObjectController(std::shared_ptr<knx::ISender<TTelegram>> pSender);
         virtual ~TKnxGroupObjectController() = default;
 
-        bool AddGroupObject(const std::shared_ptr<object::TGroupObjectBase>& groupObject) override;
+        bool AddGroupObject(const knx::TKnxGroupAddress& groupAddress,
+                            const std::shared_ptr<object::TGroupObjectBase>& groupObject) override;
         bool RemoveGroupObject(const TKnxGroupAddress& address) override;
 
     private:

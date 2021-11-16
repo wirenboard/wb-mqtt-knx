@@ -3,7 +3,7 @@
 using namespace knx::object;
 
 TDpt2::TDpt2(const TGroupObjectMqttParameter& parameter, const std::shared_ptr<mqtt::IMqttDeviceAdapter>& pMqttDevice)
-    : TGroupObjectMqttBase(parameter.KnxAddress, pMqttDevice)
+    : TGroupObjectMqttBase(pMqttDevice)
 {
     ControlC = pMqttDevice->CreateControl(parameter.ControlId + "_c", "switch", parameter.ControlTitle, 0, 1);
     ControlV = pMqttDevice->CreateControl(parameter.ControlId + "_v", "switch", parameter.ControlTitle, 0, 1);
@@ -38,5 +38,5 @@ void TDpt2::MqttControlCNotify(const WBMQTT::TAny& value)
 void TDpt2::Send()
 {
     auto val = (FieldV ? 0x01 : 0x00) | (FieldC ? (1 << 1) : 0x00);
-    KnxSend(telegram::TApci::GroupValueWrite, {static_cast<uint8_t>(val)});
+    KnxSend({static_cast<uint8_t>(val)});
 }

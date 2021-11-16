@@ -24,20 +24,19 @@ namespace knx
         class TGroupObjectBase: public ISubscriber<TGroupObjectTransaction>
         {
         public:
-            explicit TGroupObjectBase(const TKnxGroupAddress& address);
+            explicit TGroupObjectBase() = default;
 
-            virtual TKnxGroupAddress GetKnxAddress() const;
-
-            virtual void SetKnxSender(std::shared_ptr<ISenderGroupObject> sender);
+            virtual void SetKnxSender(const knx::TKnxGroupAddress& groupAddress,
+                                      std::shared_ptr<ISenderGroupObject> sender);
 
             void Notify(const TGroupObjectTransaction& args) override;
 
         protected:
-            void KnxSend(const telegram::TApci&, const std::vector<uint8_t>& data) const;
+            void KnxSend(const std::vector<uint8_t>& data) const;
             virtual void KnxNotify(const std::vector<uint8_t>& payload) = 0;
 
         private:
-            const TKnxGroupAddress SelfKnxAddress;
+            TKnxGroupAddress SelfKnxAddress;
             std::shared_ptr<ISenderGroupObject> Sender;
         };
     }

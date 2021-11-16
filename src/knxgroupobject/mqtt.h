@@ -14,9 +14,8 @@ namespace knx
         class TGroupObjectMqttBase: public TGroupObjectBase
         {
         public:
-            TGroupObjectMqttBase(const TKnxGroupAddress& address, std::shared_ptr<mqtt::IMqttDeviceAdapter> pMqttDevice)
-                : TGroupObjectBase(address),
-                  MqttDeviceAdapter(std::move(pMqttDevice))
+            explicit TGroupObjectMqttBase(std::shared_ptr<mqtt::IMqttDeviceAdapter> pMqttDevice)
+                : MqttDeviceAdapter(std::move(pMqttDevice))
             {}
 
             virtual ~TGroupObjectMqttBase() = default;
