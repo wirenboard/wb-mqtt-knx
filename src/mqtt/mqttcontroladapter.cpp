@@ -8,7 +8,7 @@ MqttControlAdapter::MqttControlAdapter(std::shared_ptr<WBMQTT::TControl> control
 void MqttControlAdapter::Send(WBMQTT::TAny&& value)
 {
     auto tx = Control->GetDevice()->GetDriver()->BeginTx();
-    Control->SetValue(tx, std::move(value));
+    Control->SetValue(tx, std::move(value)).Wait();
     tx->End();
 }
 

@@ -91,6 +91,16 @@
           ],
           "default": "1.xxx_B1",
           "propertyOrder": 4
+        },
+        "direction": {
+          "type": "string",
+          "title": "Direction",
+          "enum": [
+            "input",
+            "output"
+          ],
+          "default": "input",
+          "propertyOrder": 5
         }
       }
     }

@@ -103,8 +103,6 @@ int main(int argc, char** argv)
 
         mqttDriver->WaitForReady();
 
-        auto mqttDeviceAdapterBuilder = std::make_shared<mqtt::MqttDeviceAdapterBuilder>(mqttDriver);
-
         auto knxClientService =
             std::make_shared<knx::TKnxClientService>(knxUrl, ErrorLogger, VerboseLogger, InfoLogger);
         auto knxLegacyDevice = std::make_shared<knx::TKnxLegacyDevice>(mqttDriver,
