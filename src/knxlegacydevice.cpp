@@ -39,12 +39,13 @@ TKnxLegacyDevice::TKnxLegacyDevice(std::shared_ptr<WBMQTT::TDeviceDriver> pMqttD
                                       .SetReadonly(false))
                   .GetValue();
 
-    EventHandlerHandle =
-        DeviceDriver->On<WBMQTT::TControlOnValueEvent>([this](const WBMQTT::TControlOnValueEvent& event) {
-            DebugLogger.Log() << "On event message:\"" << event.RawValue << "\""
-                              << " from control: " << event.Control->GetId();
+    Control->SetOnValueReceiveHandler(
+        [this](const WBMQTT::PControl& pControl, const WBMQTT::TAny& value, const WBMQTT::PDriverTx& tx) {
+            const auto& valueStr = value.As<std::string>();
+            DebugLogger.Log() << "On event message:\"" << valueStr << "\""
+                              << " from control: " << pControl->GetId();
             try {
-                auto telegram = knx::converter::MqttToKnxTelegram(event.RawValue);
+                auto telegram = knx::converter::MqttToKnxTelegram(valueStr);
                 if (KnxTelegramSender)
                     KnxTelegramSender->Send(*telegram);
                 else {
