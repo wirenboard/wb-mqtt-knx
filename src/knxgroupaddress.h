@@ -17,18 +17,12 @@ namespace knx
 
         explicit TKnxGroupAddress(eibaddr_t eibAddress);
 
-        uint32_t GetMainGroup() const
-        {
-            return MainGroup;
-        }
-        uint32_t GetMiddleGroup() const
-        {
-            return MiddleGroup;
-        }
-        uint32_t GetSubGroup() const
-        {
-            return SubGroup;
-        }
+        uint32_t GetMainGroup() const;
+
+        uint32_t GetMiddleGroup() const;
+
+        uint32_t GetSubGroup() const;
+
         eibaddr_t GetEibAddress() const;
 
         bool operator<(const TKnxGroupAddress& rhs) const;
