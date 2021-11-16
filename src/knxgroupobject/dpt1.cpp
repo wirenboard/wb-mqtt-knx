@@ -9,6 +9,9 @@ TDpt1::TDpt1(const TGroupObjectMqttParameter& parameter, const std::shared_ptr<m
     ControlB->SetEventHandler([this](const WBMQTT::TAny& value) { MqttControlBNotify(value); });
 }
 
+TDpt1::~TDpt1()
+{}
+
 void TDpt1::KnxNotify(const std::vector<uint8_t>& payload)
 {
     B = payload[0] & 0x01;

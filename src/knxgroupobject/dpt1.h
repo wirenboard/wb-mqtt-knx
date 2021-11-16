@@ -14,6 +14,8 @@ namespace knx
 
             void KnxNotify(const std::vector<uint8_t>& data) override;
 
+            virtual ~TDpt1();
+
         private:
             void MqttControlBNotify(const WBMQTT::TAny& value);
 

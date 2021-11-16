@@ -8,8 +8,12 @@ TKnxGroupObjectController::TKnxGroupObjectController(std::shared_ptr<knx::ISende
 
 bool TKnxGroupObjectController::AddGroupObject(const std::shared_ptr<object::TGroupObjectBase>& groupObject)
 {
-    groupObject->SetKnxSender(shared_from_this());
-    return GroupObjectList.insert({groupObject->GetKnxAddress(), groupObject}).second;
+    if (groupObject) {
+        groupObject->SetKnxSender(shared_from_this());
+        return GroupObjectList.insert({groupObject->GetKnxAddress(), groupObject}).second;
+    } else {
+        return false;
+    }
 }
 
 bool TKnxGroupObjectController::RemoveGroupObject(const TKnxGroupAddress& address)
