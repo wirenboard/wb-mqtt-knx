@@ -1,6 +1,8 @@
 #include "mqttbuilder.h"
 #include "dpt1.h"
 #include "dpt2.h"
+#include "dpt9.h"
+#include "mqtt.h"
 
 using namespace knx::object;
 
@@ -18,14 +20,24 @@ void TGroupObjectMqttBuilder::LinkDevice(const std::string& id, const std::strin
     MqttDevice = std::make_shared<mqtt::MqttDeviceAdapter>(localDevice);
 }
 
-std::shared_ptr<TGroupObjectMqttBase> TGroupObjectMqttBuilder::Create(const TGroupObjectMqttParameter& parameter)
+std::shared_ptr<TGroupObjectBase> TGroupObjectMqttBuilder::Create(const TGroupObjectMqttParameter& parameter)
 {
     // TODO
+    std::shared_ptr<IDpt> dpt;
     if (parameter.Type == "1.xxx_B1") {
-        return std::make_shared<knx::object::TDpt1>(parameter, MqttDevice);
+        dpt = std::make_shared<TDpt1>();
     } else if (parameter.Type == "2.xxx_B2") {
-        return std::make_shared<knx::object::TDpt2>(parameter, MqttDevice);
+        dpt = std::make_shared<TDpt2>();
+    } else if (parameter.Type == "9.xxx_2-Octet_Float_Value") {
+        dpt = std::make_shared<TDpt9>();
+    } else {
+        return nullptr;
     }
+
+    return std::make_shared<knx::object::TGroupObjectMqtt>(dpt,
+                                                           parameter.ControlId,
+                                                           parameter.ControlTitle,
+                                                           MqttDevice);
     //        "2.xxx_B2",
     //        "3.xxx_B1U3",
     //        "4.xxx_Character_Set",
@@ -45,6 +57,4 @@ std::shared_ptr<TGroupObjectMqttBase> TGroupObjectMqttBuilder::Create(const TGro
     //        "17.xxx_Scene_Number",
     //        "18.001_Scene_Control",
     //        "19.001_DateTime",
-    //    return std::make_shared<knx::object::TDpt1>(parameter, MqttDevice);
-    return nullptr;
 }

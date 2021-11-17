@@ -10,6 +10,7 @@ add_executable(${PROJECT_NAME}_test ${TEST_LIST}
         ../src/knxtelegramtpdu.cpp
         ../src/configurator.cpp
         ../src/knxgroupaddress.cpp
+        ../src/knxgroupobject/dpt9.cpp
         )
 
 target_link_libraries(${PROJECT_NAME}_test gtest gtest_main gmock wbmqtt1 pthread)

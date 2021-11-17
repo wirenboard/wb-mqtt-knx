@@ -2,41 +2,28 @@
 
 using namespace knx::object;
 
-TDpt2::TDpt2(const TGroupObjectMqttParameter& parameter, const std::shared_ptr<mqtt::IMqttDeviceAdapter>& pMqttDevice)
-    : TGroupObjectMqttBase(pMqttDevice)
+std::vector<DptDescriptorField> TDpt2::getDescriptor() const
 {
-    ControlC = pMqttDevice->CreateControl(parameter.ControlId + "_c", "switch", parameter.ControlTitle, 0, 1);
-    ControlV = pMqttDevice->CreateControl(parameter.ControlId + "_v", "switch", parameter.ControlTitle, 0, 1);
-
-    ControlC->SetEventHandler([this](const WBMQTT::TAny& value) { MqttControlCNotify(value); });
-    ControlV->SetEventHandler([this](const WBMQTT::TAny& value) { MqttControlVNotify(value); });
+    return {{"c", "switch", 0, 1}, {"v", "switch", 0, 1}};
 }
 
-TDpt2::~TDpt2()
-{}
+std::vector<uint8_t> TDpt2::mqttToKnx(uint32_t controlIndex, const WBMQTT::TAny& value)
+{
+    switch (controlIndex) {
+        case 0:
+            FieldC = value.As<bool>();
+            break;
+        case 1:
+            FieldV = value.As<bool>();
+            break;
+        default:;
+    }
+    return {static_cast<uint8_t>((FieldV ? 0x01 : 0x00) | (FieldC ? (1 << 1) : 0x00))};
+}
 
-void TDpt2::KnxNotify(const std::vector<uint8_t>& payload)
+std::vector<WBMQTT::TAny> TDpt2::knxToMqtt(const std::vector<uint8_t>& payload)
 {
     FieldV = payload[0] & 0x01;
     FieldC = payload[0] & (1 << 1);
-    ControlC->Send(FieldC);
-    ControlV->Send(FieldV);
-}
-
-void TDpt2::MqttControlVNotify(const WBMQTT::TAny& value)
-{
-    FieldV = value.As<bool>();
-    Send();
-}
-
-void TDpt2::MqttControlCNotify(const WBMQTT::TAny& value)
-{
-    FieldC = value.As<bool>();
-    Send();
-}
-
-void TDpt2::Send()
-{
-    auto val = (FieldV ? 0x01 : 0x00) | (FieldC ? (1 << 1) : 0x00);
-    KnxSend({static_cast<uint8_t>(val)});
+    return {FieldC, FieldV};
 }

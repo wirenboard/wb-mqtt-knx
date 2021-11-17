@@ -50,4 +50,3 @@ uint32_t TKnxGroupAddress::GetSubGroup() const
 {
     return SubGroup;
 }
-

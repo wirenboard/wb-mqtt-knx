@@ -1,31 +1,22 @@
 #pragma once
-#include "imqttbuilder.h"
-#include "mqtt.h"
+#include "idpt.h"
 
 namespace knx
 {
     namespace object
     {
-        class TDpt2: public TGroupObjectMqttBase
+        class TDpt2: public IDpt
         {
         public:
-            TDpt2(const TGroupObjectMqttParameter& parameter,
-                  const std::shared_ptr<mqtt::IMqttDeviceAdapter>& pMqttDevice);
+            std::vector<DptDescriptorField> getDescriptor() const override;
+            std::vector<uint8_t> mqttToKnx(uint32_t controlIndex, const WBMQTT::TAny& value) override;
+            std::vector<WBMQTT::TAny> knxToMqtt(const std::vector<uint8_t>& payload) override;
 
-            void KnxNotify(const std::vector<uint8_t>& data) override;
-
-            virtual ~TDpt2();
+            virtual ~TDpt2() = default;
 
         private:
-            void MqttControlCNotify(const WBMQTT::TAny& value);
-            void MqttControlVNotify(const WBMQTT::TAny& value);
-
-            void Send();
-
             bool FieldC{false};
             bool FieldV{false};
-            std::shared_ptr<mqtt::IMqttControlAdapter> ControlC;
-            std::shared_ptr<mqtt::IMqttControlAdapter> ControlV;
         };
     }
 }

@@ -14,7 +14,7 @@ namespace knx
             virtual ~TGroupObjectMqttBuilder() = default;
 
             void LinkDevice(const std::string& id, const std::string& name) override;
-            std::shared_ptr<TGroupObjectMqttBase> Create(const TGroupObjectMqttParameter& parameter) override;
+            std::shared_ptr<TGroupObjectBase> Create(const TGroupObjectMqttParameter& parameter) override;
 
         private:
             std::shared_ptr<WBMQTT::TDeviceDriver> MqttDeviceDriver;

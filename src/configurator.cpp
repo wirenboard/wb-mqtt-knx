@@ -56,8 +56,7 @@ void TConfigurator::Configure(IKnxGroupObjectController& controller)
             auto groupAddressStr = control["groupAddress"].asString();
             auto dataPointStr = control["dataPointType"].asString();
 
-            auto groupObject = GroupObjectBuilder->Create(
-                {dataPointStr, controlIdStr, controlNameStr});
+            auto groupObject = GroupObjectBuilder->Create({dataPointStr, controlIdStr, controlNameStr});
             controller.AddGroupObject(StringToGroupAddress(groupAddressStr), groupObject);
         }
     }

@@ -44,8 +44,7 @@ TEST(KnxGroupAddressTest, LessOperatorTest)
     uint32_t middle = 2;
     uint32_t sub = 102;
     knx::TKnxGroupAddress address(main, middle, sub);
-    knx::TKnxGroupAddress address2(main, middle, sub+1);
-
+    knx::TKnxGroupAddress address2(main, middle, sub + 1);
 
     EXPECT_LT(address, address2);
 }
