@@ -1,5 +1,6 @@
 #include "knxconverter.h"
 #include "knxexception.h"
+#include "knxutils.h"
 #include <algorithm>
 #include <array>
 #include <iomanip>
@@ -133,34 +134,6 @@ namespace
         return address;
     }
 
-    uint8_t StringToByte(const std::string& byte)
-    {
-        if (byte.empty())
-            wb_throw(TKnxException, "Trying to read a byte from empty string");
-
-        try {
-            if (byte.substr(0, 2) == "0b" || byte.substr(0, 2) == "0B") {
-                if (byte.length() == 2)
-                    wb_throw(TKnxException, "invalid byte: " + byte);
-                char* strEnd;
-                unsigned res = std::strtoul(byte.c_str() + 2, &strEnd, 2);
-                if (*strEnd != 0)
-                    wb_throw(TKnxException, "invalid byte: " + byte);
-                return res;
-            } else {
-                std::size_t num;
-                int ret = std::stoi(byte, &num, 0);
-                if (num != byte.length())
-                    wb_throw(TKnxException, "invalid byte: " + byte);
-                return ret;
-            }
-        } catch (TKnxException& e) {
-            throw;
-        } catch (std::exception& e) {
-            wb_throw(TKnxException, "invalid byte: " + byte);
-        }
-    }
-
     std::tuple<bool, knx::telegram::TApci> StringToKnxApci(const std::string& apciString)
     {
         auto it = std::find(ApciString.begin(), ApciString.end(), apciString);
@@ -211,7 +184,7 @@ std::shared_ptr<TTelegram> converter::MqttToKnxTelegram(const std::string& paylo
     } else {
         // try to read APCI as number
         try {
-            const auto apci = static_cast<telegram::TApci>((StringToByte(apciStr)) & 0xf);
+            const auto apci = static_cast<telegram::TApci>((utils::StringValueToByte(apciStr)) & 0xf);
             telegram->Tpdu().SetAPCI(apci);
         } catch (TKnxException& e) {
             wb_throw(TKnxException, "Unknown telegram type: " + apciStr);
@@ -235,12 +208,12 @@ std::shared_ptr<TTelegram> converter::MqttToKnxTelegram(const std::string& paylo
     std::string dataStr;
 
     if (ss >> dataStr) {
-        knxPayload[0] = StringToByte(dataStr) & 0x3F;
+        knxPayload[0] = utils::StringValueToByte(dataStr) & 0x3F;
     }
 
     uint32_t size = 1;
     while (ss >> std::hex >> dataStr) {
-        knxPayload.push_back(StringToByte(dataStr));
+        knxPayload.push_back(utils::StringValueToByte(dataStr));
         ++size;
         if (size > knx::TTpdu::MaxPayloadSize)
             wb_throw(TKnxException, "Telegram payload is too long.");

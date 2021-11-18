@@ -2,6 +2,7 @@
 #include "dpt1.h"
 #include "dpt2.h"
 #include "dpt9.h"
+#include "dptraw.h"
 #include "mqtt.h"
 
 using namespace knx::object;
@@ -23,9 +24,11 @@ std::shared_ptr<IGroupObject> TGroupObjectMqttBuilder::Create(const TGroupObject
 {
     if (MqttDeviceList.empty())
         return nullptr;
-    // TODO
+    // TODO Add Dpts
     std::shared_ptr<IDpt> dpt;
-    if (parameter.Type == "1.xxx_B1") {
+    if (parameter.Type == "Raw_Value") {
+        dpt = std::make_shared<TDptRaw>();
+    } else if (parameter.Type == "1.xxx_B1") {
         dpt = std::make_shared<TDpt1>();
     } else if (parameter.Type == "2.xxx_B2") {
         dpt = std::make_shared<TDpt2>();
