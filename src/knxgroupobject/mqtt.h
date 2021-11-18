@@ -35,6 +35,7 @@ namespace knx
             std::shared_ptr<IDpt> Dpt;
             std::shared_ptr<WBMQTT::TLocalDevice> MqttLocalDevice;
             std::vector<std::shared_ptr<WBMQTT::TControl>> ControlList;
+            std::mutex DptExchangeMutex;
         };
     }
 }

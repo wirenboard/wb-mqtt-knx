@@ -34,7 +34,6 @@ namespace knx
         std::function<void(const TTelegram&)> OnReceiveTelegramHandler;
 
         std::atomic<bool> IsStarted{false};
-        std::mutex SetterMutex;
         std::unique_ptr<std::thread> Worker;
 
         WBMQTT::TLogger& ErrorLogger;

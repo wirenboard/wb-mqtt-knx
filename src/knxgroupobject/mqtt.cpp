@@ -39,18 +39,37 @@ TGroupObjectMqtt::TGroupObjectMqtt(std::shared_ptr<IDpt> pDpt,
 
 void TGroupObjectMqtt::MqttNotify(uint32_t index, const WBMQTT::TAny& value)
 {
-    if (Dpt->FromMqtt(index, value)) {
-        KnxSender->Send({SelfKnxAddress, telegram::TApci::GroupValueWrite, Dpt->ToKnx()});
+    std::vector<uint8_t> data;
+
+    {
+        std::lock_guard<std::mutex> lg(DptExchangeMutex);
+
+        auto isValid = Dpt->FromMqtt(index, value);
+        if (isValid) {
+            data = Dpt->ToKnx();
+        } else
+            return;
     }
+
+    KnxSender->Send({SelfKnxAddress, telegram::TApci::GroupValueWrite, data});
 }
 
 void TGroupObjectMqtt::KnxNotify(const TGroupObjectTransaction& transaction)
 {
-    if (((transaction.Apci == telegram::TApci::GroupValueWrite) ||
-         (transaction.Apci == telegram::TApci::GroupValueResponse)) &&
-        Dpt->FromKnx(transaction.Payload))
-    {
-        auto mqttData = Dpt->ToMqtt();
+    if ((transaction.Apci == telegram::TApci::GroupValueWrite) ||
+        (transaction.Apci == telegram::TApci::GroupValueResponse)) {
+        std::vector<WBMQTT::TAny> mqttData;
+
+        {
+            std::lock_guard<std::mutex> lg(DptExchangeMutex);
+
+            auto isValid = Dpt->FromKnx(transaction.Payload);
+            if (isValid) {
+                mqttData = Dpt->ToMqtt();
+            } else
+                return;
+        }
+
         uint32_t index = 0;
         for (const auto& control: ControlList) {
             auto tx = control->GetDevice()->GetDriver()->BeginTx();
