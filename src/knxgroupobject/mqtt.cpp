@@ -29,20 +29,21 @@ TGroupObjectMqtt::TGroupObjectMqtt(std::shared_ptr<IDpt> pDpt,
 
 void TGroupObjectMqtt::MqttNotify(uint32_t index, const WBMQTT::TAny& value)
 {
-    auto data = Dpt->mqttToKnx(index, value);
-    if (!data.empty())
-        KnxSender->Send({SelfKnxAddress, telegram::TApci::GroupValueWrite, data});
+    if (Dpt->FromMqtt(index, value)) {
+        KnxSender->Send({SelfKnxAddress, telegram::TApci::GroupValueWrite, Dpt->ToKnx()});
+    }
 }
 
 void TGroupObjectMqtt::KnxNotify(const TGroupObjectTransaction& transaction)
 {
-    if ((transaction.Apci == telegram::TApci::GroupValueWrite) ||
-        (transaction.Apci == telegram::TApci::GroupValueResponse)) {
-
-        auto mqttData = Dpt->knxToMqtt(transaction.Payload);
+    if (((transaction.Apci == telegram::TApci::GroupValueWrite) ||
+         (transaction.Apci == telegram::TApci::GroupValueResponse)) &&
+        Dpt->FromKnx(transaction.Payload))
+    {
+        auto mqttData = Dpt->ToMqtt();
         uint32_t index = 0;
         for (const auto& control: ControlList) {
-            control->Send(std::move(mqttData[index]));
+            control->Send(std::move(mqttData.at(index)));
             ++index;
         }
     }

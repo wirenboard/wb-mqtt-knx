@@ -20,11 +20,11 @@ protected:
 
 TEST_F(Dpt9Test, toMqttTest)
 {
-
     knx::object::TDpt9 dpt;
 
     for (const auto& sample: TestSamples) {
-        std::vector<WBMQTT::TAny> mqttData = dpt.knxToMqtt(sample.second);
+        dpt.FromKnx(sample.second);
+        std::vector<WBMQTT::TAny> mqttData = dpt.ToMqtt();
         EXPECT_EQ(1, mqttData.size());
         auto floatValue = (mqttData[0]).As<double>();
         EXPECT_NEAR(sample.first, floatValue, 0.01) << std::to_string(floatValue);
@@ -36,7 +36,8 @@ TEST_F(Dpt9Test, toKnxTest)
     knx::object::TDpt9 dpt;
 
     for (const auto& sample: TestSamples) {
-        auto knxData = dpt.mqttToKnx(0, sample.first);
+        dpt.FromMqtt(0, sample.first);
+        auto knxData = dpt.ToKnx();
         EXPECT_EQ(sample.second, knxData);
     }
 }

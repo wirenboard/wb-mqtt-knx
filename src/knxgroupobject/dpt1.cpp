@@ -8,18 +8,31 @@ std::vector<DptDescriptorField> TDpt1::getDescriptor() const
     return descriptor;
 }
 
-std::vector<uint8_t> TDpt1::mqttToKnx(uint32_t controlIndex, const WBMQTT::TAny& value)
+bool TDpt1::FromMqtt(uint32_t controlIndex, const WBMQTT::TAny& value)
 {
     if (controlIndex == 0) {
         B = value.As<bool>();
-        auto val = B ? 0x01 : 0x00;
-        return {static_cast<uint8_t>(val)};
+        return true;
     }
-    return {};
+    return false;
 }
 
-std::vector<WBMQTT::TAny> TDpt1::knxToMqtt(const std::vector<uint8_t>& payload)
+bool TDpt1::FromKnx(const std::vector<uint8_t>& payload)
 {
-    B = payload[0] & 0x01;
+    if (payload.size() == 1) {
+        B = payload[0] & 0x01;
+        return true;
+    }
+    return false;
+}
+
+std::vector<uint8_t> TDpt1::ToKnx()
+{
+    auto val = B ? 0x01 : 0x00;
+    return {static_cast<uint8_t>(val)};
+}
+
+std::vector<WBMQTT::TAny> TDpt1::ToMqtt()
+{
     return {B};
 }

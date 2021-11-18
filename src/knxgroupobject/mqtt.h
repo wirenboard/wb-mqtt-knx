@@ -2,7 +2,6 @@
 
 #include "../mqtt/imqttcontroladapter.h"
 #include "../mqtt/imqttdeviceadapter.h"
-#include "base.h"
 #include "idpt.h"
 #include "igroupobject.h"
 #include <wblib/wbmqtt.h>
