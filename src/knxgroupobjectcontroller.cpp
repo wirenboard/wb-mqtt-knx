@@ -7,7 +7,7 @@ TKnxGroupObjectController::TKnxGroupObjectController(std::shared_ptr<knx::ISende
 {}
 
 bool TKnxGroupObjectController::AddGroupObject(const knx::TKnxGroupAddress& groupAddress,
-                                               const std::shared_ptr<object::TGroupObjectBase>& groupObject)
+                                               const std::shared_ptr<object::IGroupObject>& groupObject)
 {
     if (groupObject) {
         groupObject->SetKnxSender(groupAddress, shared_from_this());
@@ -31,7 +31,7 @@ void TKnxGroupObjectController::Notify(const TTelegram& knxTelegram)
         TKnxGroupAddress address(knxTelegram.GetReceiverAddress());
         auto groupObject = GroupObjectList[address];
         if (groupObject) {
-            groupObject->Notify({address, knxTelegram.Tpdu().GetAPCI(), knxTelegram.Tpdu().GetPayload()});
+            groupObject->KnxNotify({address, knxTelegram.Tpdu().GetAPCI(), knxTelegram.Tpdu().GetPayload()});
         }
     }
 }

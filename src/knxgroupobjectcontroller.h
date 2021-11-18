@@ -1,7 +1,8 @@
 #pragma once
 #include "iknxgroupobjectcontroller.h"
+#include "isubscriber.h"
 #include "knxgroupaddress.h"
-#include "knxgroupobject/base.h"
+#include "knxgroupobject/igroupobject.h"
 #include "knxtelegram.h"
 #include <map>
 #include <memory>
@@ -20,7 +21,7 @@ namespace knx
         virtual ~TKnxGroupObjectController() = default;
 
         bool AddGroupObject(const knx::TKnxGroupAddress& groupAddress,
-                            const std::shared_ptr<object::TGroupObjectBase>& groupObject) override;
+                            const std::shared_ptr<object::IGroupObject>& groupObject) override;
         bool RemoveGroupObject(const TKnxGroupAddress& address) override;
 
     private:
@@ -29,6 +30,6 @@ namespace knx
         void Send(const object::TGroupObjectTransaction& transaction) const override;
 
         std::shared_ptr<knx::ISender<TTelegram>> Sender;
-        std::map<TKnxGroupAddress, std::shared_ptr<object::TGroupObjectBase>> GroupObjectList;
+        std::map<TKnxGroupAddress, std::shared_ptr<object::IGroupObject>> GroupObjectList;
     };
 }

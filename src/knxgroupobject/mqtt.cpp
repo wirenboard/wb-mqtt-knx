@@ -1,5 +1,6 @@
 #include "mqtt.h"
-
+#include "../knxgroupaddress.h"
+#include "../knxtelegram.h"
 #include <utility>
 
 using namespace knx::object;
@@ -26,19 +27,30 @@ TGroupObjectMqtt::TGroupObjectMqtt(std::shared_ptr<IDpt> pDpt,
     }
 }
 
-void TGroupObjectMqtt::KnxNotify(const std::vector<uint8_t>& data)
-{
-    auto mqttData = Dpt->knxToMqtt(data);
-    uint32_t index = 0;
-    for (const auto& control: ControlList) {
-        control->Send(std::move(mqttData[index]));
-        ++index;
-    }
-}
-
 void TGroupObjectMqtt::MqttNotify(uint32_t index, const WBMQTT::TAny& value)
 {
     auto data = Dpt->mqttToKnx(index, value);
     if (!data.empty())
-        KnxSend(data);
+        KnxSender->Send({SelfKnxAddress, telegram::TApci::GroupValueWrite, data});
+}
+
+void TGroupObjectMqtt::KnxNotify(const TGroupObjectTransaction& transaction)
+{
+    if ((transaction.Apci == telegram::TApci::GroupValueWrite) ||
+        (transaction.Apci == telegram::TApci::GroupValueResponse)) {
+
+        auto mqttData = Dpt->knxToMqtt(transaction.Payload);
+        uint32_t index = 0;
+        for (const auto& control: ControlList) {
+            control->Send(std::move(mqttData[index]));
+            ++index;
+        }
+    }
+}
+
+void TGroupObjectMqtt::SetKnxSender(const knx::TKnxGroupAddress& groupAddress,
+                                    std::shared_ptr<ISenderGroupObject> sender)
+{
+    SelfKnxAddress = groupAddress;
+    KnxSender = std::move(sender);
 }

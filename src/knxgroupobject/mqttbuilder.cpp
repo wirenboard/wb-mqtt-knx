@@ -20,7 +20,7 @@ void TGroupObjectMqttBuilder::LinkDevice(const std::string& id, const std::strin
     MqttDevice = std::make_shared<mqtt::MqttDeviceAdapter>(localDevice);
 }
 
-std::shared_ptr<TGroupObjectBase> TGroupObjectMqttBuilder::Create(const TGroupObjectMqttParameter& parameter)
+std::shared_ptr<IGroupObject> TGroupObjectMqttBuilder::Create(const TGroupObjectMqttParameter& parameter)
 {
     // TODO
     std::shared_ptr<IDpt> dpt;

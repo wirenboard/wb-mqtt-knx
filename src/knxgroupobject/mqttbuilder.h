@@ -1,5 +1,6 @@
 #pragma once
 #include "../mqtt/mqttdeviceadapter.h"
+#include "igroupobject.h"
 #include "imqttbuilder.h"
 
 namespace knx
@@ -14,7 +15,7 @@ namespace knx
             virtual ~TGroupObjectMqttBuilder() = default;
 
             void LinkDevice(const std::string& id, const std::string& name) override;
-            std::shared_ptr<TGroupObjectBase> Create(const TGroupObjectMqttParameter& parameter) override;
+            std::shared_ptr<IGroupObject> Create(const TGroupObjectMqttParameter& parameter) override;
 
         private:
             std::shared_ptr<WBMQTT::TDeviceDriver> MqttDeviceDriver;

@@ -2,7 +2,7 @@
 
 #pragma once
 #include "knxgroupaddress.h"
-#include "knxgroupobject/base.h"
+#include "knxgroupobject/igroupobject.h"
 #include "knxtelegram.h"
 #include <map>
 #include <memory>
@@ -14,7 +14,7 @@ namespace knx
     {
     public:
         virtual bool AddGroupObject(const knx::TKnxGroupAddress& groupAddress,
-                                    const std::shared_ptr<object::TGroupObjectBase>& groupObject) = 0;
+                                    const std::shared_ptr<object::IGroupObject>& groupObject) = 0;
         virtual bool RemoveGroupObject(const TKnxGroupAddress& address) = 0;
     };
 }

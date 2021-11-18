@@ -1,6 +1,6 @@
 #pragma once
 
-#include "base.h"
+#include "igroupobject.h"
 
 namespace knx
 {
@@ -17,7 +17,7 @@ namespace knx
         {
         public:
             virtual void LinkDevice(const std::string& id, const std::string& name) = 0;
-            virtual std::shared_ptr<TGroupObjectBase> Create(const TGroupObjectMqttParameter& parameter) = 0;
+            virtual std::shared_ptr<IGroupObject> Create(const TGroupObjectMqttParameter& parameter) = 0;
         };
     }
 }
