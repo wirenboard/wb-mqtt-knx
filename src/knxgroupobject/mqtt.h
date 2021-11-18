@@ -16,6 +16,7 @@ namespace knx
             explicit TGroupObjectMqtt(std::shared_ptr<IDpt> pDpt,
                                       const std::string& controlId,
                                       const std::string& controlName,
+                                      bool isReadOnly,
                                       std::shared_ptr<WBMQTT::TLocalDevice> pMqttDevice);
 
             void MqttNotify(uint32_t index, const WBMQTT::TAny& value);

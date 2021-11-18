@@ -55,8 +55,9 @@ void TConfigurator::Configure(IKnxGroupObjectController& controller)
             auto controlNameStr = control["controlTitle"].asString();
             auto groupAddressStr = control["groupAddress"].asString();
             auto dataPointStr = control["dataPointType"].asString();
+            auto isReadOnlyBool = control["readOnly"].asBool();
 
-            auto groupObject = GroupObjectBuilder->Create({dataPointStr, controlIdStr, controlNameStr});
+            auto groupObject = GroupObjectBuilder->Create({dataPointStr, controlIdStr, controlNameStr, isReadOnlyBool});
             controller.AddGroupObject(StringToGroupAddress(groupAddressStr), groupObject);
         }
 

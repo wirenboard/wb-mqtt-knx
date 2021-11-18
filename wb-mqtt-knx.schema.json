@@ -92,14 +92,11 @@
           "default": "1.xxx_B1",
           "propertyOrder": 4
         },
-        "direction": {
-          "type": "string",
-          "title": "Direction",
-          "enum": [
-            "input",
-            "output"
-          ],
-          "default": "input",
+        "readOnly": {
+          "type": "boolean",
+          "title": "Read only",
+          "default": false,
+          "_format": "checkbox",
           "propertyOrder": 5
         }
       }

@@ -11,6 +11,7 @@ namespace knx
             std::string Type;
             std::string ControlId;
             std::string ControlTitle;
+            bool isReadOnly = false;
         };
 
         class IGroupObjectMqttBuilder

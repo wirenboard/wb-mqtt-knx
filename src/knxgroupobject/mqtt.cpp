@@ -8,6 +8,7 @@ using namespace knx::object;
 TGroupObjectMqtt::TGroupObjectMqtt(std::shared_ptr<IDpt> pDpt,
                                    const std::string& controlId,
                                    const std::string& controlName,
+                                   bool isReadOnly,
                                    std::shared_ptr<WBMQTT::TLocalDevice> pMqttDevice)
     : Dpt(std::move(pDpt)),
       MqttLocalDevice(std::move(pMqttDevice))
@@ -26,7 +27,7 @@ TGroupObjectMqtt::TGroupObjectMqtt(std::shared_ptr<IDpt> pDpt,
                                                .SetMax(fieldDescriptor.max)
                                                .SetError("")
                                                .SetOrder(0)
-                                               .SetReadonly(false))
+                                               .SetReadonly(isReadOnly))
                            .GetValue();
         control->SetOnValueReceiveHandler([index, this](const WBMQTT::PControl&,
                                                         const WBMQTT::TAny& value,

@@ -38,6 +38,7 @@ std::shared_ptr<IGroupObject> TGroupObjectMqttBuilder::Create(const TGroupObject
     return std::make_shared<knx::object::TGroupObjectMqtt>(dpt,
                                                            parameter.ControlId,
                                                            parameter.ControlTitle,
+                                                           parameter.isReadOnly,
                                                            MqttDeviceList.back());
     //        "2.xxx_B2",
     //        "3.xxx_B1U3",
