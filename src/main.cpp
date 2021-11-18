@@ -4,8 +4,6 @@
 #include "knxgroupobject/mqttbuilder.h"
 #include "knxgroupobjectcontroller.h"
 #include "knxlegacydevice.h"
-#include "mqtt/mqttcontroladapter.h"
-#include "mqtt/mqttdeviceadapter.h"
 #include <getopt.h>
 #include <unistd.h>
 #include <wblib/log.h>
@@ -112,16 +110,20 @@ int main(int argc, char** argv)
                                                                        InfoLogger);
         auto knxGroupObjectController = std::make_shared<knx::TKnxGroupObjectController>(knxClientService);
 
+        auto groupObjectBuilder = std::make_shared<knx::object::TGroupObjectMqttBuilder>(mqttDriver);
+
         WBMQTT::SignalHandling::OnSignals({SIGINT, SIGTERM}, [&] {
+            knxClientService->Unsubscribe(knxGroupObjectController);
+            groupObjectBuilder->Clear();
+
             knxClientService->Unsubscribe(knxLegacyDevice);
             knxLegacyDevice->Deinit();
+
             knxClientService->Stop();
         });
 
         knxClientService->Subscribe(knxLegacyDevice);
         knxClientService->Subscribe(knxGroupObjectController);
-
-        auto groupObjectBuilder = std::make_shared<knx::object::TGroupObjectMqttBuilder>(mqttDriver);
 
         knx::TConfigurator configurator(DEFAULT_CONFIG_FILE_PATH, DEFAULT_CONFIG_SCHEMA_FILE_PATH, groupObjectBuilder);
         configurator.Configure(*knxGroupObjectController);

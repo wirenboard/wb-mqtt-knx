@@ -57,6 +57,7 @@ TEST_F(ConfiguratorTest, CongigureController)
     EXPECT_CALL(*groupObjectMqttBuilder, LinkDevice("room2", _)).Times(1);
 
     EXPECT_CALL(*groupObjectMqttBuilder, Create(_)).Times(4);
+    EXPECT_CALL(*groupObjectMqttBuilder, RemoveUnusedControls()).Times(2);
 
     auto param = knx::object::TGroupObjectMqttParameter{"", "", ""};
 

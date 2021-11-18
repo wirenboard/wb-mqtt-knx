@@ -61,8 +61,6 @@ TKnxLegacyDevice::TKnxLegacyDevice(std::shared_ptr<WBMQTT::TDeviceDriver> pMqttD
 
 void TKnxLegacyDevice::Deinit()
 {
-    DeviceDriver->RemoveEventHandler(EventHandlerHandle);
-
     try {
         DeviceDriver->BeginTx()->RemoveDeviceById(DEVICE_ID).Sync();
     } catch (const std::exception& e) {

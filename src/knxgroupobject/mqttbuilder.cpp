@@ -12,16 +12,17 @@ TGroupObjectMqttBuilder::TGroupObjectMqttBuilder(std::shared_ptr<WBMQTT::TDevice
 
 void TGroupObjectMqttBuilder::LinkDevice(const std::string& id, const std::string& name)
 {
-    auto localDevice =
+    MqttDeviceList.push_back(
         MqttDeviceDriver->BeginTx()
             ->CreateDevice(
                 WBMQTT::TLocalDeviceArgs{}.SetId(id).SetTitle(name).SetIsVirtual(true).SetDoLoadPrevious(false))
-            .GetValue();
-    MqttDevice = std::make_shared<mqtt::MqttDeviceAdapter>(localDevice);
+            .GetValue());
 }
 
 std::shared_ptr<IGroupObject> TGroupObjectMqttBuilder::Create(const TGroupObjectMqttParameter& parameter)
 {
+    if (MqttDeviceList.empty())
+        return nullptr;
     // TODO
     std::shared_ptr<IDpt> dpt;
     if (parameter.Type == "1.xxx_B1") {
@@ -37,7 +38,7 @@ std::shared_ptr<IGroupObject> TGroupObjectMqttBuilder::Create(const TGroupObject
     return std::make_shared<knx::object::TGroupObjectMqtt>(dpt,
                                                            parameter.ControlId,
                                                            parameter.ControlTitle,
-                                                           MqttDevice);
+                                                           MqttDeviceList.back());
     //        "2.xxx_B2",
     //        "3.xxx_B1U3",
     //        "4.xxx_Character_Set",
@@ -57,4 +58,18 @@ std::shared_ptr<IGroupObject> TGroupObjectMqttBuilder::Create(const TGroupObject
     //        "17.xxx_Scene_Number",
     //        "18.001_Scene_Control",
     //        "19.001_DateTime",
+}
+
+void TGroupObjectMqttBuilder::RemoveUnusedControls()
+{
+    if (!MqttDeviceList.empty()) {
+        MqttDeviceList.back()->RemoveUnusedControls(MqttDeviceList.back()->GetDriver()->BeginTx()).Wait();
+    }
+}
+
+void TGroupObjectMqttBuilder::Clear()
+{
+    for (const auto& device: MqttDeviceList) {
+        MqttDeviceDriver->BeginTx()->RemoveDeviceById(device->GetId());
+    }
 }

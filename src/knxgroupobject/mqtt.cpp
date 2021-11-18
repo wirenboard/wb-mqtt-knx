@@ -8,20 +8,29 @@ using namespace knx::object;
 TGroupObjectMqtt::TGroupObjectMqtt(std::shared_ptr<IDpt> pDpt,
                                    const std::string& controlId,
                                    const std::string& controlName,
-                                   std::shared_ptr<mqtt::IMqttDeviceAdapter> pMqttDevice)
+                                   std::shared_ptr<WBMQTT::TLocalDevice> pMqttDevice)
     : Dpt(std::move(pDpt)),
-      MqttDeviceAdapter(std::move(pMqttDevice))
+      MqttLocalDevice(std::move(pMqttDevice))
 {
     auto descriptorList = Dpt->getDescriptor();
     uint32_t index = 0;
 
     for (const auto& fieldDescriptor: descriptorList) {
-        auto control = MqttDeviceAdapter->CreateControl(controlId + "_" + fieldDescriptor.Name,
-                                                        fieldDescriptor.Type,
-                                                        controlName,
-                                                        fieldDescriptor.min,
-                                                        fieldDescriptor.max);
-        control->SetEventHandler([index, this](const WBMQTT::TAny& value) { MqttNotify(index, value); });
+        auto control = MqttLocalDevice
+                           ->CreateControl(MqttLocalDevice->GetDriver()->BeginTx(),
+                                           WBMQTT::TControlArgs{}
+                                               .SetId(controlId + "_" + fieldDescriptor.Name)
+                                               .SetTitle(controlName)
+                                               .SetType(fieldDescriptor.Type)
+                                               .SetMin(fieldDescriptor.min)
+                                               .SetMax(fieldDescriptor.max)
+                                               .SetError("")
+                                               .SetOrder(0)
+                                               .SetReadonly(false))
+                           .GetValue();
+        control->SetOnValueReceiveHandler([index, this](const WBMQTT::PControl&,
+                                                        const WBMQTT::TAny& value,
+                                                        const WBMQTT::PDriverTx& tx) { MqttNotify(index, value); });
         ControlList.push_back(control);
         ++index;
     }
@@ -43,7 +52,9 @@ void TGroupObjectMqtt::KnxNotify(const TGroupObjectTransaction& transaction)
         auto mqttData = Dpt->ToMqtt();
         uint32_t index = 0;
         for (const auto& control: ControlList) {
-            control->Send(std::move(mqttData.at(index)));
+            auto tx = control->GetDevice()->GetDriver()->BeginTx();
+            control->SetValue(tx, std::move(mqttData.at(index))).Wait();
+            tx->End();
             ++index;
         }
     }

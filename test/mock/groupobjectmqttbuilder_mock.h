@@ -11,5 +11,8 @@ public:
     MOCK_METHOD1(Create,
                  std::shared_ptr<knx::object::IGroupObject>(const knx::object::TGroupObjectMqttParameter& parameter));
 
+    MOCK_METHOD0(RemoveUnusedControls, void());
+    MOCK_METHOD0(Clear, void());
+
     virtual ~TGroupObjectMqttBuilderMock() = default;
 };

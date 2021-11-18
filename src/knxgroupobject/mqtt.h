@@ -1,7 +1,5 @@
 #pragma once
 
-#include "../mqtt/imqttcontroladapter.h"
-#include "../mqtt/imqttdeviceadapter.h"
 #include "idpt.h"
 #include "igroupobject.h"
 #include <wblib/wbmqtt.h>
@@ -18,7 +16,7 @@ namespace knx
             explicit TGroupObjectMqtt(std::shared_ptr<IDpt> pDpt,
                                       const std::string& controlId,
                                       const std::string& controlName,
-                                      std::shared_ptr<mqtt::IMqttDeviceAdapter> pMqttDevice);
+                                      std::shared_ptr<WBMQTT::TLocalDevice> pMqttDevice);
 
             void MqttNotify(uint32_t index, const WBMQTT::TAny& value);
 
@@ -34,8 +32,8 @@ namespace knx
             std::shared_ptr<ISenderGroupObject> KnxSender;
 
             std::shared_ptr<IDpt> Dpt;
-            std::shared_ptr<mqtt::IMqttDeviceAdapter> MqttDeviceAdapter;
-            std::vector<std::shared_ptr<mqtt::IMqttControlAdapter>> ControlList;
+            std::shared_ptr<WBMQTT::TLocalDevice> MqttLocalDevice;
+            std::vector<std::shared_ptr<WBMQTT::TControl>> ControlList;
         };
     }
 }

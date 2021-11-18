@@ -1,7 +1,7 @@
 #pragma once
-#include "../mqtt/mqttdeviceadapter.h"
 #include "igroupobject.h"
 #include "imqttbuilder.h"
+#include <wblib/wbmqtt.h>
 
 namespace knx
 {
@@ -16,10 +16,12 @@ namespace knx
 
             void LinkDevice(const std::string& id, const std::string& name) override;
             std::shared_ptr<IGroupObject> Create(const TGroupObjectMqttParameter& parameter) override;
+            void RemoveUnusedControls() override;
+            void Clear() override;
 
         private:
             std::shared_ptr<WBMQTT::TDeviceDriver> MqttDeviceDriver;
-            std::shared_ptr<mqtt::MqttDeviceAdapter> MqttDevice;
+            std::vector<std::shared_ptr<WBMQTT::TLocalDevice>> MqttDeviceList;
         };
     }
 }

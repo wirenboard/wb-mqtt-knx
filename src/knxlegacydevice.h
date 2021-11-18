@@ -26,7 +26,6 @@ namespace knx
 
     private:
         std::shared_ptr<WBMQTT::TDeviceDriver> DeviceDriver;
-        WBMQTT::PDriverEventHandlerHandle EventHandlerHandle;
         std::shared_ptr<knx::ISender<TTelegram>> KnxTelegramSender;
         std::shared_ptr<WBMQTT::TLocalDevice> LocalDevice;
         std::shared_ptr<WBMQTT::TControl> Control;

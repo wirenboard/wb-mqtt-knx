@@ -59,5 +59,7 @@ void TConfigurator::Configure(IKnxGroupObjectController& controller)
             auto groupObject = GroupObjectBuilder->Create({dataPointStr, controlIdStr, controlNameStr});
             controller.AddGroupObject(StringToGroupAddress(groupAddressStr), groupObject);
         }
+
+        GroupObjectBuilder->RemoveUnusedControls();
     }
 }
