@@ -1,7 +1,5 @@
 #include "configurator.h"
 
-using namespace knx;
-
 namespace
 {
     knx::TKnxGroupAddress StringToGroupAddress(const std::string& str)
@@ -20,29 +18,22 @@ namespace
     }
 }
 
-TConfigurator::TConfigurator(const std::string& configPath,
-                             const std::string& schemaPath,
-                             std::shared_ptr<object::IGroupObjectMqttBuilder> groupObjectBuilder)
-    : GroupObjectBuilder(std::move(groupObjectBuilder))
+void knx::configurator::ConfigureObjectController(IKnxGroupObjectController& controller,
+                                                  const std::string& configPath,
+                                                  const std::string& schemaPath,
+                                                  object::IGroupObjectMqttBuilder& groupObjectBuilder)
 {
-    ConfigRoot = WBMQTT::JSON::Parse(configPath);
-    SchemaRoot = WBMQTT::JSON::Parse(schemaPath);
+    auto configRoot = WBMQTT::JSON::Parse(configPath);
+    auto schemaRoot = WBMQTT::JSON::Parse(schemaPath);
 
-    WBMQTT::JSON::Validate(ConfigRoot, SchemaRoot);
-}
+    WBMQTT::JSON::Validate(configRoot, schemaRoot);
 
-void TConfigurator::Configure(IKnxGroupObjectController& controller)
-{
-    if (GroupObjectBuilder == nullptr) {
-        wb_throw(TKnxException, "Configurator: GroupObjectBuilder is nullptr");
-    }
-
-    auto devices = (ConfigRoot)["devices"];
+    auto devices = (configRoot)["devices"];
     for (const auto& device: devices) {
         auto deviceIdStr = device["deviceId"].asString();
         auto deviceNameStr = device["deviceTitle"].asString();
 
-        GroupObjectBuilder->LinkDevice(deviceIdStr, deviceNameStr);
+        groupObjectBuilder.LinkDevice(deviceIdStr, deviceNameStr);
 
         for (const auto& control: device["controls"]) {
             auto controlIdStr = control["controlId"].asString();
@@ -51,10 +42,10 @@ void TConfigurator::Configure(IKnxGroupObjectController& controller)
             auto dataPointStr = control["dataPointType"].asString();
             auto isReadOnlyBool = control["readOnly"].asBool();
 
-            auto groupObject = GroupObjectBuilder->Create({dataPointStr, controlIdStr, controlNameStr, isReadOnlyBool});
+            auto groupObject = groupObjectBuilder.Create({dataPointStr, controlIdStr, controlNameStr, isReadOnlyBool});
             controller.AddGroupObject(StringToGroupAddress(groupAddressStr), groupObject);
         }
 
-        GroupObjectBuilder->RemoveUnusedControls();
+        groupObjectBuilder.RemoveUnusedControls();
     }
 }

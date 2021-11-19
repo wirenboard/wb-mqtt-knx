@@ -10,18 +10,11 @@
 
 namespace knx
 {
-    class TConfigurator
+    namespace configurator
     {
-    public:
-        explicit TConfigurator(const std::string& configPath,
-                               const std::string& schemaPath,
-                               std::shared_ptr<object::IGroupObjectMqttBuilder> groupObjectBuilder);
-
-        void Configure(IKnxGroupObjectController& controller);
-
-    private:
-        Json::Value ConfigRoot;
-        Json::Value SchemaRoot;
-        std::shared_ptr<object::IGroupObjectMqttBuilder> GroupObjectBuilder;
-    };
+        void ConfigureObjectController(IKnxGroupObjectController& controller,
+                                       const std::string& configPath,
+                                       const std::string& schemaPath,
+                                       object::IGroupObjectMqttBuilder& groupObjectBuilder);
+    }
 }

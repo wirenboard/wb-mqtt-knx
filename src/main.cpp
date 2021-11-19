@@ -125,8 +125,10 @@ int main(int argc, char** argv)
         knxClientService->Subscribe(knxLegacyDevice);
         knxClientService->Subscribe(knxGroupObjectController);
 
-        knx::TConfigurator configurator(DEFAULT_CONFIG_FILE_PATH, DEFAULT_CONFIG_SCHEMA_FILE_PATH, groupObjectBuilder);
-        configurator.Configure(*knxGroupObjectController);
+        knx::configurator::ConfigureObjectController(*knxGroupObjectController,
+                                                     DEFAULT_CONFIG_FILE_PATH,
+                                                     DEFAULT_CONFIG_SCHEMA_FILE_PATH,
+                                                     *groupObjectBuilder);
 
         knxClientService->Start();
 

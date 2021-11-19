@@ -20,24 +20,27 @@ protected:
     std::string SourceDir = CMAKE_SOURCE_DIR;
 };
 
-TEST_F(ConfiguratorTest, GetConfig)
-{
-    EXPECT_NO_THROW(std::make_unique<knx::TConfigurator>(SourceDir + "/test/config/wb-mqtt-knx.conf",
-                                                         SourceDir + "/test/config/wb-mqtt-knx.schema.json",
-                                                         nullptr));
-}
-
 TEST_F(ConfiguratorTest, GetIncorrectConfig)
 {
-    EXPECT_THROW(std::make_unique<knx::TConfigurator>(SourceDir + "/test/config/wb-mqtt-knx_bad.conf",
-                                                      SourceDir + "/test/config/wb-mqtt-knx.schema.json",
-                                                      nullptr),
+    StrictMock<TKnxGroupObjectControllerMock> goController;
+    TGroupObjectMqttBuilderMock groupObjectMqttBuilder;
+
+    EXPECT_THROW(knx::configurator::ConfigureObjectController(goController,
+                                                              SourceDir + "/test/config/wb-mqtt-knx_bad.conf",
+                                                              SourceDir + "/test/config/wb-mqtt-knx.schema.json",
+                                                              groupObjectMqttBuilder),
                  std::exception);
 }
 
 TEST_F(ConfiguratorTest, NoConfig)
 {
-    EXPECT_THROW(std::make_unique<knx::TConfigurator>(".", SourceDir + "/test/config/wb-mqtt-knx.schema.json", nullptr),
+    StrictMock<TKnxGroupObjectControllerMock> goController;
+    TGroupObjectMqttBuilderMock groupObjectMqttBuilder;
+
+    EXPECT_THROW(knx::configurator::ConfigureObjectController(goController,
+                                                              ".",
+                                                              SourceDir + "/test/config/wb-mqtt-knx.schema.json",
+                                                              groupObjectMqttBuilder),
                  std::exception);
 }
 
@@ -61,8 +64,8 @@ TEST_F(ConfiguratorTest, CongigureController)
 
     auto param = knx::object::TGroupObjectMqttParameter{"", "", ""};
 
-    auto configurator = std::make_unique<knx::TConfigurator>(SourceDir + "/test/config/wb-mqtt-knx.conf",
-                                                             SourceDir + "/test/config/wb-mqtt-knx.schema.json",
-                                                             groupObjectMqttBuilder);
-    configurator->Configure(*goController);
+    knx::configurator::ConfigureObjectController(*goController,
+                                                 SourceDir + "/test/config/wb-mqtt-knx.conf",
+                                                 SourceDir + "/test/config/wb-mqtt-knx.schema.json",
+                                                 *groupObjectMqttBuilder);
 }
