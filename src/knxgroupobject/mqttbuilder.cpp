@@ -73,7 +73,9 @@ void TGroupObjectMqttBuilder::RemoveUnusedControls()
 
 void TGroupObjectMqttBuilder::Clear()
 {
+    auto tx = MqttDeviceDriver->BeginTx();
     for (const auto& device: MqttDeviceList) {
-        MqttDeviceDriver->BeginTx()->RemoveDeviceById(device->GetId());
+        tx->RemoveDeviceById(device->GetId()).Wait();
     }
+    tx->End();
 }

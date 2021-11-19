@@ -67,12 +67,13 @@ void TGroupObjectMqtt::KnxNotify(const TGroupObjectTransaction& transaction)
         }
 
         uint32_t index = 0;
+
+        auto tx = MqttLocalDevice->GetDriver()->BeginTx();
         for (const auto& control: ControlList) {
-            auto tx = control->GetDevice()->GetDriver()->BeginTx();
             control->SetValue(tx, std::move(mqttData.at(index))).Wait();
-            tx->End();
             ++index;
         }
+        tx->End();
     }
 }
 

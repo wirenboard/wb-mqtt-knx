@@ -51,8 +51,6 @@ TKnxLegacyDevice::TKnxLegacyDevice(std::shared_ptr<WBMQTT::TDeviceDriver> pMqttD
                 else {
                     ErrorLogger.Log() << "TKnxLegacyDevice: KnxTelegramSender is nullptr";
                 }
-            } catch (const TKnxException& e) {
-                ErrorLogger.Log() << e.what();
             } catch (const std::exception& e) {
                 ErrorLogger.Log() << e.what();
             }
@@ -75,8 +73,6 @@ void TKnxLegacyDevice::Notify(const TTelegram& telegram)
     try {
         const auto mqttData = converter::KnxTelegramToMqtt(telegram);
         Control->UpdateRawValue(DeviceDriver->BeginTx(), mqttData).Wait();
-    } catch (const TKnxException& e) {
-        ErrorLogger.Log() << e.what();
     } catch (const std::exception& e) {
         ErrorLogger.Log() << e.what();
     }
