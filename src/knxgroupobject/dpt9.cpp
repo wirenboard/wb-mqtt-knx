@@ -3,8 +3,6 @@
 
 using namespace knx::object;
 
-// TODO Need check negative numbers
-
 std::vector<DptDescriptorField> TDpt9::getDescriptor() const
 {
     return {{"FloatValue", "value", -671088.64, 670760.96}};

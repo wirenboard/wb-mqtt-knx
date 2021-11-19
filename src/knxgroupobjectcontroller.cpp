@@ -18,19 +18,18 @@ bool TKnxGroupObjectController::AddGroupObject(const knx::TKnxGroupAddress& grou
 
 bool TKnxGroupObjectController::RemoveGroupObject(const TKnxGroupAddress& address)
 {
-    if (GroupObjectList.erase(address)) {
-        return true;
-    }
-    return false;
+    return GroupObjectList.erase(address);
 }
 
 void TKnxGroupObjectController::Notify(const TTelegram& knxTelegram)
 {
     if (knxTelegram.IsGroupAddressed()) {
         TKnxGroupAddress address(knxTelegram.GetReceiverAddress());
-        auto groupObject = GroupObjectList[address];
-        if (groupObject) {
-            groupObject->KnxNotify({address, knxTelegram.Tpdu().GetAPCI(), knxTelegram.Tpdu().GetPayload()});
+
+        auto groupObjectIterator = GroupObjectList.find(address);
+        if (groupObjectIterator != GroupObjectList.end()) {
+            groupObjectIterator->second->KnxNotify(
+                {address, knxTelegram.Tpdu().GetAPCI(), knxTelegram.Tpdu().GetPayload()});
         }
     }
 }

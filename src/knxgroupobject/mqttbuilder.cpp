@@ -7,6 +7,14 @@
 
 using namespace knx::object;
 
+namespace
+{
+    template<typename T> std::shared_ptr<IDpt> CreateInst()
+    {
+        return std::make_shared<T>();
+    }
+}
+
 TGroupObjectMqttBuilder::TGroupObjectMqttBuilder(std::shared_ptr<WBMQTT::TDeviceDriver> pMqttDeviceDriver)
     : MqttDeviceDriver(std::move(pMqttDeviceDriver))
 {}
@@ -24,21 +32,19 @@ std::shared_ptr<IGroupObject> TGroupObjectMqttBuilder::Create(const TGroupObject
 {
     if (MqttDeviceList.empty())
         return nullptr;
-    // TODO Add Dpts
-    std::shared_ptr<IDpt> dpt;
-    if (parameter.Type == "Raw_Value") {
-        dpt = std::make_shared<TDptRaw>();
-    } else if (parameter.Type == "1.xxx_B1") {
-        dpt = std::make_shared<TDpt1>();
-    } else if (parameter.Type == "2.xxx_B2") {
-        dpt = std::make_shared<TDpt2>();
-    } else if (parameter.Type == "9.xxx_2-Octet_Float_Value") {
-        dpt = std::make_shared<TDpt9>();
-    } else {
-        return nullptr;
-    }
 
-    return std::make_shared<knx::object::TGroupObjectMqtt>(dpt,
+    // TODO Add Dpts
+    static const std::unordered_map<std::string, std::shared_ptr<IDpt> (*)()> dptsMap = {
+        {"Raw_Value", &CreateInst<TDptRaw>},
+        {"1.xxx_B1", &CreateInst<TDpt1>},
+        {"2.xxx_B2", &CreateInst<TDpt2>},
+        {"9.xxx_2-Octet_Float_Value", &CreateInst<TDpt9>}};
+
+    auto it = dptsMap.find(parameter.Type);
+    if (it == dptsMap.end())
+        return nullptr;
+
+    return std::make_shared<knx::object::TGroupObjectMqtt>(it->second(),
                                                            parameter.ControlId,
                                                            parameter.ControlTitle,
                                                            parameter.isReadOnly,
