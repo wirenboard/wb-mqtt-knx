@@ -10,8 +10,8 @@ namespace knx
         {
             std::string Name;
             std::string Type;
-            double min;
-            double max;
+            double Min;
+            double Max;
         };
 
         class IDpt

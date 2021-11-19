@@ -23,10 +23,8 @@ TGroupObjectMqtt::TGroupObjectMqtt(std::shared_ptr<IDpt> pDpt,
                                                .SetId(controlId + "_" + fieldDescriptor.Name)
                                                .SetTitle(controlName)
                                                .SetType(fieldDescriptor.Type)
-                                               .SetMin(fieldDescriptor.min)
-                                               .SetMax(fieldDescriptor.max)
-                                               .SetError("")
-                                               .SetOrder(0)
+                                               .SetMin(fieldDescriptor.Min)
+                                               .SetMax(fieldDescriptor.Max)
                                                .SetReadonly(isReadOnly))
                            .GetValue();
         control->SetOnValueReceiveHandler([index, this](const WBMQTT::PControl&,
@@ -44,11 +42,10 @@ void TGroupObjectMqtt::MqttNotify(uint32_t index, const WBMQTT::TAny& value)
     {
         std::lock_guard<std::mutex> lg(DptExchangeMutex);
 
-        auto isValid = Dpt->FromMqtt(index, value);
-        if (isValid) {
-            data = Dpt->ToKnx();
-        } else
+        if (!Dpt->FromMqtt(index, value)) {
             return;
+        }
+        data = Dpt->ToKnx();
     }
 
     KnxSender->Send({SelfKnxAddress, telegram::TApci::GroupValueWrite, data});
@@ -63,11 +60,10 @@ void TGroupObjectMqtt::KnxNotify(const TGroupObjectTransaction& transaction)
         {
             std::lock_guard<std::mutex> lg(DptExchangeMutex);
 
-            auto isValid = Dpt->FromKnx(transaction.Payload);
-            if (isValid) {
-                mqttData = Dpt->ToMqtt();
-            } else
+            if (!Dpt->FromKnx(transaction.Payload)) {
                 return;
+            }
+            mqttData = Dpt->ToMqtt();
         }
 
         uint32_t index = 0;

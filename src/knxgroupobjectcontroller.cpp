@@ -12,9 +12,8 @@ bool TKnxGroupObjectController::AddGroupObject(const knx::TKnxGroupAddress& grou
     if (groupObject) {
         groupObject->SetKnxSender(groupAddress, shared_from_this());
         return GroupObjectList.insert({groupAddress, groupObject}).second;
-    } else {
-        return false;
     }
+    return false;
 }
 
 bool TKnxGroupObjectController::RemoveGroupObject(const TKnxGroupAddress& address)

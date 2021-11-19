@@ -6,12 +6,7 @@ namespace
 {
     knx::TKnxGroupAddress StringToGroupAddress(const std::string& str)
     {
-        auto addr = str;
-
-        auto noSpaceEnd = std::remove(addr.begin(), addr.end(), ' ');
-        addr.erase(noSpaceEnd, addr.end());
-
-        auto tokens = WBMQTT::StringSplit(addr, "/");
+        auto tokens = WBMQTT::StringSplit(str, "/");
 
         if (tokens.size() == 3) {
             return {static_cast<uint32_t>(std::stoi(tokens[0])),
@@ -22,7 +17,6 @@ namespace
         } else {
             wb_throw(knx::TKnxException, "Configurator: Error parsing of KNX Group Address");
         }
-        return {0, 0, 0};
     }
 }
 
