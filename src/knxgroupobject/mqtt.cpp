@@ -9,9 +9,11 @@ TGroupObjectMqtt::TGroupObjectMqtt(std::shared_ptr<IDpt> pDpt,
                                    const std::string& controlId,
                                    const std::string& controlName,
                                    bool isReadOnly,
-                                   std::shared_ptr<WBMQTT::TLocalDevice> pMqttDevice)
+                                   std::shared_ptr<WBMQTT::TLocalDevice> pMqttDevice,
+                                   WBMQTT::TLogger& errorLogger)
     : Dpt(std::move(pDpt)),
-      MqttLocalDevice(std::move(pMqttDevice))
+      MqttLocalDevice(std::move(pMqttDevice)),
+      ErrorLogger(errorLogger)
 {
     auto descriptorList = Dpt->getDescriptor();
     uint32_t index = 0;
@@ -41,11 +43,15 @@ void TGroupObjectMqtt::MqttNotify(uint32_t index, const WBMQTT::TAny& value)
 
     {
         std::lock_guard<std::mutex> lg(DptExchangeMutex);
-
-        if (!Dpt->FromMqtt(index, value)) {
+        try {
+            if (!Dpt->FromMqtt(index, value)) {
+                return;
+            }
+            data = Dpt->ToKnx();
+        } catch (const std::exception& exception) {
+            ErrorLogger.Log() << exception.what();
             return;
         }
-        data = Dpt->ToKnx();
     }
 
     KnxSender->Send({SelfKnxAddress, telegram::TApci::GroupValueWrite, data});
@@ -60,10 +66,15 @@ void TGroupObjectMqtt::KnxNotify(const TGroupObjectTransaction& transaction)
         {
             std::lock_guard<std::mutex> lg(DptExchangeMutex);
 
-            if (!Dpt->FromKnx(transaction.Payload)) {
+            try {
+                if (!Dpt->FromKnx(transaction.Payload)) {
+                    return;
+                }
+                mqttData = Dpt->ToMqtt();
+            } catch (const std::exception& exception) {
+                ErrorLogger.Log() << exception.what();
                 return;
             }
-            mqttData = Dpt->ToMqtt();
         }
 
         uint32_t index = 0;

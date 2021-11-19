@@ -25,10 +25,10 @@ TConfigurator::TConfigurator(const std::string& configPath,
                              std::shared_ptr<object::IGroupObjectMqttBuilder> groupObjectBuilder)
     : GroupObjectBuilder(std::move(groupObjectBuilder))
 {
-    ConfigRoot = std::make_unique<Json::Value>(WBMQTT::JSON::Parse(configPath));
-    SchemaRoot = std::make_unique<Json::Value>(WBMQTT::JSON::Parse(schemaPath));
+    ConfigRoot = WBMQTT::JSON::Parse(configPath);
+    SchemaRoot = WBMQTT::JSON::Parse(schemaPath);
 
-    WBMQTT::JSON::Validate(*ConfigRoot, *SchemaRoot);
+    WBMQTT::JSON::Validate(ConfigRoot, SchemaRoot);
 }
 
 void TConfigurator::Configure(IKnxGroupObjectController& controller)
@@ -37,7 +37,7 @@ void TConfigurator::Configure(IKnxGroupObjectController& controller)
         wb_throw(TKnxException, "Configurator: GroupObjectBuilder is nullptr");
     }
 
-    auto devices = (*ConfigRoot)["devices"];
+    auto devices = (ConfigRoot)["devices"];
     for (const auto& device: devices) {
         auto deviceIdStr = device["deviceId"].asString();
         auto deviceNameStr = device["deviceTitle"].asString();

@@ -1,6 +1,7 @@
 #pragma once
 #include "igroupobject.h"
 #include "imqttbuilder.h"
+#include <wblib/log.h>
 #include <wblib/wbmqtt.h>
 
 namespace knx
@@ -11,7 +12,8 @@ namespace knx
         {
         public:
             TGroupObjectMqttBuilder() = delete;
-            explicit TGroupObjectMqttBuilder(std::shared_ptr<WBMQTT::TDeviceDriver> pMqttDeviceDriver);
+            explicit TGroupObjectMqttBuilder(std::shared_ptr<WBMQTT::TDeviceDriver> pMqttDeviceDriver,
+                                             WBMQTT::TLogger& errorLogger);
             virtual ~TGroupObjectMqttBuilder() = default;
 
             void LinkDevice(const std::string& id, const std::string& name) override;
@@ -22,6 +24,7 @@ namespace knx
         private:
             std::shared_ptr<WBMQTT::TDeviceDriver> MqttDeviceDriver;
             std::vector<std::shared_ptr<WBMQTT::TLocalDevice>> MqttDeviceList;
+            WBMQTT::TLogger& ErrorLogger;
         };
     }
 }

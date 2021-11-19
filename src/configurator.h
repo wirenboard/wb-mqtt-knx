@@ -20,8 +20,8 @@ namespace knx
         void Configure(IKnxGroupObjectController& controller);
 
     private:
-        std::unique_ptr<Json::Value> ConfigRoot;
-        std::unique_ptr<Json::Value> SchemaRoot;
+        Json::Value ConfigRoot;
+        Json::Value SchemaRoot;
         std::shared_ptr<object::IGroupObjectMqttBuilder> GroupObjectBuilder;
     };
 }

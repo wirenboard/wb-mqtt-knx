@@ -2,9 +2,9 @@
 
 #include "idpt.h"
 #include "igroupobject.h"
-#include <wblib/wbmqtt.h>
-
 #include <utility>
+#include <wblib/log.h>
+#include <wblib/wbmqtt.h>
 
 namespace knx
 {
@@ -17,7 +17,8 @@ namespace knx
                                       const std::string& controlId,
                                       const std::string& controlName,
                                       bool isReadOnly,
-                                      std::shared_ptr<WBMQTT::TLocalDevice> pMqttDevice);
+                                      std::shared_ptr<WBMQTT::TLocalDevice> pMqttDevice,
+                                      WBMQTT::TLogger& errorLogger);
 
             void MqttNotify(uint32_t index, const WBMQTT::TAny& value);
 
@@ -36,6 +37,7 @@ namespace knx
             std::shared_ptr<WBMQTT::TLocalDevice> MqttLocalDevice;
             std::vector<std::shared_ptr<WBMQTT::TControl>> ControlList;
             std::mutex DptExchangeMutex;
+            WBMQTT::TLogger& ErrorLogger;
         };
     }
 }

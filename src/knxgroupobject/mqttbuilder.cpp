@@ -15,8 +15,10 @@ namespace
     }
 }
 
-TGroupObjectMqttBuilder::TGroupObjectMqttBuilder(std::shared_ptr<WBMQTT::TDeviceDriver> pMqttDeviceDriver)
-    : MqttDeviceDriver(std::move(pMqttDeviceDriver))
+TGroupObjectMqttBuilder::TGroupObjectMqttBuilder(std::shared_ptr<WBMQTT::TDeviceDriver> pMqttDeviceDriver,
+                                                 WBMQTT::TLogger& errorLogger)
+    : MqttDeviceDriver(std::move(pMqttDeviceDriver)),
+      ErrorLogger(errorLogger)
 {}
 
 void TGroupObjectMqttBuilder::LinkDevice(const std::string& id, const std::string& name)
@@ -48,7 +50,8 @@ std::shared_ptr<IGroupObject> TGroupObjectMqttBuilder::Create(const TGroupObject
                                                            parameter.ControlId,
                                                            parameter.ControlTitle,
                                                            parameter.isReadOnly,
-                                                           MqttDeviceList.back());
+                                                           MqttDeviceList.back(),
+                                                           ErrorLogger);
     //        "2.xxx_B2",
     //        "3.xxx_B1U3",
     //        "4.xxx_Character_Set",

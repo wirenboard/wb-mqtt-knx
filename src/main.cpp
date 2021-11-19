@@ -110,7 +110,7 @@ int main(int argc, char** argv)
                                                                        InfoLogger);
         auto knxGroupObjectController = std::make_shared<knx::TKnxGroupObjectController>(knxClientService);
 
-        auto groupObjectBuilder = std::make_shared<knx::object::TGroupObjectMqttBuilder>(mqttDriver);
+        auto groupObjectBuilder = std::make_shared<knx::object::TGroupObjectMqttBuilder>(mqttDriver, ErrorLogger);
 
         WBMQTT::SignalHandling::OnSignals({SIGINT, SIGTERM}, [&] {
             knxClientService->Unsubscribe(knxGroupObjectController);
