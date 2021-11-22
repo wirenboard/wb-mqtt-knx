@@ -1,6 +1,8 @@
 #include "mqttbuilder.h"
 #include "dpt1.h"
 #include "dpt2.h"
+#include "dpt5.h"
+#include "dpt6.h"
 #include "dpt9.h"
 #include "dptraw.h"
 #include "mqtt.h"
@@ -40,6 +42,8 @@ std::shared_ptr<IGroupObject> TGroupObjectMqttBuilder::Create(const TGroupObject
         {"Raw_Value", &CreateInst<TDptRaw>},
         {"1.xxx_B1", &CreateInst<TDpt1>},
         {"2.xxx_B2", &CreateInst<TDpt2>},
+        {"5.xxx_8-Bit_Unsigned_Value", &CreateInst<TDpt5>},
+        {"6.xxx_V8", &CreateInst<TDpt6>},
         {"9.xxx_2-Octet_Float_Value", &CreateInst<TDpt9>}};
 
     auto it = dptsMap.find(parameter.Type);
@@ -54,8 +58,6 @@ std::shared_ptr<IGroupObject> TGroupObjectMqttBuilder::Create(const TGroupObject
                                                            ErrorLogger);
     //        "3.xxx_B1U3",
     //        "4.xxx_Character_Set",
-    //        "5.xxx_8-Bit_Unsigned_Value",
-    //        "6.xxx_V8",
     //        "6.020_Status_with_Mode",
     //        "7.xxx_2-Octet_Unsigned_Value",
     //        "8.xxx_2-Octet_Signed_Value",

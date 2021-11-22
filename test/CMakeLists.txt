@@ -10,8 +10,10 @@ add_executable(${PROJECT_NAME}_test ${TEST_LIST}
         ../src/knxtelegramtpdu.cpp
         ../src/configurator.cpp
         ../src/knxgroupaddress.cpp
-        ../src/knxgroupobject/dpt9.cpp
         ../src/knxgroupobject/dpt1.cpp
+        ../src/knxgroupobject/dpt5.cpp
+        ../src/knxgroupobject/dpt6.cpp
+        ../src/knxgroupobject/dpt9.cpp
         ../src/knxgroupobject/dptraw.cpp
         ../src/knxutils.cpp
         )

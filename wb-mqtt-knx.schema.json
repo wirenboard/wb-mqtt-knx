@@ -69,6 +69,8 @@
             "Raw_Value",
             "1.xxx_B1",
             "2.xxx_B2",
+            "5.xxx_8-Bit_Unsigned_Value",
+            "6.xxx_V8",
             "9.xxx_2-Octet_Float_Value"
           ],
           "default": "1.xxx_B1",
