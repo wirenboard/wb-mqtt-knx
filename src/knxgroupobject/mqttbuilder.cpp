@@ -52,7 +52,6 @@ std::shared_ptr<IGroupObject> TGroupObjectMqttBuilder::Create(const TGroupObject
                                                            parameter.isReadOnly,
                                                            MqttDeviceList.back(),
                                                            ErrorLogger);
-    //        "2.xxx_B2",
     //        "3.xxx_B1U3",
     //        "4.xxx_Character_Set",
     //        "5.xxx_8-Bit_Unsigned_Value",
@@ -60,7 +59,6 @@ std::shared_ptr<IGroupObject> TGroupObjectMqttBuilder::Create(const TGroupObject
     //        "6.020_Status_with_Mode",
     //        "7.xxx_2-Octet_Unsigned_Value",
     //        "8.xxx_2-Octet_Signed_Value",
-    //        "9.xxx_2-Octet_Float_Value",
     //        "10.001_Time",
     //        "11.001_Date",
     //        "12.001_4-Octet_Unsigned_Value",

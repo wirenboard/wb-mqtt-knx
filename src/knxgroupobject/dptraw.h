@@ -23,7 +23,7 @@ namespace knx
             virtual ~TDptRaw() = default;
 
         private:
-            std::vector<uint8_t> RawData;
+            std::vector<uint8_t> RawData = {0};
         };
     }
 }

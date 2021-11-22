@@ -11,6 +11,7 @@ add_executable(${PROJECT_NAME}_test ${TEST_LIST}
         ../src/configurator.cpp
         ../src/knxgroupaddress.cpp
         ../src/knxgroupobject/dpt9.cpp
+        ../src/knxgroupobject/dpt1.cpp
         ../src/knxgroupobject/dptraw.cpp
         ../src/knxutils.cpp
         )
