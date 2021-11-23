@@ -26,7 +26,7 @@ namespace knx
     private:
         void Notify(const TTelegram& knxTelegram) override;
 
-        void Send(const object::TGroupObjectTransaction& transaction) const override;
+        void Send(const object::TGroupObjectTransaction& transaction) override;
 
         std::shared_ptr<knx::ISender<TTelegram>> Sender;
         std::map<TKnxGroupAddress, std::shared_ptr<object::IGroupObject>> GroupObjectList;

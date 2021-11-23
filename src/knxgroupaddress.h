@@ -5,6 +5,7 @@
 #include "wblib/exceptions.h"
 #include <cstdint>
 #include <sstream>
+#include <wblib/utils.h>
 
 namespace knx
 {
@@ -15,6 +16,8 @@ namespace knx
 
         TKnxGroupAddress(uint32_t main, uint32_t middle, uint32_t sub);
         TKnxGroupAddress(uint32_t main, uint32_t sub);
+
+        explicit TKnxGroupAddress(const std::string& str);
 
         explicit TKnxGroupAddress(eibaddr_t eibAddress);
 
@@ -33,6 +36,10 @@ namespace knx
         std::string ToString() const;
 
     private:
+        void Init(uint32_t main, uint32_t middle, uint32_t sub);
+
+        void Init(uint32_t main, uint32_t sub);
+
         uint32_t MainGroup{0};
         uint32_t MiddleGroup{0};
         uint32_t SubGroup{0};

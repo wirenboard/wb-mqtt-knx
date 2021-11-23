@@ -34,7 +34,7 @@ void TKnxGroupObjectController::Notify(const TTelegram& knxTelegram)
     }
 }
 
-void TKnxGroupObjectController::Send(const object::TGroupObjectTransaction& transaction) const
+void TKnxGroupObjectController::Send(const object::TGroupObjectTransaction& transaction)
 {
     TTelegram knxTelegram{};
 

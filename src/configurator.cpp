@@ -1,23 +1,5 @@
 #include "configurator.h"
 
-namespace
-{
-    knx::TKnxGroupAddress StringToGroupAddress(const std::string& str)
-    {
-        auto tokens = WBMQTT::StringSplit(str, "/");
-
-        if (tokens.size() == 3) {
-            return {static_cast<uint32_t>(std::stoi(tokens[0])),
-                    static_cast<uint32_t>(std::stoi(tokens[1])),
-                    static_cast<uint32_t>(std::stoi(tokens[2]))};
-        } else if (tokens.size() == 2) {
-            return {static_cast<uint32_t>(std::stoi(tokens[0])), static_cast<uint32_t>(std::stoi(tokens[1]))};
-        } else {
-            wb_throw(knx::TKnxException, "Configurator: Error parsing of KNX Group Address");
-        }
-    }
-}
-
 void knx::configurator::ConfigureObjectController(IKnxGroupObjectController& controller,
                                                   const std::string& configPath,
                                                   const std::string& schemaPath,
@@ -43,7 +25,7 @@ void knx::configurator::ConfigureObjectController(IKnxGroupObjectController& con
             auto isReadOnlyBool = control["readOnly"].asBool();
 
             auto groupObject = groupObjectBuilder.Create({dataPointStr, controlIdStr, controlNameStr, isReadOnlyBool});
-            controller.AddGroupObject(StringToGroupAddress(groupAddressStr), groupObject);
+            controller.AddGroupObject(knx::TKnxGroupAddress{groupAddressStr}, groupObject);
         }
 
         groupObjectBuilder.RemoveUnusedControls();
