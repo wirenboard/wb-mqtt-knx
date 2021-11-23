@@ -7,7 +7,7 @@ using namespace knx::object;
 
 TGroupObjectMqtt::TGroupObjectMqtt(std::shared_ptr<IDpt> pDpt,
                                    const std::string& controlId,
-                                   const std::string& controlName,
+                                   const std::string& controlTitle,
                                    bool isReadOnly,
                                    std::shared_ptr<WBMQTT::TLocalDevice> pMqttDevice,
                                    WBMQTT::TLogger& errorLogger)
@@ -21,12 +21,12 @@ TGroupObjectMqtt::TGroupObjectMqtt(std::shared_ptr<IDpt> pDpt,
     auto tx = MqttLocalDevice->GetDriver()->BeginTx();
 
     for (const auto& fieldDescriptor: descriptorList) {
-        auto fullControlId = controlId + "_" + fieldDescriptor.Name;
+        auto fullControlId = controlId + "_" + fieldDescriptor.Id;
         auto control = MqttLocalDevice
                            ->CreateControl(tx,
                                            WBMQTT::TControlArgs{}
                                                .SetId(fullControlId)
-                                               .SetTitle(controlName)
+                                               .SetTitle(controlTitle)
                                                .SetType(fieldDescriptor.Type)
                                                .SetMin(fieldDescriptor.Min)
                                                .SetMax(fieldDescriptor.Max)

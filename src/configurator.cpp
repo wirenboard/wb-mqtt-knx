@@ -28,12 +28,12 @@ void knx::configurator::ConfigureObjectController(IKnxGroupObjectController& con
 
     WBMQTT::JSON::Validate(configRoot, schemaRoot);
 
-    auto devices = (configRoot)["devices"];
+    auto devices = configRoot["devices"];
     for (const auto& device: devices) {
         auto deviceIdStr = device["deviceId"].asString();
-        auto deviceNameStr = device["deviceTitle"].asString();
+        auto deviceTitleStr = device["deviceTitle"].asString();
 
-        groupObjectBuilder.LinkDevice(deviceIdStr, deviceNameStr);
+        groupObjectBuilder.LinkDevice(deviceIdStr, deviceTitleStr);
 
         for (const auto& control: device["controls"]) {
             auto controlIdStr = control["controlId"].asString();

@@ -8,7 +8,7 @@ namespace knx
     {
         struct DptDescriptorField
         {
-            std::string Name;
+            std::string Id;
             std::string Type;
             double Min;
             double Max;
