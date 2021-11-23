@@ -14,7 +14,6 @@ namespace knx
             TGroupObjectMqttBuilder() = delete;
             explicit TGroupObjectMqttBuilder(std::shared_ptr<WBMQTT::TDeviceDriver> pMqttDeviceDriver,
                                              WBMQTT::TLogger& errorLogger);
-            virtual ~TGroupObjectMqttBuilder() = default;
 
             void LinkDevice(const std::string& id, const std::string& name) override;
             std::shared_ptr<IGroupObject> Create(const TGroupObjectMqttParameter& parameter) override;

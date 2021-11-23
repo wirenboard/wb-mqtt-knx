@@ -6,5 +6,7 @@ namespace knx
     {
     public:
         virtual void Send(const Args&... args) const = 0;
+
+        virtual ~ISender() = default;
     };
 }

@@ -22,8 +22,6 @@ namespace knx
 
         void Notify(const TTelegram& t) override;
 
-        virtual ~TKnxLegacyDevice() = default;
-
     private:
         std::shared_ptr<WBMQTT::TDeviceDriver> DeviceDriver;
         std::shared_ptr<knx::ISender<TTelegram>> KnxTelegramSender;

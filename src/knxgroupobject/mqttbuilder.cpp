@@ -86,5 +86,4 @@ void TGroupObjectMqttBuilder::Clear()
     for (const auto& device: MqttDeviceList) {
         tx->RemoveDeviceById(device->GetId()).Wait();
     }
-    tx->End();
 }

@@ -4,6 +4,7 @@
 #include "knxexception.h"
 #include "wblib/exceptions.h"
 #include <cstdint>
+#include <sstream>
 
 namespace knx
 {
@@ -28,6 +29,8 @@ namespace knx
         bool operator<(const TKnxGroupAddress& rhs) const;
 
         bool operator==(const TKnxGroupAddress& rhs) const;
+
+        std::string ToString() const;
 
     private:
         uint32_t MainGroup{0};

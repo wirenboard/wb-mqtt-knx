@@ -20,8 +20,6 @@ namespace knx
 
             std::vector<WBMQTT::TAny> ToMqtt() override;
 
-            virtual ~TDptRaw() = default;
-
         private:
             std::vector<uint8_t> RawData = {0};
         };

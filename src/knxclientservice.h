@@ -22,8 +22,6 @@ namespace knx
         void Start();
         void Stop();
 
-        ~TKnxClientService() override = default;
-
     private:
         void KnxdConnectProcessing();
         void KnxdReceiveProcessing(const knx::TKnxConnection& In);

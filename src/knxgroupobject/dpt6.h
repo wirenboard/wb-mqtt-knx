@@ -14,8 +14,6 @@ namespace knx
             std::vector<uint8_t> ToKnx() override;
             std::vector<WBMQTT::TAny> ToMqtt() override;
 
-            virtual ~TDpt6() = default;
-
         private:
             int8_t FieldRelSignedValue = 0;
         };

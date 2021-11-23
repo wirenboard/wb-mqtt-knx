@@ -20,14 +20,15 @@ namespace knx
                                       std::shared_ptr<WBMQTT::TLocalDevice> pMqttDevice,
                                       WBMQTT::TLogger& errorLogger);
 
-            void MqttNotify(uint32_t index, const WBMQTT::TAny& value);
+            void MqttNotify(const std::string& deviceId,
+                            const std::string& controlId,
+                            uint32_t index,
+                            const WBMQTT::TAny& value);
 
             void KnxNotify(const TGroupObjectTransaction& transaction) override;
 
             void SetKnxSender(const TKnxGroupAddress& groupAddress,
                               std::shared_ptr<ISenderGroupObject> sender) override;
-
-            virtual ~TGroupObjectMqtt() = default;
 
         private:
             TKnxGroupAddress SelfKnxAddress;

@@ -25,6 +25,8 @@ namespace knx
 
             virtual void SetKnxSender(const knx::TKnxGroupAddress& groupAddress,
                                       std::shared_ptr<ISenderGroupObject> sender) = 0;
+
+            virtual ~IGroupObject() = default;
         };
     }
 }

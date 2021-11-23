@@ -18,26 +18,34 @@ TGroupObjectMqtt::TGroupObjectMqtt(std::shared_ptr<IDpt> pDpt,
     auto descriptorList = Dpt->getDescriptor();
     uint32_t index = 0;
 
+    auto tx = MqttLocalDevice->GetDriver()->BeginTx();
+
     for (const auto& fieldDescriptor: descriptorList) {
+        auto fullControlId = controlId + "_" + fieldDescriptor.Name;
         auto control = MqttLocalDevice
-                           ->CreateControl(MqttLocalDevice->GetDriver()->BeginTx(),
+                           ->CreateControl(tx,
                                            WBMQTT::TControlArgs{}
-                                               .SetId(controlId + "_" + fieldDescriptor.Name)
+                                               .SetId(fullControlId)
                                                .SetTitle(controlName)
                                                .SetType(fieldDescriptor.Type)
                                                .SetMin(fieldDescriptor.Min)
                                                .SetMax(fieldDescriptor.Max)
                                                .SetReadonly(isReadOnly))
                            .GetValue();
-        control->SetOnValueReceiveHandler([index, this](const WBMQTT::PControl&,
-                                                        const WBMQTT::TAny& value,
-                                                        const WBMQTT::PDriverTx& tx) { MqttNotify(index, value); });
+        control->SetOnValueReceiveHandler([index, fullControlId, this](const WBMQTT::PControl&,
+                                                                       const WBMQTT::TAny& value,
+                                                                       const WBMQTT::PDriverTx& tx) {
+            MqttNotify(MqttLocalDevice->GetId(), fullControlId, index, value);
+        });
         ControlList.push_back(control);
         ++index;
     }
 }
 
-void TGroupObjectMqtt::MqttNotify(uint32_t index, const WBMQTT::TAny& value)
+void TGroupObjectMqtt::MqttNotify(const std::string& deviceId,
+                                  const std::string& controlId,
+                                  uint32_t index,
+                                  const WBMQTT::TAny& value)
 {
     std::vector<uint8_t> data;
 
@@ -49,7 +57,8 @@ void TGroupObjectMqtt::MqttNotify(uint32_t index, const WBMQTT::TAny& value)
             }
             data = Dpt->ToKnx();
         } catch (const std::exception& exception) {
-            ErrorLogger.Log() << exception.what();
+            ErrorLogger.Log() << "Invalid Mqtt Control value: " << deviceId + "." + controlId + " : "
+                              << exception.what();
             return;
         }
     }
@@ -72,7 +81,8 @@ void TGroupObjectMqtt::KnxNotify(const TGroupObjectTransaction& transaction)
                 }
                 mqttData = Dpt->ToMqtt();
             } catch (const std::exception& exception) {
-                ErrorLogger.Log() << exception.what();
+                ErrorLogger.Log() << "Invalid Dpt format (" + transaction.Address.ToString() + ") : "
+                                  << exception.what();
                 return;
             }
         }
@@ -84,7 +94,6 @@ void TGroupObjectMqtt::KnxNotify(const TGroupObjectTransaction& transaction)
             control->SetValue(tx, std::move(mqttData.at(index))).Wait();
             ++index;
         }
-        tx->End();
     }
 }
 

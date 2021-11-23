@@ -48,3 +48,9 @@ TEST(KnxGroupAddressTest, LessOperatorTest)
 
     EXPECT_LT(address, address2);
 }
+
+TEST(KnxGroupAddressTest, ToStringTest)
+{
+    knx::TKnxGroupAddress address(1, 2, 3);
+    EXPECT_EQ("1/2/3", address.ToString());
+}

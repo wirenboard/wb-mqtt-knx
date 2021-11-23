@@ -6,5 +6,7 @@ namespace knx
     {
     public:
         virtual void Notify(const Args&... args) = 0;
+
+        virtual ~ISubscriber() = default;
     };
 }

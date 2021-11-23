@@ -50,3 +50,10 @@ uint32_t TKnxGroupAddress::GetSubGroup() const
 {
     return SubGroup;
 }
+
+std::string TKnxGroupAddress::ToString() const
+{
+    std::stringstream ss;
+    ss << MainGroup << "/" << MiddleGroup << "/" << SubGroup;
+    return ss.str();
+}

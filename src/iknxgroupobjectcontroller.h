@@ -16,5 +16,7 @@ namespace knx
         virtual bool AddGroupObject(const knx::TKnxGroupAddress& groupAddress,
                                     const std::shared_ptr<object::IGroupObject>& groupObject) = 0;
         virtual bool RemoveGroupObject(const TKnxGroupAddress& address) = 0;
+
+        virtual ~IKnxGroupObjectController() = default;
     };
 }

@@ -21,6 +21,8 @@ namespace knx
             virtual std::shared_ptr<IGroupObject> Create(const TGroupObjectMqttParameter& parameter) = 0;
             virtual void RemoveUnusedControls() = 0;
             virtual void Clear() = 0;
+
+            virtual ~IGroupObjectMqttBuilder() = default;
         };
     }
 }

@@ -24,6 +24,8 @@ namespace knx
 
             virtual std::vector<uint8_t> ToKnx() = 0;
             virtual std::vector<WBMQTT::TAny> ToMqtt() = 0;
+
+            virtual ~IDpt() = default;
         };
     }
 }
