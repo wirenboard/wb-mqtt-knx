@@ -25,25 +25,25 @@ TEST_F(Dpt6Test, InitVal)
 
 TEST_F(Dpt6Test, toMqttTest)
 {
-    EXPECT_TRUE(Dpt->FromKnx({0x00, 25}));
+    EXPECT_NO_THROW(Dpt->FromKnx({0x00, 25}));
     EXPECT_EQ(25, Dpt->ToMqtt().at(0).As<double>());
-    EXPECT_TRUE(Dpt->FromKnx({0x00, static_cast<uint8_t>(-110)}));
+    EXPECT_NO_THROW(Dpt->FromKnx({0x00, static_cast<uint8_t>(-110)}));
     EXPECT_EQ(-110, Dpt->ToMqtt().at(0).As<double>());
 }
 
 TEST_F(Dpt6Test, toKnxTest)
 {
-    EXPECT_TRUE(Dpt->FromMqtt(0, 45.0));
+    EXPECT_NO_THROW(Dpt->FromMqtt(0, 45.0));
     std::vector<uint8_t> vec = {0, 45};
     EXPECT_EQ(vec, Dpt->ToKnx());
-    EXPECT_TRUE(Dpt->FromMqtt(0, -110.0));
+    EXPECT_NO_THROW(Dpt->FromMqtt(0, -110.0));
     vec = {0, static_cast<uint8_t>(-110)};
     EXPECT_EQ(vec, Dpt->ToKnx());
 }
 
 TEST_F(Dpt6Test, fromKnxNegativeTest)
 {
-    EXPECT_FALSE(Dpt->FromKnx({0x00}));
+    EXPECT_THROW(Dpt->FromKnx({0x00}), knx::TKnxException);
 }
 
 TEST_F(Dpt6Test, formMqttNegativeTest)

@@ -1,4 +1,6 @@
 #include "dpt2.h"
+#include "../knxexception.h"
+#include "datapointerror.h"
 
 using namespace knx::object;
 
@@ -7,29 +9,25 @@ std::vector<DptDescriptorField> TDpt2::getDescriptor() const
     return {{"c", "switch", 0, 1}, {"v", "switch", 0, 1}};
 }
 
-bool TDpt2::FromMqtt(uint32_t controlIndex, const WBMQTT::TAny& value)
+void TDpt2::FromMqtt(uint32_t controlIndex, const WBMQTT::TAny& value)
 {
     switch (controlIndex) {
         case 0:
             FieldC = value.As<bool>();
-            return true;
         case 1:
             FieldV = value.As<bool>();
-            return true;
         default:
-            return false;
+            wb_throw(TKnxException, datapointError::MQTT_INVALID_INDEX);
     }
 }
 
-bool TDpt2::FromKnx(const std::vector<uint8_t>& payload)
+void TDpt2::FromKnx(const std::vector<uint8_t>& payload)
 {
     if (payload.size() == 1) {
         FieldV = payload[0] & 0x01;
         FieldC = payload[0] & (1 << 1);
-        return true;
-    }
-
-    return false;
+    } else
+        wb_throw(TKnxException, datapointError::KNX_INVALID_PAYLOAD_SIZE);
 }
 
 std::vector<uint8_t> TDpt2::ToKnx()

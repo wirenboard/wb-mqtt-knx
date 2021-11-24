@@ -32,33 +32,30 @@ TGroupObjectMqtt::TGroupObjectMqtt(std::shared_ptr<IDpt> pDpt,
                                                .SetMax(fieldDescriptor.Max)
                                                .SetReadonly(isReadOnly))
                            .GetValue();
-        control->SetOnValueReceiveHandler([index, fullControlId, this](const WBMQTT::PControl&,
-                                                                       const WBMQTT::TAny& value,
-                                                                       const WBMQTT::PDriverTx& tx) {
-            MqttNotify(MqttLocalDevice->GetId(), fullControlId, index, value);
-        });
+        control->SetOnValueReceiveHandler(
+            [index, this](WBMQTT::PControl pControl, const WBMQTT::TAny& value, const WBMQTT::PDriverTx&) {
+                MqttNotify(pControl, index, value);
+            });
         ControlList.push_back(control);
         ++index;
     }
 }
 
-void TGroupObjectMqtt::MqttNotify(const std::string& deviceId,
-                                  const std::string& controlId,
-                                  uint32_t index,
-                                  const WBMQTT::TAny& value)
+void TGroupObjectMqtt::MqttNotify(WBMQTT::PControl& pControl, uint32_t index, const WBMQTT::TAny& value)
 {
     std::vector<uint8_t> data;
 
     {
         std::lock_guard<std::mutex> lg(DptExchangeMutex);
         try {
-            if (!Dpt->FromMqtt(index, value)) {
-                return;
-            }
+            Dpt->FromMqtt(index, value);
             data = Dpt->ToKnx();
         } catch (const std::exception& exception) {
-            ErrorLogger.Log() << "Invalid Mqtt Control value: " << deviceId + "." + controlId + " : "
-                              << exception.what();
+            auto tx = MqttLocalDevice->GetDriver()->BeginTx();
+            auto setErrorFuture = pControl->SetError(tx, exception.what());
+            ErrorLogger.Log() << "Invalid Mqtt Control value: "
+                              << MqttLocalDevice->GetId() + "." + pControl->GetId() + " : " << exception.what();
+            setErrorFuture.Wait();
             return;
         }
     }
@@ -76,13 +73,17 @@ void TGroupObjectMqtt::KnxNotify(const TGroupObjectTransaction& transaction)
             std::lock_guard<std::mutex> lg(DptExchangeMutex);
 
             try {
-                if (!Dpt->FromKnx(transaction.Payload)) {
-                    return;
-                }
+                Dpt->FromKnx(transaction.Payload);
                 mqttData = Dpt->ToMqtt();
             } catch (const std::exception& exception) {
                 ErrorLogger.Log() << "Invalid Dpt format (" + transaction.Address.ToString() + ") : "
                                   << exception.what();
+
+                auto tx = MqttLocalDevice->GetDriver()->BeginTx();
+                for (const auto& control: ControlList) {
+                    control->SetError(tx, exception.what()).Wait();
+                }
+
                 return;
             }
         }

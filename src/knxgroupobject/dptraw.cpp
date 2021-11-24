@@ -1,6 +1,7 @@
 #include "dptraw.h"
 #include "../knxexception.h"
 #include "../knxtelegram.h"
+#include "datapointerror.h"
 
 using namespace knx::object;
 
@@ -9,7 +10,7 @@ std::vector<DptDescriptorField> TDptRaw::getDescriptor() const
     return {{"RawValue", "text"}};
 }
 
-bool TDptRaw::FromMqtt(uint32_t controlIndex, const WBMQTT::TAny& value)
+void TDptRaw::FromMqtt(uint32_t controlIndex, const WBMQTT::TAny& value)
 {
     if (controlIndex == 0) {
         std::stringstream ss(value.As<std::string>());
@@ -22,19 +23,18 @@ bool TDptRaw::FromMqtt(uint32_t controlIndex, const WBMQTT::TAny& value)
             if (size > knx::TTpdu::MaxPayloadSize)
                 wb_throw(TKnxException, "Telegram payload is too long.");
         }
-        return true;
-    }
-    return false;
+    } else
+        wb_throw(TKnxException, datapointError::MQTT_INVALID_INDEX);
 }
 
-bool TDptRaw::FromKnx(const std::vector<uint8_t>& payload)
+void TDptRaw::FromKnx(const std::vector<uint8_t>& payload)
 {
     if (!payload.empty()) {
         RawData = payload;
-        return true;
-    }
-    return false;
+    } else
+        wb_throw(TKnxException, "KNX payload is empty");
 }
+
 std::vector<uint8_t> TDptRaw::ToKnx()
 {
     return RawData;

@@ -20,10 +20,7 @@ namespace knx
                                       std::shared_ptr<WBMQTT::TLocalDevice> pMqttDevice,
                                       WBMQTT::TLogger& errorLogger);
 
-            void MqttNotify(const std::string& deviceId,
-                            const std::string& controlId,
-                            uint32_t index,
-                            const WBMQTT::TAny& value);
+            void MqttNotify(WBMQTT::PControl& pControl, uint32_t index, const WBMQTT::TAny& value);
 
             void KnxNotify(const TGroupObjectTransaction& transaction) override;
 

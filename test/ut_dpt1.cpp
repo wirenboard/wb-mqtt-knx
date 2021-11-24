@@ -24,23 +24,23 @@ TEST_F(Dpt1Test, InitVal)
 
 TEST_F(Dpt1Test, toMqttTest)
 {
-    EXPECT_TRUE(Dpt->FromKnx({0x00}));
+    EXPECT_NO_THROW(Dpt->FromKnx({0x00}));
     EXPECT_EQ(false, Dpt->ToMqtt().at(0).As<bool>());
-    EXPECT_TRUE(Dpt->FromKnx({0x01}));
+    EXPECT_NO_THROW(Dpt->FromKnx({0x01}));
     EXPECT_EQ(true, Dpt->ToMqtt().at(0).As<bool>());
 }
 
 TEST_F(Dpt1Test, toKnxTest)
 {
-    EXPECT_TRUE(Dpt->FromMqtt(0, false));
+    EXPECT_NO_THROW(Dpt->FromMqtt(0, false));
     EXPECT_EQ(0, Dpt->ToKnx().at(0));
-    EXPECT_TRUE(Dpt->FromMqtt(0, true));
+    EXPECT_NO_THROW(Dpt->FromMqtt(0, true));
     EXPECT_EQ(1, Dpt->ToKnx().at(0));
 }
 
 TEST_F(Dpt1Test, fromKnxNegativeTest)
 {
-    EXPECT_FALSE(Dpt->FromKnx({0x00, 0x01}));
+    EXPECT_THROW(Dpt->FromKnx({0x00, 0x01}), knx::TKnxException);
 }
 
 TEST_F(Dpt1Test, formMqttNegativeTest)

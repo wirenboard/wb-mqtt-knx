@@ -12,9 +12,9 @@ namespace knx
         /// Structure for communicating with a group object
         struct TGroupObjectTransaction
         {
-            TKnxGroupAddress Address;
-            telegram::TApci Apci;
-            std::vector<uint8_t> Payload;
+            TKnxGroupAddress Address;     ///< Destination group address
+            telegram::TApci Apci;         ///< Command code for group objects
+            std::vector<uint8_t> Payload; ///< KNX telegram payload
         };
 
         using ISenderGroupObject = ISender<TGroupObjectTransaction>;

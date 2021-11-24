@@ -31,13 +31,11 @@ namespace knx
             /// Receiving and cache a value from the mqtt control associated with the datapoint field
             /// \param controlIndex sequence number of the MQTT control from the descriptor
             /// \param value MQTT control value
-            /// \return Is the value and index valid
-            virtual bool FromMqtt(uint32_t controlIndex, const WBMQTT::TAny& value) = 0;
+            virtual void FromMqtt(uint32_t controlIndex, const WBMQTT::TAny& value) = 0;
 
             /// Receiving and cache a message from a KNX network
             /// \param payload Content of APDU from KNX telegram
-            /// \return Is the APDU payload valid
-            virtual bool FromKnx(const std::vector<uint8_t>& payload) = 0;
+            virtual void FromKnx(const std::vector<uint8_t>& payload) = 0;
 
             /// Converting data for sending to KNX
             /// \return APDU payload
