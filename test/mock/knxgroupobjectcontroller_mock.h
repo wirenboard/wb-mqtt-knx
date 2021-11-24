@@ -7,8 +7,7 @@
 class TKnxGroupObjectControllerMock: public knx::IKnxGroupObjectController
 {
 public:
-    MOCK_METHOD2(AddGroupObject,
-                 bool(const knx::TKnxGroupAddress& groupAddress, const knx::object::PGroupObject&));
+    MOCK_METHOD2(AddGroupObject, bool(const knx::TKnxGroupAddress& groupAddress, const knx::object::PGroupObject&));
     MOCK_METHOD1(RemoveGroupObject, bool(const knx::TKnxGroupAddress& a));
 
     virtual ~TKnxGroupObjectControllerMock() = default;
