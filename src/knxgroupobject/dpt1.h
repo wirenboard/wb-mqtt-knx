@@ -6,6 +6,11 @@ namespace knx
 {
     namespace object
     {
+        /// \brief Datapoint Types B1
+        ///
+        /// - ID: 1.xxx
+        /// - Format: 1 bit: B1
+        /// - Field names: b
         class TDpt1: public IDpt
         {
         public:

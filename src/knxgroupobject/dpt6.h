@@ -5,6 +5,11 @@ namespace knx
 {
     namespace object
     {
+        /// \brief Datapoint Types V8
+        ///
+        /// - ID: 6.xxx
+        /// - Format: 8 bit
+        /// - Field names: RelSignedValue
         class TDpt6: public IDpt
         {
         public:

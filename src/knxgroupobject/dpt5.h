@@ -5,6 +5,11 @@ namespace knx
 {
     namespace object
     {
+        /// \brief Datapoint Types "8-Bit Unsigned Value"
+        ///
+        /// - ID: 5.xxx
+        /// - Format: 8 bit: U8
+        /// - Field names: UnsignedValue
         class TDpt5: public IDpt
         {
         public:

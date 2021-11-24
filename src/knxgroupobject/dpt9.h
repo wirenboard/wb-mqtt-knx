@@ -5,6 +5,11 @@ namespace knx
 {
     namespace object
     {
+        /// \brief Datapoint Types "2-Octet Float Value"
+        ///
+        /// - ID: 9.xxx
+        /// - Format: 2 octets: F16
+        /// - Field names: FloatValue
         class TDpt9: public IDpt
         {
         public:

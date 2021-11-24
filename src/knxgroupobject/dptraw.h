@@ -7,6 +7,12 @@ namespace knx
 {
     namespace object
     {
+        /// \brief Raw KNX payload data.
+        ///
+        /// Array of bytes as a text string. The first data byte is the first byte in the APDU.
+        /// <br>Example:
+        ///        - for a control input data: "34 0x34 0b11011"
+        ///        - for a control output data: "0x01 0x03 0x50"
         class TDptRaw: public IDpt
         {
         public:
