@@ -11,8 +11,8 @@ namespace
     constexpr auto CONTROL_TYPE = "text";
 } // namespace
 
-TKnxLegacyDevice::TKnxLegacyDevice(std::shared_ptr<WBMQTT::TDeviceDriver> pMqttDriver,
-                                   std::shared_ptr<knx::ISender<TTelegram>> pKnxTelegramSender,
+TKnxLegacyDevice::TKnxLegacyDevice(WBMQTT::PDeviceDriver pMqttDriver,
+                                   knx::PSender<TTelegram> pKnxTelegramSender,
                                    WBMQTT::TLogger& errorLogger,
                                    WBMQTT::TLogger& debugLogger,
                                    WBMQTT::TLogger& infoLogger)

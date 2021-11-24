@@ -18,6 +18,7 @@ namespace knx
         };
 
         using ISenderGroupObject = ISender<TGroupObjectTransaction>;
+        using PSenderGroupObject = std::shared_ptr<ISenderGroupObject>;
 
         /// Group object for working with a KNX network
         class IGroupObject
@@ -30,11 +31,12 @@ namespace knx
             /// Linking the group object to a KNX message transmitter in the network
             /// \param groupAddress the group address to which messages will be sent.
             /// \param sender sender object
-            virtual void SetKnxSender(const knx::TKnxGroupAddress& groupAddress,
-                                      std::shared_ptr<ISenderGroupObject> sender) = 0;
+            virtual void SetKnxSender(const knx::TKnxGroupAddress& groupAddress, PSenderGroupObject sender) = 0;
 
             /// Virtual destructor
             virtual ~IGroupObject() = default;
         };
+
+        using PGroupObject = std::shared_ptr<IGroupObject>;
     }
 }

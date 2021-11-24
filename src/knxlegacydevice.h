@@ -12,8 +12,8 @@ namespace knx
     class TKnxLegacyDevice: public ISubscriber<TTelegram>
     {
     public:
-        explicit TKnxLegacyDevice(std::shared_ptr<WBMQTT::TDeviceDriver> pMqttDriver,
-                                  std::shared_ptr<knx::ISender<TTelegram>> pKnxTelegramSender,
+        explicit TKnxLegacyDevice(WBMQTT::PDeviceDriver pMqttDriver,
+                                  knx::PSender<TTelegram> pKnxTelegramSender,
                                   WBMQTT::TLogger& errorLogger,
                                   WBMQTT::TLogger& debugLogger,
                                   WBMQTT::TLogger& infoLogger);
@@ -23,10 +23,10 @@ namespace knx
         void Notify(const TTelegram& t) override;
 
     private:
-        std::shared_ptr<WBMQTT::TDeviceDriver> DeviceDriver;
-        std::shared_ptr<knx::ISender<TTelegram>> KnxTelegramSender;
-        std::shared_ptr<WBMQTT::TLocalDevice> LocalDevice;
-        std::shared_ptr<WBMQTT::TControl> Control;
+        WBMQTT::PDeviceDriver DeviceDriver;
+        knx::PSender<TTelegram> KnxTelegramSender;
+        WBMQTT::PLocalDevice LocalDevice;
+        WBMQTT::PControl Control;
 
         WBMQTT::TLogger& ErrorLogger;
         WBMQTT::TLogger& DebugLogger;

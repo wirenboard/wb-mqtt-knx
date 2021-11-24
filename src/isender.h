@@ -1,4 +1,5 @@
 #pragma once
+#include <memory>
 
 namespace knx
 {
@@ -9,4 +10,6 @@ namespace knx
 
         virtual ~ISender() = default;
     };
+
+    template<typename... Args> using PSender = std::shared_ptr<ISender<Args...>>;
 }

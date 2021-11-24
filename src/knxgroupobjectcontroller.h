@@ -17,10 +17,10 @@ namespace knx
     {
     public:
         explicit TKnxGroupObjectController() = delete;
-        explicit TKnxGroupObjectController(std::shared_ptr<knx::ISender<TTelegram>> pSender);
+        explicit TKnxGroupObjectController(knx::PSender<TTelegram> pSender);
 
         bool AddGroupObject(const knx::TKnxGroupAddress& groupAddress,
-                            const std::shared_ptr<object::IGroupObject>& groupObject) override;
+                            const object::PGroupObject& groupObject) override;
         bool RemoveGroupObject(const TKnxGroupAddress& address) override;
 
     private:
@@ -28,7 +28,7 @@ namespace knx
 
         void Send(const object::TGroupObjectTransaction& transaction) override;
 
-        std::shared_ptr<knx::ISender<TTelegram>> Sender;
-        std::map<TKnxGroupAddress, std::shared_ptr<object::IGroupObject>> GroupObjectList;
+        PSender<TTelegram> Sender;
+        std::map<TKnxGroupAddress, object::PGroupObject> GroupObjectList;
     };
 }

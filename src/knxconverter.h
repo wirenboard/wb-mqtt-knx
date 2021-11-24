@@ -8,6 +8,6 @@ namespace knx
     namespace converter
     {
         std::string KnxTelegramToMqtt(const TTelegram& telegram);
-        std::shared_ptr<TTelegram> MqttToKnxTelegram(const std::string& payload);
+        PTelegram MqttToKnxTelegram(const std::string& payload);
     }
 }

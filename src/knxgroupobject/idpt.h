@@ -1,6 +1,7 @@
 #pragma once
 
 #include "wblib/any.h"
+#include <memory>
 
 namespace knx
 {
@@ -49,5 +50,7 @@ namespace knx
             /// Virtual destructor
             virtual ~IDpt() = default;
         };
+
+        using PDpt = std::shared_ptr<IDpt>;
     }
 }

@@ -9,5 +9,5 @@ public:
     MOCK_METHOD1(KnxNotify, void(const knx::object::TGroupObjectTransaction& transaction));
     MOCK_METHOD2(SetKnxSender,
                  void(const knx::TKnxGroupAddress& groupAddress,
-                      std::shared_ptr<knx::object::ISenderGroupObject> sender));
+                      knx::object::PSenderGroupObject sender));
 };

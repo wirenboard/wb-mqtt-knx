@@ -1,4 +1,5 @@
 #pragma once
+#include <memory>
 
 namespace knx
 {
@@ -9,4 +10,6 @@ namespace knx
 
         virtual ~ISubscriber() = default;
     };
+
+    template<typename... Args> using PSubscriber = std::shared_ptr<ISubscriber<Args...>>;
 }

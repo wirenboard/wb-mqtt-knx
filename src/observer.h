@@ -9,7 +9,7 @@ namespace knx
     template<typename... Args> class TObserver
     {
     public:
-        virtual bool Subscribe(std::shared_ptr<ISubscriber<Args...>> subscriber)
+        virtual bool Subscribe(PSubscriber<Args...> subscriber)
         {
             auto it = std::find(SubscriberList.begin(), SubscriberList.end(), subscriber);
             if (it == SubscriberList.end()) {
@@ -19,7 +19,7 @@ namespace knx
             return false;
         }
 
-        virtual bool Unsubscribe(std::shared_ptr<ISubscriber<Args...>> subscriber)
+        virtual bool Unsubscribe(PSubscriber<Args...> subscriber)
         {
             auto it = std::find(SubscriberList.begin(), SubscriberList.end(), subscriber);
             if (it != SubscriberList.end()) {
@@ -40,6 +40,8 @@ namespace knx
         }
 
     private:
-        std::vector<std::shared_ptr<ISubscriber<Args...>>> SubscriberList;
+        std::vector<PSubscriber<Args...>> SubscriberList;
     };
+
+    template<typename... Args> using PObserver = std::shared_ptr<TObserver<Args...>>;
 }

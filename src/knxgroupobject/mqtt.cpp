@@ -5,11 +5,11 @@
 
 using namespace knx::object;
 
-TGroupObjectMqtt::TGroupObjectMqtt(std::shared_ptr<IDpt> pDpt,
+TGroupObjectMqtt::TGroupObjectMqtt(PDpt pDpt,
                                    const std::string& controlId,
                                    const std::string& controlTitle,
                                    bool isReadOnly,
-                                   std::shared_ptr<WBMQTT::TLocalDevice> pMqttDevice,
+                                   WBMQTT::PLocalDevice pMqttDevice,
                                    WBMQTT::TLogger& errorLogger)
     : Dpt(std::move(pDpt)),
       MqttLocalDevice(std::move(pMqttDevice)),
@@ -98,8 +98,7 @@ void TGroupObjectMqtt::KnxNotify(const TGroupObjectTransaction& transaction)
     }
 }
 
-void TGroupObjectMqtt::SetKnxSender(const knx::TKnxGroupAddress& groupAddress,
-                                    std::shared_ptr<ISenderGroupObject> sender)
+void TGroupObjectMqtt::SetKnxSender(const knx::TKnxGroupAddress& groupAddress, PSenderGroupObject sender)
 {
     SelfKnxAddress = groupAddress;
     KnxSender = std::move(sender);

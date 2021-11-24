@@ -12,17 +12,16 @@ namespace knx
         {
         public:
             TGroupObjectMqttBuilder() = delete;
-            explicit TGroupObjectMqttBuilder(std::shared_ptr<WBMQTT::TDeviceDriver> pMqttDeviceDriver,
-                                             WBMQTT::TLogger& errorLogger);
+            explicit TGroupObjectMqttBuilder(WBMQTT::PDeviceDriver pMqttDeviceDriver, WBMQTT::TLogger& errorLogger);
 
             void LinkDevice(const std::string& id, const std::string& name) override;
-            std::shared_ptr<IGroupObject> Create(const TGroupObjectMqttParameter& parameter) override;
+            PGroupObject Create(const TGroupObjectMqttParameter& parameter) override;
             void RemoveUnusedControls() override;
             void Clear() override;
 
         private:
-            std::shared_ptr<WBMQTT::TDeviceDriver> MqttDeviceDriver;
-            std::vector<std::shared_ptr<WBMQTT::TLocalDevice>> MqttDeviceList;
+            WBMQTT::PDeviceDriver MqttDeviceDriver;
+            std::vector<WBMQTT::PLocalDevice> MqttDeviceList;
             WBMQTT::TLogger& ErrorLogger;
         };
     }

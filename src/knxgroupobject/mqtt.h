@@ -13,27 +13,25 @@ namespace knx
         class TGroupObjectMqtt: public IGroupObject
         {
         public:
-            explicit TGroupObjectMqtt(std::shared_ptr<IDpt> pDpt,
+            explicit TGroupObjectMqtt(PDpt pDpt,
                                       const std::string& controlId,
                                       const std::string& controlTitle,
                                       bool isReadOnly,
-                                      std::shared_ptr<WBMQTT::TLocalDevice> pMqttDevice,
+                                      WBMQTT::PLocalDevice pMqttDevice,
                                       WBMQTT::TLogger& errorLogger);
 
             void MqttNotify(WBMQTT::PControl& pControl, uint32_t index, const WBMQTT::TAny& value);
 
             void KnxNotify(const TGroupObjectTransaction& transaction) override;
 
-            void SetKnxSender(const TKnxGroupAddress& groupAddress,
-                              std::shared_ptr<ISenderGroupObject> sender) override;
+            void SetKnxSender(const TKnxGroupAddress& groupAddress, PSenderGroupObject sender) override;
 
         private:
             TKnxGroupAddress SelfKnxAddress;
-            std::shared_ptr<ISenderGroupObject> KnxSender;
-
-            std::shared_ptr<IDpt> Dpt;
-            std::shared_ptr<WBMQTT::TLocalDevice> MqttLocalDevice;
-            std::vector<std::shared_ptr<WBMQTT::TControl>> ControlList;
+            PSenderGroupObject KnxSender;
+            PDpt Dpt;
+            WBMQTT::PLocalDevice MqttLocalDevice;
+            std::vector<WBMQTT::PControl> ControlList;
             std::mutex DptExchangeMutex;
             WBMQTT::TLogger& ErrorLogger;
         };

@@ -164,7 +164,7 @@ std::string converter::KnxTelegramToMqtt(const TTelegram& telegram)
     return ss.str();
 }
 
-std::shared_ptr<TTelegram> converter::MqttToKnxTelegram(const std::string& payload)
+PTelegram converter::MqttToKnxTelegram(const std::string& payload)
 {
     auto telegram = std::make_shared<knx::TTelegram>();
 

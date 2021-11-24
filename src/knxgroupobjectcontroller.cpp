@@ -2,12 +2,11 @@
 
 using namespace knx;
 
-TKnxGroupObjectController::TKnxGroupObjectController(std::shared_ptr<knx::ISender<TTelegram>> pSender)
-    : Sender(std::move(pSender))
+TKnxGroupObjectController::TKnxGroupObjectController(PSender<TTelegram> pSender): Sender(std::move(pSender))
 {}
 
 bool TKnxGroupObjectController::AddGroupObject(const knx::TKnxGroupAddress& groupAddress,
-                                               const std::shared_ptr<object::IGroupObject>& groupObject)
+                                               const object::PGroupObject& groupObject)
 {
     if (groupObject) {
         groupObject->SetKnxSender(groupAddress, shared_from_this());
