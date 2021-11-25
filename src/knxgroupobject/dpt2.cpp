@@ -26,8 +26,9 @@ void TDpt2::FromKnx(const std::vector<uint8_t>& payload)
     if (payload.size() == 1) {
         FieldV = payload[0] & 0x01;
         FieldC = payload[0] & (1 << 1);
-    } else
+    } else {
         wb_throw(TKnxException, datapointError::KNX_INVALID_PAYLOAD_SIZE);
+    }
 }
 
 std::vector<uint8_t> TDpt2::ToKnx()

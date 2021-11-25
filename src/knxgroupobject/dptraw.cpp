@@ -23,16 +23,18 @@ void TDptRaw::FromMqtt(uint32_t controlIndex, const WBMQTT::TAny& value)
             if (size > knx::TTpdu::MaxPayloadSize)
                 wb_throw(TKnxException, "Telegram payload is too long.");
         }
-    } else
+    } else {
         wb_throw(TKnxException, datapointError::MQTT_INVALID_INDEX);
+    }
 }
 
 void TDptRaw::FromKnx(const std::vector<uint8_t>& payload)
 {
     if (!payload.empty()) {
         RawData = payload;
-    } else
+    } else {
         wb_throw(TKnxException, "KNX payload is empty");
+    }
 }
 
 std::vector<uint8_t> TDptRaw::ToKnx()

@@ -14,16 +14,18 @@ void TDpt1::FromMqtt(uint32_t controlIndex, const WBMQTT::TAny& value)
 {
     if (controlIndex == 0) {
         B = value.As<bool>();
-    } else
+    } else {
         wb_throw(TKnxException, datapointError::MQTT_INVALID_INDEX);
+    }
 }
 
 void TDpt1::FromKnx(const std::vector<uint8_t>& payload)
 {
     if (payload.size() == 1) {
         B = payload[0] & 0x01;
-    } else
+    } else {
         wb_throw(TKnxException, datapointError::KNX_INVALID_PAYLOAD_SIZE);
+    }
 }
 
 std::vector<uint8_t> TDpt1::ToKnx()

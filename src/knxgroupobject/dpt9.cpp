@@ -14,8 +14,9 @@ void TDpt9::FromMqtt(uint32_t controlIndex, const WBMQTT::TAny& value)
 {
     if (controlIndex == 0) {
         FieldFloatValue = value.As<double>();
-    } else
+    } else {
         wb_throw(TKnxException, datapointError::MQTT_INVALID_INDEX);
+    }
 }
 
 void TDpt9::FromKnx(const std::vector<uint8_t>& payload)
@@ -26,8 +27,9 @@ void TDpt9::FromKnx(const std::vector<uint8_t>& payload)
                                              (static_cast<uint16_t>(payload[1] & 0x07) << 8) | payload[2]);
         uint32_t exp = (payload[1] >> 3) & 0x0F;
         FieldFloatValue = (static_cast<double>(mantissa) * 0.01) * std::pow(2, exp);
-    } else
+    } else {
         wb_throw(TKnxException, datapointError::KNX_INVALID_PAYLOAD_SIZE);
+    }
 }
 
 std::vector<uint8_t> TDpt9::ToKnx()

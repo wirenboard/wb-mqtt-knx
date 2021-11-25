@@ -13,16 +13,18 @@ void TDpt5::FromMqtt(uint32_t controlIndex, const WBMQTT::TAny& value)
 {
     if (controlIndex == 0) {
         FieldUnsignedValue = static_cast<uint8_t>(value.As<double>());
-    } else
+    } else {
         wb_throw(TKnxException, datapointError::MQTT_INVALID_INDEX);
+    }
 }
 
 void TDpt5::FromKnx(const std::vector<uint8_t>& payload)
 {
     if (payload.size() == 2) {
         FieldUnsignedValue = payload[1];
-    } else
+    } else {
         wb_throw(TKnxException, datapointError::KNX_INVALID_PAYLOAD_SIZE);
+    }
 }
 
 std::vector<uint8_t> TDpt5::ToKnx()
