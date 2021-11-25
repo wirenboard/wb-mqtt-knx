@@ -84,3 +84,6 @@ cmake-build-*
 # VS Code files
 .devcontainer
 .vscode
+
+# Doxygen output files
+doc
