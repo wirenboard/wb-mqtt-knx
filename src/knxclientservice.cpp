@@ -97,19 +97,6 @@ namespace knx
         ErrorLogger.Log() << "Error in KNX loop: " << what;
     }
 
-    void TKnxClientService::SetOnReceive(const std::function<void(const TTelegram&)>& handler)
-    {
-        std::lock_guard<std::mutex> lg(SetterMutex);
-        OnReceiveTelegramHandler = handler;
-    }
-
-    void TKnxClientService::OnReceive(const TTelegram& telegram)
-    {
-        std::lock_guard<std::mutex> lg(SetterMutex);
-        if (OnReceiveTelegramHandler)
-            OnReceiveTelegramHandler(telegram);
-    }
-
     void TKnxClientService::Start()
     {
         bool expectedIsStartedValue = false;
@@ -126,10 +113,9 @@ namespace knx
         bool expectedIsStartedValue = true;
 
         if (!IsStarted.compare_exchange_strong(expectedIsStartedValue, false)) {
-            wb_throw(knx::TKnxException, "Attempt to stop already stopped TKnxDevice");
+            wb_throw(knx::TKnxException, "Attempt to stop already stopped TKnxClientService");
         }
 
-        SetOnReceive({});
         if (Worker->joinable()) {
             Worker->join();
         }
@@ -184,7 +170,7 @@ namespace knx
 
             try {
                 TTelegram knxTelegram(telegram);
-                OnReceive(knxTelegram);
+                NotifyAllSubscribers(knxTelegram);
             } catch (const TKnxException& e) {
                 ErrorLogger.Log() << e.what();
             } catch (const std::exception& e) {
@@ -193,4 +179,4 @@ namespace knx
         }
     }
 
-} // namespace knx
+}

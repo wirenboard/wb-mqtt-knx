@@ -2,6 +2,7 @@
 
 #include "knxtelegramtpdu.h"
 #include <eibclient.h>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -63,4 +64,5 @@ namespace knx
         TTpdu Mtpdu;
     };
 
+    using PTelegram = std::shared_ptr<TTelegram>;
 }

@@ -24,7 +24,7 @@
           "items": {
             "$ref": "#/definitions/control"
           },
-          "minItems": 1,
+          "minItems": 0,
           "_format": "tabs",
           "propertyOrder": 3,
           "options": {
@@ -32,7 +32,12 @@
             "disable_array_delete_last_row": true
           }
         }
-      }
+      },
+      "required": [
+        "deviceId",
+        "deviceTitle",
+        "controls"
+      ]
     },
     "control": {
       "headerTemplate": "group_object_header_template",
@@ -54,10 +59,10 @@
           "title": "Group Address",
           "type": "string",
           "propertyOrder": 3,
-          "pattern": "(?!^ *0\\/0\\/0 *$)(?!^ *0\\/0 *$)(?=(^ *(\\d|1[0-5])\\/([0-7])\\/(\\d|[1-9]\\d|1\\d{1,2}|2[0-4]\\d|25[0-5]) *$)|(^ *(\\d|1[0-5])\\/(\\d|[^0]\\d{1,2}|1\\d{3}|20[0-3]\\d|204[0-7]) *$))",
+          "pattern": "(?!^ *0\\/0\\/0 *$)(?!^ *0\\/0 *$)(?!^ *0 *$)(?=(^ *(\\d|1[0-5])\\/([0-7])\\/(\\d|[1-9]\\d|1\\d{1,2}|2[0-4]\\d|25[0-5]) *$)|(^ *(\\d|1[0-5])\\/(\\d|[^0]\\d{1,2}|1\\d{3}|20[0-3]\\d|204[0-7]) *$)|(^ *(\\d|[^0]\\d{1,3}|[1-2]\\d{4}|3[0-1]\\d{3}|32[0-6]\\d{2}|327[0-5]\\d|3276[0-7]) *$))",
           "options": {
             "inputAttributes": {
-              "placeholder": "Example: 7/7/140 , 7/1034"
+              "placeholder": "Example: 7/7/140 , 7/1034 , 32001"
             },
             "patternmessage": "Incorrect KNX address"
           }
@@ -69,30 +74,24 @@
             "Raw_Value",
             "1.xxx_B1",
             "2.xxx_B2",
-            "3.xxx_B1U3",
-            "4.xxx_Character_Set",
             "5.xxx_8-Bit_Unsigned_Value",
             "6.xxx_V8",
-            "6.020_Status_with_Mode",
-            "7.xxx_2-Octet_Unsigned_Value",
-            "8.xxx_2-Octet_Signed_Value",
-            "9.xxx_2-Octet_Float_Value",
-            "10.001_Time",
-            "11.001_Date",
-            "12.001_4-Octet_Unsigned_Value",
-            "13.xxx_4-Octet_Signed_Value",
-            "14.xxx_4-Octet_Float_Value",
-            "15.000_Access_Data",
-            "16.xxx_String",
-            "17.xxx_Scene_Number",
-            "18.001_Scene_Control",
-            "19.001_DateTime",
-            "TODO..."
+            "9.xxx_2-Octet_Float_Value"
           ],
           "default": "1.xxx_B1",
           "propertyOrder": 4
+        },
+        "readOnly": {
+          "type": "boolean",
+          "title": "Read only",
+          "default": false,
+          "_format": "checkbox",
+          "propertyOrder": 5
         }
-      }
+      },
+      "required": [
+        "dataPointType"
+      ]
     }
   },
   "properties": {
@@ -114,15 +113,22 @@
       "_format": "checkbox",
       "propertyOrder": 2
     },
+    "enableLegacyKnxDevice": {
+      "type": "boolean",
+      "title": "Enable the KNX Gateway Device: knx/data",
+      "default": true,
+      "_format": "checkbox",
+      "propertyOrder": 3
+    },
     "devices": {
       "type": "array",
       "title": "List of Devices",
       "items": {
         "$ref": "#/definitions/device"
       },
-      "minItems": 1,
+      "minItems": 0,
       "_format": "tabs",
-      "propertyOrder": 3,
+      "propertyOrder": 4,
       "options": {
         "disable_collapse": true,
         "disable_array_delete_last_row": true
@@ -135,6 +141,12 @@
   "defaultProperties": [
     "configVersion",
     "debug"
+  ],
+  "required": [
+    "configVersion",
+    "debug",
+    "devices",
+    "enableLegacyKnxDevice"
   ],
   "configFile": {
     "path": "/etc/wb-mqtt-knx.conf",
