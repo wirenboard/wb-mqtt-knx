@@ -8,10 +8,15 @@ namespace knx
 {
     namespace object
     {
+        /// IGroupObjectMqttBuilder implementation
         class TGroupObjectMqttBuilder: public IGroupObjectMqttBuilder
         {
         public:
             TGroupObjectMqttBuilder() = delete;
+
+            /// Constructor
+            /// \param pMqttDeviceDriver wb-mqtt Device Driver
+            /// \param errorLogger error logger instance
             explicit TGroupObjectMqttBuilder(WBMQTT::PDeviceDriver pMqttDeviceDriver, WBMQTT::TLogger& errorLogger);
 
             void LinkDevice(const std::string& id, const std::string& name) override;

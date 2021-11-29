@@ -11,8 +11,21 @@
 
 Если у DataPoint типа присутствует несколько полей, то на каждое поле создаётся свой контрол. 
 
+## Представление DataPoint типов
 
-## Представление DataPiont типов
+### Raw_Value
+
+С помошью этого типа точки данных возможно принимать и оправлять массив байт по заданному групповому адресу. 
+
+| datapoint_field | type | range |
+| ---- | ---- | ----|
+| - | text | - |
+
+Пример принятых данных:   `0x00 0x01 0x03 0x50`; `0x01`.    
+Пример данных для оправки: `0x00 34 0x34 0b11011`; `0x00`.
+
+*Примечание:* В посылке всегда передаётся и принимается первый байт KNX пейлоада, как в случае короткой 
+так и в случае длинной посылки.
 
 ### 1.xxx_B1
 
@@ -27,20 +40,6 @@
 | c | switch | 0, 1 |
 | v | switch | 0, 1 |
 
-
-### 3.xxx_B1U3
-
-| datapoint_field | type | range |
-| ---- | ---- | ----|
-| c | switch | 0, 1 |
-| StepCode | value |  0 ... 7 |
-
-### 4.xxx_Character_Set
-
-| datapoint_field | type | range |
-| ---- | ---- | ----|
-| Character | text |  -  |
-
 ### 5.xxx_8-Bit_Unsigned_Value
 
 | datapoint_field | type | range |
@@ -53,65 +52,11 @@
 | ---- | ---- | ----|
 | RelSignedValue | value | -128 ... 127 |
 
-### 6.020_Status_with_Mode
-
-| datapoint_field | type | range |
-| ---- | ---- | ----|
-| a | switch | 0,1 |
-| b | switch | 0,1 |
-| c | switch | 0,1 |
-| d | switch | 0,1 |
-| e | switch | 0,1 |
-| f | value | 1, 2, 4 |
-
-### 7.xxx_2-Octet_Unsigned_Value
-
-| datapoint_field | type | range |
-| ---- | ---- | ----|
-| UnsignedValue | value | 0 ... 65 535 |
-
-### 8.xxx_2-Octet_Signed_Value
-
-| datapoint_field | type | range |
-| ---- | ---- | ----|
-| SignedValue | value | -32 768 ... 32 768 |
-
 ### 9.xxx_2-Octet_Float_Value
 
 | datapoint_field | type | range |
 | ---- | ---- | ----|
 | FloatValue | value | -671 088,64 ... 670 760,96 |
 
-### 10.001_Time
-
-| datapoint_field | type | range |
-| ---- | ---- | ----|
-| Day | value | 0 ... 7 |
-| Hour | value | 0 ... 23 |
-| Minutes | value | 0 ... 59 |
-| Seconds | value | 0 ... 59 |
-
-### 11.001_Date
-
-| datapoint_field | type | range |
-| ---- | ---- | ----|
-| Day | value | 1 ... 31 |
-| Month | value | 1 ... 12 |
-| Year | value | 0 ... 99 |
-
-### 12.001_4-Octet_Unsigned_Value
-
-| datapoint_field | type | range |
-| ---- | ---- | ----|
-| UnsignedValue | value | 0 ... 4 294 967 295 |
-
-### 13.xxx_4-Octet_Signed_Value
-
-| datapoint_field | type | range |
-| ---- | ---- | ----|
-| SignedValue | value | -2 147 483 648 ... 2 147 483 647 |
-
-### X.XXX TODO
-
 ## Информация по датапоинтам
-https://www.knx.org/wAssets/docs/downloads/Certification/Interworking-Datapoint-types/03_07_02-Datapoint-Types-v02.02.01-AS.pdf
+<https://www.knx.org/wAssets/docs/downloads/Certification/Interworking-Datapoint-types/03_07_02-Datapoint-Types-v02.02.01-AS.pdf>
