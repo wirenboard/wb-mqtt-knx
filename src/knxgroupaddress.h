@@ -30,7 +30,7 @@ namespace knx
         TKnxGroupAddress(uint32_t main, uint32_t sub);
 
         /// \brief Constructor from string address
-        /// \param str address string. For example: "1/2/34"; "1/234"
+        /// \param str address string. For example: "1/2/34"; "1/234"; "2305"
         explicit TKnxGroupAddress(const std::string& str);
 
         /// \brief Constructor from EibAddress
@@ -70,6 +70,8 @@ namespace knx
         void Init(uint32_t main, uint32_t middle, uint32_t sub);
 
         void Init(uint32_t main, uint32_t sub);
+
+        void Init(uint32_t address);
 
         uint32_t MainGroup{0};
         uint32_t MiddleGroup{0};

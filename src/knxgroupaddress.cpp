@@ -8,6 +8,7 @@ namespace
     constexpr auto MIDDLE_GROUP_MAX = 7U;
     constexpr auto SUB_GROUP_TRIPLE_MAX = 255U;
     constexpr auto SUB_GROUP_DOUBLE_MAX = 2047U;
+    constexpr auto EIB_ADDRESS_MAX = 32767U;
     constexpr auto GROUP_ADDRESS_ERROR_MESSAGE = "Invalid KNX Group Address: ";
 }
 
@@ -31,6 +32,8 @@ TKnxGroupAddress::TKnxGroupAddress(const std::string& str)
              static_cast<uint32_t>(std::stoi(tokens[2])));
     } else if (tokens.size() == 2) {
         Init(static_cast<uint32_t>(std::stoi(tokens[0])), static_cast<uint32_t>(std::stoi(tokens[1])));
+    } else if (tokens.size() == 1) {
+        Init(static_cast<uint32_t>(std::stoi(tokens[0])));
     } else {
         wb_throw(knx::TKnxException, GROUP_ADDRESS_ERROR_MESSAGE + str);
     }
@@ -57,11 +60,19 @@ void TKnxGroupAddress::Init(uint32_t main, uint32_t sub)
     SubGroup = sub & 0xFF;
 }
 
+void TKnxGroupAddress::Init(uint32_t address)
+{
+    if ((address > EIB_ADDRESS_MAX))
+        wb_throw(knx::TKnxException, GROUP_ADDRESS_ERROR_MESSAGE + std::to_string(address));
+
+    MainGroup = (address >> 11) & 0x0F;
+    MiddleGroup = (address >> 8) & 0x07;
+    SubGroup = address & 0xFF;
+}
+
 TKnxGroupAddress::TKnxGroupAddress(eibaddr_t eibAddress)
 {
-    MainGroup = (eibAddress >> 11) & 0x0F;
-    MiddleGroup = (eibAddress >> 8) & 0x07;
-    SubGroup = eibAddress & 0xFF;
+    Init(eibAddress);
 }
 
 eibaddr_t TKnxGroupAddress::GetEibAddress() const

@@ -69,11 +69,14 @@ TEST(KnxGroupAddressTest, FromStringTest)
 
     address = knx::TKnxGroupAddress{"15/2047"};
     EXPECT_EQ("15/7/255", address.ToString());
+
+    address = knx::TKnxGroupAddress{"32767"};
+    EXPECT_EQ("15/7/255", address.ToString());
 }
 
 TEST(KnxGroupAddressTest, FromStringNegativeTest)
 {
-    std::vector<std::string> addressList = {"a1/2/3", "16/2/3", "1/8/3", "1/1/256", "", "///"};
+    std::vector<std::string> addressList = {"a1/2/3", "16/2/3", "1/8/3", "1/1/256", "", "///", "32768"};
 
     for (const auto& addtessStr: addressList) {
         EXPECT_THROW(knx::TKnxGroupAddress{addtessStr}, std::exception);
