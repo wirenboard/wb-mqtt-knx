@@ -1,16 +1,11 @@
 #include "configurator.h"
 
-void knx::configurator::ConfigureObjectController(IKnxGroupObjectController& controller,
-                                                  const std::string& configPath,
-                                                  const std::string& schemaPath,
-                                                  object::IGroupObjectMqttBuilder& groupObjectBuilder)
+using namespace knx;
+
+void Configurator::ConfigureObjectController(IKnxGroupObjectController& controller,
+                                             object::IGroupObjectMqttBuilder& groupObjectBuilder)
 {
-    auto configRoot = WBMQTT::JSON::Parse(configPath);
-    auto schemaRoot = WBMQTT::JSON::Parse(schemaPath);
-
-    WBMQTT::JSON::Validate(configRoot, schemaRoot);
-
-    auto devices = configRoot["devices"];
+    auto devices = ConfigRoot["devices"];
     for (const auto& device: devices) {
         auto deviceIdStr = device["deviceId"].asString();
         auto deviceTitleStr = device["deviceTitle"].asString();
@@ -30,4 +25,22 @@ void knx::configurator::ConfigureObjectController(IKnxGroupObjectController& con
 
         groupObjectBuilder.RemoveUnusedControls();
     }
+}
+
+Configurator::Configurator(const std::string& configPath, const std::string& schemaPath)
+{
+    ConfigRoot = WBMQTT::JSON::Parse(configPath);
+    SchemaRoot = WBMQTT::JSON::Parse(schemaPath);
+
+    WBMQTT::JSON::Validate(ConfigRoot, SchemaRoot);
+}
+
+bool Configurator::IsDebugEnable()
+{
+    return ConfigRoot["debug"].asBool();
+}
+
+bool Configurator::IsKnxLegacyDeviceEnable()
+{
+    return ConfigRoot["enableLegacyKnxDevice"].asBool();
 }

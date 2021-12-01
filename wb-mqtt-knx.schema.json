@@ -33,7 +33,11 @@
           }
         }
       },
-      "required" : ["deviceId", "deviceTitle", "controls"]
+      "required": [
+        "deviceId",
+        "deviceTitle",
+        "controls"
+      ]
     },
     "control": {
       "headerTemplate": "group_object_header_template",
@@ -109,6 +113,13 @@
       "_format": "checkbox",
       "propertyOrder": 2
     },
+    "enableLegacyKnxDevice": {
+      "type": "boolean",
+      "title": "Enable the KNX Gateway Device",
+      "default": true,
+      "_format": "checkbox",
+      "propertyOrder": 3
+    },
     "devices": {
       "type": "array",
       "title": "List of Devices",
@@ -117,7 +128,7 @@
       },
       "minItems": 0,
       "_format": "tabs",
-      "propertyOrder": 3,
+      "propertyOrder": 4,
       "options": {
         "disable_collapse": true,
         "disable_array_delete_last_row": true
@@ -134,7 +145,8 @@
   "required": [
     "configVersion",
     "debug",
-    "devices"
+    "devices",
+    "enableLegacyKnxDevice"
   ],
   "configFile": {
     "path": "/etc/wb-mqtt-knx.conf",

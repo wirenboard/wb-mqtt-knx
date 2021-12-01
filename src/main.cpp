@@ -85,6 +85,10 @@ int main(int argc, char** argv)
     WBMQTT::SignalHandling::Start();
 
     try {
+        knx::Configurator configurator(DEFAULT_CONFIG_FILE_PATH, DEFAULT_CONFIG_SCHEMA_FILE_PATH);
+        if (configurator.IsDebugEnable()) {
+            VerboseLogger.SetEnabled(true);
+        }
 
         auto mqttClient = WBMQTT::NewMosquittoMqttClient(mqttConfig);
         auto mqttDriver = WBMQTT::NewDriver(WBMQTT::TDriverArgs{}
@@ -103,11 +107,15 @@ int main(int argc, char** argv)
 
         auto knxClientService =
             std::make_shared<knx::TKnxClientService>(knxUrl, ErrorLogger, VerboseLogger, InfoLogger);
-        auto knxLegacyDevice = std::make_shared<knx::TKnxLegacyDevice>(mqttDriver,
-                                                                       knxClientService,
-                                                                       ErrorLogger,
-                                                                       VerboseLogger,
-                                                                       InfoLogger);
+
+        std::shared_ptr<knx::TKnxLegacyDevice> knxLegacyDevice;
+        if (configurator.IsKnxLegacyDeviceEnable()) {
+            knxLegacyDevice = std::make_shared<knx::TKnxLegacyDevice>(mqttDriver,
+                                                                      knxClientService,
+                                                                      ErrorLogger,
+                                                                      VerboseLogger,
+                                                                      InfoLogger);
+        }
         auto knxGroupObjectController = std::make_shared<knx::TKnxGroupObjectController>(knxClientService);
 
         auto groupObjectBuilder = std::make_shared<knx::object::TGroupObjectMqttBuilder>(mqttDriver, ErrorLogger);
@@ -116,19 +124,20 @@ int main(int argc, char** argv)
             knxClientService->Unsubscribe(knxGroupObjectController);
             groupObjectBuilder->Clear();
 
-            knxClientService->Unsubscribe(knxLegacyDevice);
-            knxLegacyDevice->Deinit();
+            if (knxLegacyDevice) {
+                knxClientService->Unsubscribe(knxLegacyDevice);
+                knxLegacyDevice->Deinit();
+            }
 
             knxClientService->Stop();
         });
 
-        knxClientService->Subscribe(knxLegacyDevice);
+        if (knxLegacyDevice) {
+            knxClientService->Subscribe(knxLegacyDevice);
+        }
         knxClientService->Subscribe(knxGroupObjectController);
 
-        knx::configurator::ConfigureObjectController(*knxGroupObjectController,
-                                                     DEFAULT_CONFIG_FILE_PATH,
-                                                     DEFAULT_CONFIG_SCHEMA_FILE_PATH,
-                                                     *groupObjectBuilder);
+        configurator.ConfigureObjectController(*knxGroupObjectController, *groupObjectBuilder);
 
         knxClientService->Start();
 

@@ -10,16 +10,31 @@
 
 namespace knx
 {
-    namespace configurator
+    /// \brief Class for wb-mqtt-knx service configuration
+    class Configurator
     {
-        /// Group object controller configuration function depending on wb-mqtt-knx config
-        /// \param controller Group Object Controller instance
+    public:
+        /// Constructor
         /// \param configPath wb-mqtt-knx config path
         /// \param schemaPath wb-mqtt-knx schema path
+        Configurator(const std::string& configPath, const std::string& schemaPath);
+
+        /// Group object controller configuration function depending on wb-mqtt-knx config
+        /// \param controller Group Object Controller instance
         /// \param groupObjectBuilder Group Object builder
         void ConfigureObjectController(IKnxGroupObjectController& controller,
-                                       const std::string& configPath,
-                                       const std::string& schemaPath,
                                        object::IGroupObjectMqttBuilder& groupObjectBuilder);
-    }
+
+        /// Is the option enabled in the config
+        /// \return Debug is enable
+        bool IsDebugEnable();
+
+        /// Is the option enabled in the config
+        /// \return KNX Legacy Device is enable
+        bool IsKnxLegacyDeviceEnable();
+
+    private:
+        Json::Value ConfigRoot;
+        Json::Value SchemaRoot;
+    };
 }
