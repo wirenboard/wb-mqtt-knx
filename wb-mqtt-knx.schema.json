@@ -24,7 +24,7 @@
           "items": {
             "$ref": "#/definitions/control"
           },
-          "minItems": 1,
+          "minItems": 0,
           "_format": "tabs",
           "propertyOrder": 3,
           "options": {
@@ -32,7 +32,8 @@
             "disable_array_delete_last_row": true
           }
         }
-      }
+      },
+      "required" : ["deviceId", "deviceTitle", "controls"]
     },
     "control": {
       "headerTemplate": "group_object_header_template",
@@ -114,7 +115,7 @@
       "items": {
         "$ref": "#/definitions/device"
       },
-      "minItems": 1,
+      "minItems": 0,
       "_format": "tabs",
       "propertyOrder": 3,
       "options": {
@@ -129,6 +130,11 @@
   "defaultProperties": [
     "configVersion",
     "debug"
+  ],
+  "required": [
+    "configVersion",
+    "debug",
+    "devices"
   ],
   "configFile": {
     "path": "/etc/wb-mqtt-knx.conf",

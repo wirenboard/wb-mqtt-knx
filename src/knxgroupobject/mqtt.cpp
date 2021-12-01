@@ -22,11 +22,12 @@ TGroupObjectMqtt::TGroupObjectMqtt(PDpt pDpt,
 
     for (const auto& fieldDescriptor: descriptorList) {
         auto fullControlId = controlId + "_" + fieldDescriptor.Id;
+        auto fullControlTitle = controlTitle + " [ " + fieldDescriptor.Id + " ]";
         auto control = MqttLocalDevice
                            ->CreateControl(tx,
                                            WBMQTT::TControlArgs{}
                                                .SetId(fullControlId)
-                                               .SetTitle(controlTitle)
+                                               .SetTitle(fullControlTitle)
                                                .SetType(fieldDescriptor.Type)
                                                .SetMin(fieldDescriptor.Min)
                                                .SetMax(fieldDescriptor.Max)
