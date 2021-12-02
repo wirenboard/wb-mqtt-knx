@@ -23,13 +23,14 @@ namespace knx
         void Stop();
 
     private:
+        std::unique_ptr<knx::TKnxConnection> KnxdConnection;
+
         void KnxdConnectProcessing();
-        void KnxdReceiveProcessing(const knx::TKnxConnection& In);
+        void KnxdReceiveProcessing();
 
         void HandleLoopError(const std::string& what);
 
         std::string KnxServerUrl;
-        std::function<void(const TTelegram&)> OnReceiveTelegramHandler;
 
         std::atomic<bool> IsStarted{false};
         std::unique_ptr<std::thread> Worker;
