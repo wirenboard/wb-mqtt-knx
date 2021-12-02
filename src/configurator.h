@@ -27,11 +27,11 @@ namespace knx
 
         /// Is the option enabled in the config
         /// \return Debug is enable
-        bool IsDebugEnable();
+        bool IsDebugEnabled();
 
         /// Is the option enabled in the config
         /// \return KNX Legacy Device is enable
-        bool IsKnxLegacyDeviceEnable();
+        bool IsKnxLegacyDeviceEnabled();
 
     private:
         Json::Value ConfigRoot;

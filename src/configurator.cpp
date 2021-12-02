@@ -35,12 +35,12 @@ Configurator::Configurator(const std::string& configPath, const std::string& sch
     WBMQTT::JSON::Validate(ConfigRoot, SchemaRoot);
 }
 
-bool Configurator::IsDebugEnable()
+bool Configurator::IsDebugEnabled()
 {
     return ConfigRoot["debug"].asBool();
 }
 
-bool Configurator::IsKnxLegacyDeviceEnable()
+bool Configurator::IsKnxLegacyDeviceEnabled()
 {
     return ConfigRoot["enableLegacyKnxDevice"].asBool();
 }

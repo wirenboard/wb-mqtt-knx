@@ -115,7 +115,7 @@
     },
     "enableLegacyKnxDevice": {
       "type": "boolean",
-      "title": "Enable the KNX Gateway Device",
+      "title": "Enable the KNX Gateway Device: knx/data",
       "default": true,
       "_format": "checkbox",
       "propertyOrder": 3

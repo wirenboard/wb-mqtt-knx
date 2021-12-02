@@ -86,7 +86,7 @@ int main(int argc, char** argv)
 
     try {
         knx::Configurator configurator(DEFAULT_CONFIG_FILE_PATH, DEFAULT_CONFIG_SCHEMA_FILE_PATH);
-        if (configurator.IsDebugEnable()) {
+        if (configurator.IsDebugEnabled()) {
             VerboseLogger.SetEnabled(true);
         }
 
@@ -109,7 +109,7 @@ int main(int argc, char** argv)
             std::make_shared<knx::TKnxClientService>(knxUrl, ErrorLogger, VerboseLogger, InfoLogger);
 
         std::shared_ptr<knx::TKnxLegacyDevice> knxLegacyDevice;
-        if (configurator.IsKnxLegacyDeviceEnable()) {
+        if (configurator.IsKnxLegacyDeviceEnabled()) {
             knxLegacyDevice = std::make_shared<knx::TKnxLegacyDevice>(mqttDriver,
                                                                       knxClientService,
                                                                       ErrorLogger,

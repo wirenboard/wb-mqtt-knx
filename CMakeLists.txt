@@ -51,4 +51,4 @@ configure_file (
 install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
 install(FILES ${PROJECT_SOURCE_DIR}/wb-mqtt-knx.schema.json DESTINATION /usr/share/wb-mqtt-confed/schemas)
 install(FILES ${PROJECT_SOURCE_DIR}/wb-mqtt-knx.conf DESTINATION /etc)
-install(FILES ${PROJECT_SOURCE_DIR}/wb-mqtt-knx.wbconfig DESTINATION /etc/wb-configs.d RENAME 42wb-mqtt-knx)
+install(FILES ${PROJECT_SOURCE_DIR}/wb-mqtt-knx.wbconfigs DESTINATION /etc/wb-configs.d RENAME 42wb-mqtt-knx)
