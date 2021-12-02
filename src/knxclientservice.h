@@ -9,17 +9,28 @@
 
 namespace knx
 {
+    /// \brief Class for transmitting and receiving KNX telegrams
     class TKnxClientService: public ISender<TTelegram>, public TObserver<TTelegram>
     {
     public:
+        /// Constructor
+        /// \param knxServerUrl the knxd server URL
+        /// \param errorLogger a Error logger object
+        /// \param debugLogger a Debug logger object
+        /// \param infoLogger a Info logger object
         explicit TKnxClientService(const std::string& knxServerUrl,
                                    WBMQTT::TLogger& errorLogger,
                                    WBMQTT::TLogger& debugLogger,
                                    WBMQTT::TLogger& infoLogger);
 
+        /// Send KNX telegram
+        /// \param telegram a KNX telegram
         void Send(const TTelegram& telegram) override;
 
+        /// Start service
         void Start();
+
+        /// Strop service
         void Stop();
 
     private:
