@@ -20,6 +20,22 @@ namespace
     constexpr auto SELECT_TIMEOUT_RETURN_VALUE = 0;
     constexpr auto SELECT_ERROR_RETURN_VALUE = -1;
 
+    std::string ToLog(const knx::TTelegram& telegram)
+    {
+        auto tpdu = telegram.Tpdu().GetRaw();
+        std::stringstream ss;
+        ss << "S_EIB(" << std::to_string(telegram.GetSourceAddress()) << ")\t";
+        ss << "D_EIB(" << std::to_string(telegram.GetReceiverAddress()) << ")\t";
+        ss << "TPDU(";
+        ss << tpdu.size() << "):";
+        ss << std::hex << std::noshowbase;
+        for (unsigned char i: tpdu) {
+            ss << "0x" << std::setw(2) << std::setfill('0');
+            ss << (unsigned)i << " ";
+        }
+        return ss.str();
+    }
+
 } // namespace
 
 namespace knx
@@ -49,8 +65,13 @@ namespace knx
                                                     telegram.GetReceiverAddress(),
                                                     static_cast<int32_t>(tpduPayload.size()),
                                                     tpduPayload.data());
-            if (sendResult == EIB_ERROR_RETURN_VALUE)
+            if (sendResult != EIB_ERROR_RETURN_VALUE) {
+                if (DebugLogger.IsEnabled()) {
+                    DebugLogger.Log() << "Sent to knxd: \t\t" << ToLog(telegram);
+                }
+            } else {
                 wb_throw(TKnxException, "Failed to send group telegram");
+            }
 
         } else {
             wb_throw(TKnxException, "Sending individual telegrams is not supported by knxd");
@@ -156,18 +177,6 @@ namespace knx
 
             tpduPayload.resize(packetLen);
 
-            if (DebugLogger.IsEnabled()) {
-                std::stringstream ss;
-                ss << "KNX Client received a tpduPayload: ";
-                ss << packetLen << " ";
-                ss << std::hex << std::noshowbase;
-                for (int i = 0; i < packetLen; i++) {
-                    ss << "0x" << std::setw(2) << std::setfill('0');
-                    ss << (unsigned)tpduPayload[i] << " ";
-                }
-                DebugLogger.Log() << ss.str();
-            }
-
             try {
                 TTelegram knxTelegram;
                 knxTelegram.SetReceiverAddress(destEibAddress);
@@ -175,6 +184,10 @@ namespace knx
 
                 knxTelegram.SetSourceAddress(srcEibAddress);
                 knxTelegram.Tpdu().SetRaw(tpduPayload);
+
+                if (DebugLogger.IsEnabled()) {
+                    DebugLogger.Log() << "Received from knxd: " << ToLog(knxTelegram);
+                }
                 NotifyAllSubscribers(knxTelegram);
             } catch (const TKnxException& e) {
                 ErrorLogger.Log() << e.what();
