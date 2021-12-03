@@ -1,0 +1,11 @@
+#pragma once
+
+// the configured options and settings for wb-mqtt-knx
+
+#define PROJECT_NAME "@PROJECT_NAME@"
+#define DEB_VERSION "@DEB_VERSION@"
+
+#define DEFAULT_CONFIG_FILE_PATH "@DEFAULT_CONFIG_FILE_PATH@"
+#define DEFAULT_CONFIG_SCHEMA_FILE_PATH "@DEFAULT_CONFIG_SCHEMA_FILE_PATH@"
+
+#define CMAKE_SOURCE_DIR "@CMAKE_SOURCE_DIR@"

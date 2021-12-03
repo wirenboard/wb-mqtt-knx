@@ -74,3 +74,16 @@ obj-arm-linux-gnueabihf/
 obj-arm-linux-gnueabi/
 *.debhelper.log
 
+# CLion configs and generated files
+.idea
+cmake-build-*
+
+# clang-format files
+.clang-format*
+
+# VS Code files
+.devcontainer
+.vscode
+
+# Doxygen output files
+doc

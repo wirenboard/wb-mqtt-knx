@@ -1,29 +1,47 @@
-#include "knx-client.h"
+#pragma once
+#include "isubscriber.h"
+#include <algorithm>
+#include <list>
 #include <memory>
-#include <wbmqtt/mqtt_wrapper.h>
 
-#ifndef OBSERVER_H
-#define OBSERVER_H
+namespace knx
+{
+    template<typename... Args> class TObserver
+    {
+    public:
+        virtual bool Subscribe(PSubscriber<Args...> subscriber)
+        {
+            auto it = std::find(SubscriberList.begin(), SubscriberList.end(), subscriber);
+            if (it == SubscriberList.end()) {
+                SubscriberList.push_back(subscriber);
+                return true;
+            }
+            return false;
+        }
 
-class TMqttKnxObserver : public IMQTTObserver,
-                         public std::enable_shared_from_this<TMqttKnxObserver> {
-public:
-    TMqttKnxObserver(PMQTTClientBase mqttClient, PKnxClient knxClient);
-    void SetUp();
-    void OnConnect(int rc);
-    void OnMessage(const mosquitto_message* message);
-    void OnSubscribe(int mid, int qosCount, const int* grantedQos);
+        virtual bool Unsubscribe(PSubscriber<Args...> subscriber)
+        {
+            auto it = std::find(SubscriberList.begin(), SubscriberList.end(), subscriber);
+            if (it != SubscriberList.end()) {
+                SubscriberList.erase(it);
+                return true;
+            }
+            return false;
+        }
 
-    void OnTelegram(uint8_t* package, int len);
+        virtual ~TObserver() = default;
 
-    void LoopOnce();
-    void Loop();
+    protected:
+        virtual void NotifyAllSubscribers(const Args&... data)
+        {
+            for (const auto& subscriber: SubscriberList) {
+                subscriber->Notify(data...);
+            }
+        }
 
-private:
-    PMQTTClientBase MqttClient;
-    PKnxClient KnxClient;
-};
+    private:
+        std::vector<PSubscriber<Args...>> SubscriberList;
+    };
 
-typedef std::shared_ptr<TMqttKnxObserver> PMqttKnxObserver;
-
-#endif // OBSERVER_H
+    template<typename... Args> using PObserver = std::shared_ptr<TObserver<Args...>>;
+}

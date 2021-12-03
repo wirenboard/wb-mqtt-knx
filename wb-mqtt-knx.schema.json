@@ -1,0 +1,162 @@
+{
+  "type": "object",
+  "title": "KNX Group Object Configuration",
+  "definitions": {
+    "device": {
+      "headerTemplate": "device_header_template",
+      "type": "object",
+      "title": "Device",
+      "properties": {
+        "deviceId": {
+          "type": "string",
+          "title": "Device ID",
+          "minLength": "1",
+          "propertyOrder": 1
+        },
+        "deviceTitle": {
+          "type": "string",
+          "title": "Title",
+          "propertyOrder": 2
+        },
+        "controls": {
+          "type": "array",
+          "title": "List of Controls",
+          "items": {
+            "$ref": "#/definitions/control"
+          },
+          "minItems": 0,
+          "_format": "tabs",
+          "propertyOrder": 3,
+          "options": {
+            "disable_collapse": true,
+            "disable_array_delete_last_row": true
+          }
+        }
+      },
+      "required": [
+        "deviceId",
+        "deviceTitle",
+        "controls"
+      ]
+    },
+    "control": {
+      "headerTemplate": "group_object_header_template",
+      "type": "object",
+      "title": "Control",
+      "properties": {
+        "controlId": {
+          "type": "string",
+          "title": "Control ID",
+          "minLength": "1",
+          "propertyOrder": 1
+        },
+        "controlTitle": {
+          "type": "string",
+          "title": "Title",
+          "propertyOrder": 2
+        },
+        "groupAddress": {
+          "title": "Group Address",
+          "type": "string",
+          "propertyOrder": 3,
+          "pattern": "(?!^ *0\\/0\\/0 *$)(?!^ *0\\/0 *$)(?!^ *0 *$)(?=(^ *(\\d|1[0-5])\\/([0-7])\\/(\\d|[1-9]\\d|1\\d{1,2}|2[0-4]\\d|25[0-5]) *$)|(^ *(\\d|1[0-5])\\/(\\d|[^0]\\d{1,2}|1\\d{3}|20[0-3]\\d|204[0-7]) *$)|(^ *(\\d|[^0]\\d{1,3}|[1-2]\\d{4}|3[0-1]\\d{3}|32[0-6]\\d{2}|327[0-5]\\d|3276[0-7]) *$))",
+          "options": {
+            "inputAttributes": {
+              "placeholder": "Example: 7/7/140 , 7/1034 , 32001"
+            },
+            "patternmessage": "Incorrect KNX address"
+          }
+        },
+        "dataPointType": {
+          "type": "string",
+          "title": "Data point type",
+          "enum": [
+            "Raw_Value",
+            "1.xxx_B1",
+            "2.xxx_B2",
+            "5.xxx_8-Bit_Unsigned_Value",
+            "6.xxx_V8",
+            "9.xxx_2-Octet_Float_Value"
+          ],
+          "default": "1.xxx_B1",
+          "propertyOrder": 4
+        },
+        "readOnly": {
+          "type": "boolean",
+          "title": "Read only",
+          "default": false,
+          "_format": "checkbox",
+          "propertyOrder": 5
+        }
+      },
+      "required": [
+        "dataPointType"
+      ]
+    }
+  },
+  "properties": {
+    "configVersion": {
+      "type": "integer",
+      "title": "Config version",
+      "minimum": 1,
+      "maximum": 1,
+      "default": 1,
+      "propertyOrder": 1,
+      "options": {
+        "hidden": true
+      }
+    },
+    "debug": {
+      "type": "boolean",
+      "title": "Enable debug logging",
+      "default": false,
+      "_format": "checkbox",
+      "propertyOrder": 2
+    },
+    "enableLegacyKnxDevice": {
+      "type": "boolean",
+      "title": "Enable the KNX Gateway Device: knx/data",
+      "default": true,
+      "_format": "checkbox",
+      "propertyOrder": 3
+    },
+    "devices": {
+      "type": "array",
+      "title": "List of Devices",
+      "items": {
+        "$ref": "#/definitions/device"
+      },
+      "minItems": 0,
+      "_format": "tabs",
+      "propertyOrder": 4,
+      "options": {
+        "disable_collapse": true,
+        "disable_array_delete_last_row": true
+      }
+    }
+  },
+  "options": {
+    "disable_edit_json": false
+  },
+  "defaultProperties": [
+    "configVersion",
+    "debug"
+  ],
+  "required": [
+    "configVersion",
+    "debug",
+    "devices",
+    "enableLegacyKnxDevice"
+  ],
+  "configFile": {
+    "path": "/etc/wb-mqtt-knx.conf",
+    "service": "wb-mqtt-knx",
+    "validate": false
+  },
+  "translations": {
+    "en": {
+      "device_header_template": "{{self.deviceId}}",
+      "group_object_header_template": "{{self.controlId}} ({{self.groupAddress}})"
+    }
+  }
+}

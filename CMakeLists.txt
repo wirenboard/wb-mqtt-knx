@@ -1,25 +1,54 @@
-execute_process (COMMAND /usr/bin/which gcc-4.7 RESULT_VARIABLE IS_GCC47)
-
-if (${IS_GCC47} STREQUAL "0")
-    set(CMAKE_C_COMPILER gcc-4.7)
-    set(CMAKE_CXX_COMPILER g++-4.7)
-else()
-    set(CMAKE_C_COMPILER gcc)
-    set(CMAKE_CXX_COMPILER g++)
-endif()
+cmake_minimum_required(VERSION 3.7)
 
 project(wb-mqtt-knx)
-enable_testing()
-cmake_minimum_required(VERSION 2.8)
-aux_source_directory(src/ SRC_LIST)
-aux_source_directory(test/ TEST_LIST)
-set(CMAKE_CXX_FLAGS "-std=c++0x -O2 -Wall -Werror -pedantic ")
-add_executable(${PROJECT_NAME} ${SRC_LIST})
-add_executable(${PROJECT_NAME}_test ${TEST_LIST} src/Telegram.cpp src/Exception.cpp)
-target_link_libraries(${PROJECT_NAME} -lwbmqtt -lmosquitto -lmosquittopp -leibclient -llog4cpp)
-target_link_libraries(${PROJECT_NAME}_test -lgtest -lgtest_main -lwbmqtt -pthread)
-install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
 
-add_test(telegram_test ${PROJECT_NAME}_test)
-add_custom_target(check COMMAND ${CMAKE_CTEST_COMMAND}
-                  DEPENDS ${PROJECT_NAME}_test)
+set(DEFAULT_CONFIG_FILE_PATH "/etc/wb-mqtt-knx.conf" CACHE STRING "Set default json config path")
+set(DEFAULT_CONFIG_SCHEMA_FILE_PATH "/usr/share/wb-mqtt-confed/schemas/wb-mqtt-knx.schema.json" CACHE STRING "Set default json config schema path")
+
+execute_process (
+        COMMAND bash -c "head -1 ${PROJECT_SOURCE_DIR}/debian/changelog | awk '{ printf $2; }' | sed 's/[\(\)]//g'"
+        OUTPUT_VARIABLE DEB_VERSION
+)
+
+
+
+# add the binary tree to the search path for include files
+# so that we will find config.h
+include_directories("${PROJECT_BINARY_DIR}")
+
+# specify the C++ standard
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+
+add_compile_options(-Wall -Werror -pedantic)
+
+if (CMAKE_BUILD_TYPE MATCHES Debug)
+    add_compile_options(-O0 -gdwarf-3 --coverage)
+else ()
+    add_compile_options(-O2 -DNDEBUG)
+endif ()
+
+aux_source_directory(src/ SRC_LIST)
+aux_source_directory(src/knxgroupobject SRC_LIST)
+
+add_executable(${PROJECT_NAME} ${SRC_LIST})
+target_link_libraries(${PROJECT_NAME} wbmqtt1 eibclient pthread)
+
+if (CMAKE_BUILD_TYPE MATCHES Debug)
+    target_link_libraries(${PROJECT_NAME} gcov)
+endif ()
+
+# Adding unit tests
+enable_testing()
+add_subdirectory(test)
+
+# tell CMake to generate config.h
+configure_file (
+        "${PROJECT_SOURCE_DIR}/src/config.h.in"
+        "${PROJECT_BINARY_DIR}/config.h"
+)
+
+install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
+install(FILES ${PROJECT_SOURCE_DIR}/wb-mqtt-knx.schema.json DESTINATION /usr/share/wb-mqtt-confed/schemas)
+install(FILES ${PROJECT_SOURCE_DIR}/wb-mqtt-knx.conf DESTINATION /etc)
+install(FILES ${PROJECT_SOURCE_DIR}/wb-mqtt-knx.wbconfigs DESTINATION /etc/wb-configs.d RENAME 42wb-mqtt-knx)

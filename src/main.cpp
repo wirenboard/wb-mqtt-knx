@@ -1,87 +1,151 @@
-#include "knx-client.h"
-#include "observer.h"
-#include <eibclient.h>
-#include <eibloadresult.h>
-#include <eibtypes.h>
+#include "config.h"
+#include "configurator.h"
+#include "knxclientservice.h"
+#include "knxgroupobject/mqttbuilder.h"
+#include "knxgroupobjectcontroller.h"
+#include "knxlegacydevice.h"
 #include <getopt.h>
-#include <iostream>
-#include <log4cpp/Category.hh>
-#include <log4cpp/OstreamAppender.hh>
-#include <log4cpp/PatternLayout.hh>
-#include <log4cpp/SyslogAppender.hh>
 #include <unistd.h>
-#include <wbmqtt/mqtt_wrapper.h>
+#include <wblib/log.h>
+#include <wblib/signal_handling.h>
+#include <wblib/wbmqtt.h>
 
-#include "logging.h"
+namespace
+{
+    const auto KNX_DRIVER_INIT_TIMEOUT_S = std::chrono::seconds(30);
+    const auto KNX_DRIVER_STOP_TIMEOUT_S = std::chrono::seconds(60); // topic cleanup can take a lot of time
+
+    WBMQTT::TLogger ErrorLogger("ERROR: [knx] ", WBMQTT::TLogger::StdErr, WBMQTT::TLogger::RED);
+    WBMQTT::TLogger VerboseLogger("INFO: [knx] ", WBMQTT::TLogger::StdErr, WBMQTT::TLogger::WHITE, false);
+    WBMQTT::TLogger InfoLogger("INFO: [knx] ", WBMQTT::TLogger::StdErr, WBMQTT::TLogger::GREY);
+} // namespace
 
 int main(int argc, char** argv)
 {
-    TMQTTClient::TConfig mqttConfig;
+    WBMQTT::TMosquittoMqttConfig mqttConfig;
     std::string knxUrl = "ip:localhost:6720";
     mqttConfig.Host = "localhost";
     mqttConfig.Port = 1883;
-    bool debug = false;
+    mqttConfig.Id = PROJECT_NAME;
+
     int c;
     int verboseLevel = 0;
     while ((c = getopt(argc, argv, "vdp:H:k:")) != -1) {
         switch (c) {
-        case 'v':
-            verboseLevel++;
-            break;
-        case 'd':
-            debug = true;
-            break;
-        case 'p':
-            mqttConfig.Port = std::stoi(optarg);
-            break;
-        case 'H':
-            mqttConfig.Host = optarg;
-            break;
-        case 'k':
-            knxUrl = optarg;
-            break;
-        default:
-            break;
+            case 'v':
+                verboseLevel++;
+                break;
+            case 'd':
+                break;
+            case 'p':
+                mqttConfig.Port = std::stoi(optarg);
+                break;
+            case 'H':
+                mqttConfig.Host = optarg;
+                break;
+            case 'k':
+                knxUrl = optarg;
+                break;
+            default:
+                break;
         }
     }
-    mosqpp::lib_init();
 
-    // set up logging
-    log4cpp::Category& logRoot = log4cpp::Category::getRoot();
-    log4cpp::PatternLayout* logLayout = new log4cpp::PatternLayout;
-    logLayout->setConversionPattern("%d{%Y-%m-%d %H:%M:%S.%l} %p: %m%n");
-
-    if (debug) {
-        auto appender = new log4cpp::OstreamAppender("default", &std::cerr);
-        appender->setLayout(logLayout);
-        logRoot.addAppender(appender);
-        logRoot.setPriority(log4cpp::Priority::DEBUG);
-    } else {
-        long pid = getpid();
-        auto appender =
-            new log4cpp::SyslogAppender("default", "wb-mqtt-knx[" + std::to_string(pid) + "]");
-        appender->setLayout(logLayout);
-        logRoot.addAppender(appender);
-
-        auto priority = log4cpp::Priority::WARN;
-        if (verboseLevel == 1) priority = log4cpp::Priority::NOTICE;
-        if (verboseLevel == 2) priority = log4cpp::Priority::INFO;
-        if (verboseLevel >= 3) priority = log4cpp::Priority::DEBUG;
-
-        logRoot.setPriority(priority);
+#ifdef NDEBUG
+    if (verboseLevel > 0) {
+        VerboseLogger.SetEnabled(true);
     }
+#else
+    VerboseLogger.SetEnabled(true);
+#endif
 
-    PMQTTClient mqttClient(new TMQTTClient(mqttConfig));
+    WBMQTT::TPromise<void> initialized;
+
+    WBMQTT::SetThreadName(PROJECT_NAME);
+    WBMQTT::SignalHandling::Handle({SIGINT, SIGTERM, SIGHUP});
+    WBMQTT::SignalHandling::OnSignals({SIGINT, SIGTERM}, [&] {
+        WBMQTT::SignalHandling::Stop();
+        InfoLogger.Log() << "wb-mqtt-knx service stopped";
+    });
+
+    /* if signal arrived before driver is initialized:
+    wait some time to initialize and then exit gracefully
+    else if timed out: exit with error
+*/
+    WBMQTT::SignalHandling::SetWaitFor(KNX_DRIVER_INIT_TIMEOUT_S, initialized.GetFuture(), [&] {
+        ErrorLogger.Log() << "Driver takes too long to initialize. Exiting.";
+        exit(1);
+    });
+
+    /* if handling of signal takes too much time: exit with error */
+    WBMQTT::SignalHandling::SetOnTimeout(KNX_DRIVER_STOP_TIMEOUT_S, [&] {
+        ErrorLogger.Log() << "Driver takes too long to stop. Exiting.";
+        exit(2);
+    });
+    WBMQTT::SignalHandling::Start();
+
     try {
-        PKnxClient knxClient(new TKnxClient(knxUrl));
+        knx::Configurator configurator(DEFAULT_CONFIG_FILE_PATH, DEFAULT_CONFIG_SCHEMA_FILE_PATH);
+        if (configurator.IsDebugEnabled()) {
+            VerboseLogger.SetEnabled(true);
+        }
 
-        PMqttKnxObserver observer(new TMqttKnxObserver(mqttClient, knxClient));
+        auto mqttClient = WBMQTT::NewMosquittoMqttClient(mqttConfig);
+        auto mqttDriver = WBMQTT::NewDriver(WBMQTT::TDriverArgs{}
+                                                .SetId(PROJECT_NAME)
+                                                .SetBackend(WBMQTT::NewDriverBackend(mqttClient))
+                                                .SetUseStorage(false)
+                                                .SetReownUnknownDevices(true));
+        mqttDriver->StartLoop();
 
-        observer->SetUp();
-        mqttClient->StartLoop();
-        observer->Loop();
+        WBMQTT::SignalHandling::OnSignals({SIGINT, SIGTERM}, [&] {
+            mqttDriver->StopLoop();
+            mqttDriver->Close();
+        });
+
+        mqttDriver->WaitForReady();
+
+        auto knxClientService =
+            std::make_shared<knx::TKnxClientService>(knxUrl, ErrorLogger, VerboseLogger, InfoLogger);
+
+        std::shared_ptr<knx::TKnxLegacyDevice> knxLegacyDevice;
+        if (configurator.IsKnxLegacyDeviceEnabled()) {
+            knxLegacyDevice = std::make_shared<knx::TKnxLegacyDevice>(mqttDriver,
+                                                                      knxClientService,
+                                                                      ErrorLogger,
+                                                                      VerboseLogger,
+                                                                      InfoLogger);
+        }
+        auto knxGroupObjectController = std::make_shared<knx::TKnxGroupObjectController>(knxClientService);
+
+        auto groupObjectBuilder = std::make_shared<knx::object::TGroupObjectMqttBuilder>(mqttDriver, ErrorLogger);
+
+        WBMQTT::SignalHandling::OnSignals({SIGINT, SIGTERM}, [&] {
+            knxClientService->Unsubscribe(knxGroupObjectController);
+            groupObjectBuilder->Clear();
+
+            if (knxLegacyDevice) {
+                knxClientService->Unsubscribe(knxLegacyDevice);
+                knxLegacyDevice->Deinit();
+            }
+
+            knxClientService->Stop();
+        });
+
+        if (knxLegacyDevice) {
+            knxClientService->Subscribe(knxLegacyDevice);
+        }
+        knxClientService->Subscribe(knxGroupObjectController);
+
+        configurator.ConfigureObjectController(*knxGroupObjectController, *groupObjectBuilder);
+
+        knxClientService->Start();
+
+        initialized.Complete();
+        WBMQTT::SignalHandling::Wait();
     } catch (std::exception& e) {
-        LOG(ERROR) << e.what();
+        ErrorLogger.Log() << e.what();
+        WBMQTT::SignalHandling::Stop();
         exit(1);
     }
 
