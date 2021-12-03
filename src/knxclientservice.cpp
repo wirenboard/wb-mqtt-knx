@@ -20,6 +20,22 @@ namespace
     constexpr auto SELECT_TIMEOUT_RETURN_VALUE = 0;
     constexpr auto SELECT_ERROR_RETURN_VALUE = -1;
 
+    std::string ToLog(const knx::TTelegram& telegram)
+    {
+        auto tpdu = telegram.Tpdu().GetRaw();
+        std::stringstream ss;
+        ss << "S_EIB(" << std::to_string(telegram.GetSourceAddress()) << ") ";
+        ss << "D_EIB(" << std::to_string(telegram.GetReceiverAddress()) << ") ";
+        ss << "TPDU(";
+        ss << tpdu.size() << "):";
+        ss << std::hex << std::noshowbase;
+        for (unsigned char i: tpdu) {
+            ss << "0x" << std::setw(2) << std::setfill('0');
+            ss << (unsigned)i << " ";
+        }
+        return ss.str();
+    }
+
 } // namespace
 
 namespace knx
@@ -36,27 +52,26 @@ namespace knx
 
     void TKnxClientService::Send(const TTelegram& telegram)
     {
-
         if (!IsStarted)
             return;
 
-        TKnxConnection Out(KnxServerUrl);
-        if (!Out)
-            wb_throw(TKnxException, "Failed to open Url: " + KnxServerUrl + ". Is knxd running?");
+        if (!KnxdConnection->IsConnected())
+            wb_throw(TKnxException, "Failed the knxd connection");
 
         if (telegram.IsGroupAddressed()) {
-            const int32_t openResult = EIBOpen_GroupSocket(Out.GetEIBConnection(), 0);
-            if (openResult == EIB_ERROR_RETURN_VALUE)
-                wb_throw(TKnxException, "Failed to open GroupSocket");
-
             auto tpduPayload = telegram.Tpdu().GetRaw();
 
-            const int32_t sendResult = EIBSendGroup(Out.GetEIBConnection(),
+            const int32_t sendResult = EIBSendGroup(KnxdConnection->GetEIBConnection(),
                                                     telegram.GetReceiverAddress(),
                                                     static_cast<int32_t>(tpduPayload.size()),
                                                     tpduPayload.data());
-            if (sendResult == EIB_ERROR_RETURN_VALUE)
-                wb_throw(TKnxException, "failed to send group telegram");
+            if (sendResult != EIB_ERROR_RETURN_VALUE) {
+                if (DebugLogger.IsEnabled()) {
+                    DebugLogger.Log() << "Sent to knxd: " << ToLog(telegram);
+                }
+            } else {
+                wb_throw(TKnxException, "Failed to send group telegram");
+            }
 
         } else {
             wb_throw(TKnxException, "Sending individual telegrams is not supported by knxd");
@@ -67,9 +82,9 @@ namespace knx
     {
         // The loop responsible for connecting to the knxd server
         while (IsStarted) {
-            TKnxConnection In(KnxServerUrl);
+            KnxdConnection = std::make_unique<TKnxConnection>(KnxServerUrl);
 
-            if (!In) {
+            if (!KnxdConnection->IsConnected()) {
                 HandleLoopError("Failed to open KnxServerUrl: " + KnxServerUrl + ". Is knxd running?");
 
                 auto tick = std::chrono::microseconds(0);
@@ -82,13 +97,13 @@ namespace knx
 
             InfoLogger.Log() << "KNX connection successful";
 
-            const int32_t eibOpenResult = EIBOpenVBusmonitor(In.GetEIBConnection());
+            const int32_t eibOpenResult = EIBOpen_GroupSocket(KnxdConnection->GetEIBConnection(), 0);
             if (eibOpenResult == EIB_ERROR_RETURN_VALUE) {
-                HandleLoopError("failed to open Busmonitor connection");
+                HandleLoopError("failed to open EIB GroupSocket connection");
                 continue;
             }
 
-            KnxdReceiveProcessing(In);
+            KnxdReceiveProcessing();
         }
     }
 
@@ -122,11 +137,11 @@ namespace knx
         Worker.reset();
     }
 
-    void TKnxClientService::KnxdReceiveProcessing(const TKnxConnection& In)
+    void TKnxClientService::KnxdReceiveProcessing()
     {
-        const int32_t linuxFileDescriptor = EIB_Poll_FD(In.GetEIBConnection());
+        const int32_t linuxFileDescriptor = EIB_Poll_FD(KnxdConnection->GetEIBConnection());
         if (linuxFileDescriptor == EIB_ERROR_RETURN_VALUE) {
-            HandleLoopError("failed to get Poll fd");
+            HandleLoopError("Failed to get Poll fd");
             return;
         }
         // The loop responsible for receiving telegrams from knxd
@@ -141,35 +156,38 @@ namespace knx
             if (selectResult == SELECT_TIMEOUT_RETURN_VALUE) {
                 continue;
             } else if (selectResult == SELECT_ERROR_RETURN_VALUE) {
-                HandleLoopError(std::string("select failed: ") + std::strerror(errno));
+                HandleLoopError(std::string("Select failed: ") + std::strerror(errno));
                 break;
             }
 
-            std::vector<uint8_t> telegram(MAX_TELEGRAM_LENGTH, 0);
+            std::vector<uint8_t> tpduPayload(MAX_TELEGRAM_LENGTH, 0);
 
-            const int32_t packetLen =
-                EIBGetBusmonitorPacket(In.GetEIBConnection(), static_cast<int32_t>(telegram.size()), telegram.data());
+            eibaddr_t srcEibAddress;
+            eibaddr_t destEibAddress;
+
+            const int32_t packetLen = EIBGetGroup_Src(KnxdConnection->GetEIBConnection(),
+                                                      static_cast<int32_t>(tpduPayload.size()),
+                                                      tpduPayload.data(),
+                                                      &srcEibAddress,
+                                                      &destEibAddress);
             if (packetLen == EIB_ERROR_RETURN_VALUE) {
-                HandleLoopError(std::string("failed to read Busmonitor packet: ") + std::strerror(errno));
+                HandleLoopError(std::string("Failed to get a group TPDU: ") + std::strerror(errno));
                 break;
             }
 
-            telegram.resize(packetLen);
-
-            if (DebugLogger.IsEnabled()) {
-                std::stringstream ss;
-                ss << "KNX Client received a telegram: ";
-                ss << packetLen << " ";
-                ss << std::hex << std::noshowbase;
-                for (int i = 0; i < packetLen; i++) {
-                    ss << "0x" << std::setw(2) << std::setfill('0');
-                    ss << (unsigned)telegram[i] << " ";
-                }
-                DebugLogger.Log() << ss.str();
-            }
+            tpduPayload.resize(packetLen);
 
             try {
-                TTelegram knxTelegram(telegram);
+                TTelegram knxTelegram;
+                knxTelegram.SetReceiverAddress(destEibAddress);
+                knxTelegram.SetGroupAddressedFlag(true);
+
+                knxTelegram.SetSourceAddress(srcEibAddress);
+                knxTelegram.Tpdu().SetRaw(tpduPayload);
+
+                if (DebugLogger.IsEnabled()) {
+                    DebugLogger.Log() << "Received from knxd: " << ToLog(knxTelegram);
+                }
                 NotifyAllSubscribers(knxTelegram);
             } catch (const TKnxException& e) {
                 ErrorLogger.Log() << e.what();

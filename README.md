@@ -17,11 +17,11 @@ KNX to MQTT gateway (C++)
 mosquitto_pub -t '/devices/knx/controls/data/on' -m "g:${DstAddr} ${APCI} ${Data}"
 ```
 
-Отправка телеграм с индивидуальным адресом получателя не поддерживается.
+Отправка и приём телеграм с индивидуальным адресом получателя не поддерживается.
 
 Все сообщения из KNX будут доставлены в MQTT топик `/devices/knx/controls/data` в виде:
 ```
-i:${SrcAddr} [i,g]:${DstAddr} ${APCI} ${Data}
+i:${SrcAddr} g:${DstAddr} ${APCI} ${Data}
 ```
 
 * `SrcAddr`, `DstAddr` - Адреса KNX устройств в формате "n/n/n" или "n/n".
@@ -30,26 +30,12 @@ i:${SrcAddr} [i,g]:${DstAddr} ${APCI} ${Data}
 
 При отправке сообщений для полей `ACPI` и `Data` допускаются форматы: `0xAA`, `0XAA`, `0b10101010`, `0B10101010`, `170`  
 
-Поддерживаемые типы сообщений(`APCI`) при приёме телеграмм с индивидуальным и групповым адресом:
+Поддерживаемые типы сообщений(`APCI`) при приёме телеграмм:
 * `GroupValueRead`
 * `GroupValueResponse`
 * `GroupValueWrite`
-* `IndividualAddrWrite`
-* `IndividualAddrRequest`
-* `IndividualAddrResponse`
-* `AdcRead`
-* `AdcResponse`
-* `MemoryRead`
-* `MemoryResponse`
-* `MemoryWrite`
-* `UserMessage`
-* `MaskVersionRead`
-* `MaskVersionResponse`
-* `Restart`
-* `Escape`
-* любое 4х-битное числовое значение
 
-Поддерживаемые типы сообщений(`APCI`) при отправке телеграмм c групповым адресом получателя:
+Поддерживаемые типы сообщений(`APCI`) при отправке телеграмм:
 * `GroupValueRead`
 * `GroupValueResponse`
 * `GroupValueWrite`

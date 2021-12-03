@@ -6,14 +6,17 @@ TKnxConnection::TKnxConnection(const std::string& knxServerUrl)
 {
     Connection = EIBSocketURL(knxServerUrl.c_str());
 }
+
 EIBConnection* TKnxConnection::GetEIBConnection() const
 {
     return Connection;
 }
-bool TKnxConnection::operator!() const
+
+bool TKnxConnection::IsConnected() const
 {
-    return !Connection;
+    return Connection != nullptr;
 }
+
 TKnxConnection::~TKnxConnection()
 {
     EIBClose(Connection);
