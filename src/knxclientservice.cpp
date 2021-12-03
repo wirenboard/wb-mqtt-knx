@@ -50,7 +50,7 @@ namespace knx
                                                     static_cast<int32_t>(tpduPayload.size()),
                                                     tpduPayload.data());
             if (sendResult == EIB_ERROR_RETURN_VALUE)
-                wb_throw(TKnxException, "failed to send group telegram");
+                wb_throw(TKnxException, "Failed to send group telegram");
 
         } else {
             wb_throw(TKnxException, "Sending individual telegrams is not supported by knxd");
@@ -78,7 +78,7 @@ namespace knx
 
             const int32_t eibOpenResult = EIBOpen_GroupSocket(KnxdConnection->GetEIBConnection(), 0);
             if (eibOpenResult == EIB_ERROR_RETURN_VALUE) {
-                HandleLoopError("failed to open Busmonitor connection");
+                HandleLoopError("failed to open EIB GroupSocket connection");
                 continue;
             }
 
@@ -120,7 +120,7 @@ namespace knx
     {
         const int32_t linuxFileDescriptor = EIB_Poll_FD(KnxdConnection->GetEIBConnection());
         if (linuxFileDescriptor == EIB_ERROR_RETURN_VALUE) {
-            HandleLoopError("failed to get Poll fd");
+            HandleLoopError("Failed to get Poll fd");
             return;
         }
         // The loop responsible for receiving telegrams from knxd
@@ -135,7 +135,7 @@ namespace knx
             if (selectResult == SELECT_TIMEOUT_RETURN_VALUE) {
                 continue;
             } else if (selectResult == SELECT_ERROR_RETURN_VALUE) {
-                HandleLoopError(std::string("select failed: ") + std::strerror(errno));
+                HandleLoopError(std::string("Select failed: ") + std::strerror(errno));
                 break;
             }
 
@@ -150,7 +150,7 @@ namespace knx
                                                       &srcEibAddress,
                                                       &destEibAddress);
             if (packetLen == EIB_ERROR_RETURN_VALUE) {
-                HandleLoopError(std::string("failed to read Busmonitor packet: ") + std::strerror(errno));
+                HandleLoopError(std::string("Failed to get a group TPDU: ") + std::strerror(errno));
                 break;
             }
 
