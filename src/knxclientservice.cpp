@@ -24,8 +24,8 @@ namespace
     {
         auto tpdu = telegram.Tpdu().GetRaw();
         std::stringstream ss;
-        ss << "S_EIB(" << std::to_string(telegram.GetSourceAddress()) << ")\t";
-        ss << "D_EIB(" << std::to_string(telegram.GetReceiverAddress()) << ")\t";
+        ss << "S_EIB(" << std::to_string(telegram.GetSourceAddress()) << ") ";
+        ss << "D_EIB(" << std::to_string(telegram.GetReceiverAddress()) << ") ";
         ss << "TPDU(";
         ss << tpdu.size() << "):";
         ss << std::hex << std::noshowbase;
@@ -67,7 +67,7 @@ namespace knx
                                                     tpduPayload.data());
             if (sendResult != EIB_ERROR_RETURN_VALUE) {
                 if (DebugLogger.IsEnabled()) {
-                    DebugLogger.Log() << "Sent to knxd: \t\t" << ToLog(telegram);
+                    DebugLogger.Log() << "Sent to knxd: " << ToLog(telegram);
                 }
             } else {
                 wb_throw(TKnxException, "Failed to send group telegram");
