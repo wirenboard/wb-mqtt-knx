@@ -21,8 +21,15 @@ TGroupObjectMqtt::TGroupObjectMqtt(PDpt pDpt,
     auto tx = MqttLocalDevice->GetDriver()->BeginTx();
 
     for (const auto& fieldDescriptor: descriptorList) {
-        auto fullControlId = controlId + "_" + fieldDescriptor.Id;
-        auto fullControlTitle = controlTitle + " [ " + fieldDescriptor.Id + " ]";
+        std::string fullControlId;
+        std::string fullControlTitle;
+        if (descriptorList.size() == 1) {
+            fullControlId = controlId;
+            fullControlTitle = controlTitle;
+        } else {
+            fullControlId = controlId + "_" + fieldDescriptor.Id;
+            fullControlTitle = controlTitle + " ." + fieldDescriptor.Id;
+        }
         auto control = MqttLocalDevice
                            ->CreateControl(tx,
                                            WBMQTT::TControlArgs{}
