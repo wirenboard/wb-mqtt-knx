@@ -81,12 +81,20 @@
           "default": "1.xxx_B1",
           "propertyOrder": 4
         },
+        "readPoolInterval": {
+          "type": "integer",
+          "title": "READ poll interval",
+          "minimum": 10,
+          "maximum" : 100000,
+          "default": 1000,
+          "propertyOrder": 5
+        },
         "readOnly": {
           "type": "boolean",
           "title": "Read only",
           "default": false,
           "_format": "checkbox",
-          "propertyOrder": 5
+          "propertyOrder": 6
         }
       },
       "required": [
