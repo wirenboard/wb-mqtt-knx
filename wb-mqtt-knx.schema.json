@@ -81,20 +81,27 @@
           "default": "1.xxx_B1",
           "propertyOrder": 4
         },
+        "enableReadPool": {
+          "type": "boolean",
+          "title": "Enable READ polling",
+          "default": false,
+          "_format": "checkbox",
+          "propertyOrder": 5
+        },
         "readPoolInterval": {
           "type": "integer",
-          "title": "READ poll interval",
-          "minimum": 10,
-          "maximum" : 100000,
+          "title": "READ poll interval (ms)",
+          "minimum": 100,
+          "maximum": 100000,
           "default": 1000,
-          "propertyOrder": 5
+          "propertyOrder": 6
         },
         "readOnly": {
           "type": "boolean",
           "title": "Read only",
           "default": false,
           "_format": "checkbox",
-          "propertyOrder": 6
+          "propertyOrder": 7
         }
       },
       "required": [

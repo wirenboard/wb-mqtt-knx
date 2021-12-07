@@ -17,9 +17,11 @@ namespace knx
         /// Add group object to controller
         /// \param groupAddress group address associated with a group object
         /// \param groupObject group object for management
+        /// \param pollInterval read poll interval
         /// \return The group object has been successfully added to the controller
         virtual bool AddGroupObject(const knx::TKnxGroupAddress& groupAddress,
-                                    const object::PGroupObject& groupObject) = 0;
+                                    const object::PGroupObject& groupObject,
+                                    std::chrono::milliseconds pollInterval) = 0;
 
         /// Remove group object from controller
         /// \param groupAddress group address associated with a group object

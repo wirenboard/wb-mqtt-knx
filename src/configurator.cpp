@@ -18,9 +18,13 @@ void Configurator::ConfigureObjectController(IKnxGroupObjectController& controll
             auto groupAddressStr = control["groupAddress"].asString();
             auto dataPointStr = control["dataPointType"].asString();
             auto isReadOnlyBool = control["readOnly"].asBool();
+            auto enableReadPool = control["enableReadPool"].asBool();
+            auto readPoolInterval = std::chrono::milliseconds(control["readPoolInterval"].asInt());
 
             auto groupObject = groupObjectBuilder.Create({dataPointStr, controlIdStr, controlNameStr, isReadOnlyBool});
-            controller.AddGroupObject(knx::TKnxGroupAddress{groupAddressStr}, groupObject);
+            controller.AddGroupObject(knx::TKnxGroupAddress{groupAddressStr},
+                                      groupObject,
+                                      enableReadPool ? readPoolInterval : std::chrono::milliseconds::zero());
         }
 
         groupObjectBuilder.RemoveUnusedControls();
