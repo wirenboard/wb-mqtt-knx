@@ -88,20 +88,12 @@
           "_format": "checkbox",
           "propertyOrder": 5
         },
-        "readPoolInterval": {
-          "type": "integer",
-          "title": "READ poll interval (ms)",
-          "minimum": 100,
-          "maximum": 100000,
-          "default": 1000,
-          "propertyOrder": 6
-        },
         "readOnly": {
           "type": "boolean",
           "title": "Read only",
           "default": false,
           "_format": "checkbox",
-          "propertyOrder": 7
+          "propertyOrder": 6
         }
       },
       "required": [
@@ -135,6 +127,14 @@
       "_format": "checkbox",
       "propertyOrder": 3
     },
+    "readPoolInterval": {
+      "type": "integer",
+      "title": "READ poll interval for Devices (ms)",
+      "minimum": 100,
+      "maximum": 100000,
+      "default": 1000,
+      "propertyOrder": 4
+    },
     "devices": {
       "type": "array",
       "title": "List of Devices",
@@ -143,7 +143,7 @@
       },
       "minItems": 0,
       "_format": "tabs",
-      "propertyOrder": 4,
+      "propertyOrder": 5,
       "options": {
         "disable_collapse": true,
         "disable_array_delete_last_row": true

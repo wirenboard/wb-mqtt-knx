@@ -6,6 +6,8 @@ void Configurator::ConfigureObjectController(IKnxGroupObjectController& controll
                                              object::IGroupObjectMqttBuilder& groupObjectBuilder)
 {
     auto devices = ConfigRoot["devices"];
+    auto readPoolInterval = std::chrono::milliseconds(ConfigRoot["readPoolInterval"].asInt());
+
     for (const auto& device: devices) {
         auto deviceIdStr = device["deviceId"].asString();
         auto deviceTitleStr = device["deviceTitle"].asString();
@@ -19,7 +21,6 @@ void Configurator::ConfigureObjectController(IKnxGroupObjectController& controll
             auto dataPointStr = control["dataPointType"].asString();
             auto isReadOnlyBool = control["readOnly"].asBool();
             auto enableReadPool = control["enableReadPool"].asBool();
-            auto readPoolInterval = std::chrono::milliseconds(control["readPoolInterval"].asInt());
 
             auto groupObject = groupObjectBuilder.Create({dataPointStr, controlIdStr, controlNameStr, isReadOnlyBool});
             controller.AddGroupObject(knx::TKnxGroupAddress{groupAddressStr},
