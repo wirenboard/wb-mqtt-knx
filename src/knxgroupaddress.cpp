@@ -4,11 +4,16 @@ using namespace knx;
 
 namespace
 {
-    constexpr auto MAIN_GROUP_MAX = 15U;
+    // For the first generation of KNX devices, the maximum address of the main group was 15
+    constexpr auto MAIN_GROUP_MAX = 31U;
+
     constexpr auto MIDDLE_GROUP_MAX = 7U;
     constexpr auto SUB_GROUP_TRIPLE_MAX = 255U;
     constexpr auto SUB_GROUP_DOUBLE_MAX = 2047U;
-    constexpr auto EIB_ADDRESS_MAX = 32767U;
+
+    // For the first generation of KNX devices, the maximum address was: 0x7FFF
+    constexpr auto EIB_ADDRESS_MAX = 0xFFFFU;
+
     constexpr auto GROUP_ADDRESS_ERROR_MESSAGE = "Invalid KNX Group Address: ";
 }
 
@@ -65,7 +70,7 @@ void TKnxGroupAddress::Init(uint32_t address)
     if ((address > EIB_ADDRESS_MAX))
         wb_throw(knx::TKnxException, GROUP_ADDRESS_ERROR_MESSAGE + std::to_string(address));
 
-    MainGroup = (address >> 11) & 0x0F;
+    MainGroup = (address >> 11) & 0x1F;
     MiddleGroup = (address >> 8) & 0x07;
     SubGroup = address & 0xFF;
 }
@@ -77,7 +82,7 @@ TKnxGroupAddress::TKnxGroupAddress(eibaddr_t eibAddress)
 
 eibaddr_t TKnxGroupAddress::GetEibAddress() const
 {
-    return ((MainGroup & 0x0F) << 11) | ((MiddleGroup & 0x07) << 8) | (SubGroup & 0xFF);
+    return ((MainGroup & 0x1F) << 11) | ((MiddleGroup & 0x07) << 8) | (SubGroup & 0xFF);
 }
 
 bool TKnxGroupAddress::operator<(const TKnxGroupAddress& rhs) const
