@@ -1,3 +1,9 @@
+wb-mqtt-knx (1.1.0) unstable; urgency=medium
+
+  * Changed names of controls for KNX group objects
+
+ -- Roman Kochkin <roman.kochkin@wirenboard.ru>  Wed, 08 Dec 2021 08:36:00 +0300
+
 wb-mqtt-knx (1.0.0) unstable; urgency=medium
 
   * Ported to libwbmqtt1
