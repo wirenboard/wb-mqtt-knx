@@ -29,7 +29,7 @@ namespace knx
                                       WBMQTT::TLogger& errorLogger);
 
             void KnxNotify(const TGroupObjectTransaction& transaction) override;
-
+            void KnxError(const TGroupObjectError& error) override;
             void SetKnxSender(const TKnxGroupAddress& groupAddress, PSenderGroupObject sender) override;
 
         private:

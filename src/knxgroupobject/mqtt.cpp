@@ -111,3 +111,22 @@ void TGroupObjectMqtt::SetKnxSender(const knx::TKnxGroupAddress& groupAddress, P
     SelfKnxAddress = groupAddress;
     KnxSender = std::move(sender);
 }
+
+void TGroupObjectMqtt::KnxError(const TGroupObjectError& error)
+{
+    std::string errorMessage;
+    switch (error) {
+        case TGroupObjectError::None:
+            return;
+        case TGroupObjectError::PoolReadTimeoutError:
+            errorMessage = "Device not responding to read requests";
+            break;
+        case TGroupObjectError::SocketError:
+            errorMessage = "knxd socket error";
+    }
+
+    auto tx = MqttLocalDevice->GetDriver()->BeginTx();
+    for (const auto& control: ControlList) {
+        control->SetError(tx, errorMessage).Wait();
+    }
+}

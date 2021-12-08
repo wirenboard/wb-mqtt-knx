@@ -32,8 +32,12 @@ void TKnxGroupObjectController::Notify(const TTelegram& knxTelegram)
 
         auto groupObjectIterator = GroupObjectList.find(address);
         if (groupObjectIterator != GroupObjectList.end()) {
-            groupObjectIterator->second.groupObject->KnxNotify(
-                {address, knxTelegram.Tpdu().GetAPCI(), knxTelegram.Tpdu().GetPayload()});
+            auto& item = groupObjectIterator->second;
+            auto apci = knxTelegram.Tpdu().GetAPCI();
+            if (apci == telegram::TApci::GroupValueResponse) {
+                item.RequestedRead = false;
+            }
+            item.groupObject->KnxNotify({address, knxTelegram.Tpdu().GetAPCI(), knxTelegram.Tpdu().GetPayload()});
         }
     }
 }
@@ -61,8 +65,12 @@ void TKnxGroupObjectController::Notify(const TTickTimerEvent& timerEvent)
                 if (item.counter > 0) {
                     --item.counter;
                 } else {
+                    if (item.RequestedRead) {
+                        item.groupObject->KnxError(object::TGroupObjectError::PoolReadTimeoutError);
+                    }
                     item.counter = item.pollInterval;
                     Send({address, telegram::TApci::GroupValueRead, {0}});
+                    item.RequestedRead = true;
                 }
             }
         }

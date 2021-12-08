@@ -32,6 +32,7 @@ namespace knx
             object::PGroupObject groupObject;
             uint32_t pollInterval{0};
             uint32_t counter{0};
+            bool RequestedRead = false;
         };
 
         void Notify(const TTelegram& knxTelegram) override;
