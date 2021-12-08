@@ -25,8 +25,14 @@ bool TKnxGroupObjectController::RemoveGroupObject(const TKnxGroupAddress& addres
     return GroupObjectList.erase(address);
 }
 
-void TKnxGroupObjectController::Notify(const TTelegram& knxTelegram)
+void TKnxGroupObjectController::Notify(const TTelegram& knxTelegram, const TKnxError& error)
 {
+    if (error != TKnxError::None) {
+        for (auto& item: GroupObjectList) {
+            item.second.groupObject->KnxNotifyError(error);
+        }
+        return;
+    }
     if (knxTelegram.IsGroupAddressed()) {
         TKnxGroupAddress address(knxTelegram.GetReceiverAddress());
 
@@ -66,7 +72,7 @@ void TKnxGroupObjectController::Notify(const TTickTimerEvent& timerEvent)
                     --item.counter;
                 } else {
                     if (item.RequestedRead) {
-                        item.groupObject->KnxError(object::TGroupObjectError::PoolReadTimeoutError);
+                        item.groupObject->KnxNotifyError(TKnxError::PoolReadTimeoutError);
                     }
                     item.counter = item.pollInterval;
                     Send({address, telegram::TApci::GroupValueRead, {0}});

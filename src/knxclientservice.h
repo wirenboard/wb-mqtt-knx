@@ -2,6 +2,7 @@
 
 #include "isender.h"
 #include "knxconnection.h"
+#include "knxerror.h"
 #include "knxtelegram.h"
 #include "observer.h"
 #include "wblib/log.h"
@@ -10,7 +11,8 @@
 namespace knx
 {
     /// \brief Class for transmitting and receiving KNX telegrams
-    class TKnxClientService: public ISender<TTelegram>, public TObserver<TTelegram>
+    class TKnxClientService: public ISender<TTelegram>,
+                             public TObserver<TTelegram, TKnxError>
     {
     public:
         /// Constructor

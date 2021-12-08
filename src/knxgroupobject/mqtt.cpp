@@ -112,16 +112,16 @@ void TGroupObjectMqtt::SetKnxSender(const knx::TKnxGroupAddress& groupAddress, P
     KnxSender = std::move(sender);
 }
 
-void TGroupObjectMqtt::KnxError(const TGroupObjectError& error)
+void TGroupObjectMqtt::KnxNotifyError(const TKnxError& error)
 {
     std::string errorMessage;
     switch (error) {
-        case TGroupObjectError::None:
+        case TKnxError::None:
             return;
-        case TGroupObjectError::PoolReadTimeoutError:
+        case TKnxError::PoolReadTimeoutError:
             errorMessage = "Device not responding to read requests";
             break;
-        case TGroupObjectError::SocketError:
+        case TKnxError::KnxdSocketError:
             errorMessage = "knxd socket error";
     }
 

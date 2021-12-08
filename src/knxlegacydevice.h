@@ -2,6 +2,7 @@
 
 #include "isender.h"
 #include "isubscriber.h"
+#include "knxerror.h"
 #include "knxtelegram.h"
 #include <wblib/log.h>
 #include <wblib/wbmqtt.h>
@@ -9,7 +10,7 @@
 namespace knx
 {
 
-    class TKnxLegacyDevice: public ISubscriber<TTelegram>
+    class TKnxLegacyDevice: public ISubscriber<TTelegram, TKnxError>
     {
     public:
         explicit TKnxLegacyDevice(WBMQTT::PDeviceDriver pMqttDriver,
@@ -20,7 +21,7 @@ namespace knx
 
         void Deinit();
 
-        void Notify(const TTelegram& t) override;
+        void Notify(const TTelegram& t, const TKnxError& error) override;
 
     private:
         WBMQTT::PDeviceDriver DeviceDriver;

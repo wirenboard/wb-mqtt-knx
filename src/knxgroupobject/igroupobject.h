@@ -4,6 +4,7 @@
 #include "../knxgroupaddress.h"
 #include "../knxtelegram.h"
 #include <memory>
+#include "../knxerror.h"
 
 namespace knx
 {
@@ -15,13 +16,6 @@ namespace knx
             TKnxGroupAddress Address;     ///< Destination group address
             telegram::TApci Apci;         ///< Command code for group objects
             std::vector<uint8_t> Payload; ///< KNX telegram payload
-        };
-
-        enum class TGroupObjectError
-        {
-            None = 0,
-            SocketError,
-            PoolReadTimeoutError
         };
 
         using ISenderGroupObject = ISender<TGroupObjectTransaction>;
@@ -37,7 +31,7 @@ namespace knx
 
             /// Notification of a group object about an error in the KNX network
             /// \param error Error value
-            virtual void KnxError(const TGroupObjectError& error) = 0;
+            virtual void KnxNotifyError(const TKnxError& error) = 0;
 
             /// Linking the group object to a KNX message transmitter in the network
             /// \param groupAddress the group address to which messages will be sent.

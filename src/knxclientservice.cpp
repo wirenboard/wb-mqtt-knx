@@ -172,6 +172,7 @@ namespace knx
                                                       &destEibAddress);
             if (packetLen == EIB_ERROR_RETURN_VALUE) {
                 HandleLoopError(std::string("Failed to get a group TPDU: ") + std::strerror(errno));
+                NotifyAllSubscribers(TTelegram{},TKnxError::KnxdSocketError);
                 break;
             }
 
@@ -188,7 +189,7 @@ namespace knx
                 if (DebugLogger.IsEnabled()) {
                     DebugLogger.Log() << "Received from knxd: " << ToLog(knxTelegram);
                 }
-                NotifyAllSubscribers(knxTelegram);
+                NotifyAllSubscribers(knxTelegram, TKnxError::None);
             } catch (const TKnxException& e) {
                 ErrorLogger.Log() << e.what();
             } catch (const std::exception& e) {
