@@ -4,7 +4,7 @@
 #include "../knxgroupaddress.h"
 #include "../knxtelegram.h"
 #include <memory>
-#include "../knxerror.h"
+#include "../knxevent.h"
 
 namespace knx
 {
@@ -30,8 +30,8 @@ namespace knx
             virtual void KnxNotify(const TGroupObjectTransaction& transaction) = 0;
 
             /// Notification of a group object about an error in the KNX network
-            /// \param error Error value
-            virtual void KnxNotifyError(const TKnxError& error) = 0;
+            /// \param event Error value
+            virtual void KnxNotifyEvent(const TKnxEvent& event) = 0;
 
             /// Linking the group object to a KNX message transmitter in the network
             /// \param groupAddress the group address to which messages will be sent.

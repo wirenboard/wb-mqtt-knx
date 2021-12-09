@@ -3,9 +3,11 @@
 namespace knx
 {
     /// Service errors
-    enum class TKnxError
+    enum class TKnxEvent
     {
         None = 0,
+        ReceivedTelegram,
+        KnxdSocketConnected,
         KnxdSocketError,
         PoolReadTimeoutError
     };

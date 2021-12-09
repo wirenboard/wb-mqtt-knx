@@ -68,10 +68,10 @@ void TKnxLegacyDevice::Deinit()
     }
 }
 
-void TKnxLegacyDevice::Notify(const TTelegram& telegram, const TKnxError&)
+void TKnxLegacyDevice::Notify( const TKnxEvent&, const TTelegram& t)
 {
     try {
-        const auto mqttData = converter::KnxTelegramToMqtt(telegram);
+        const auto mqttData = converter::KnxTelegramToMqtt(t);
         Control->UpdateRawValue(DeviceDriver->BeginTx(), mqttData).Wait();
     } catch (const std::exception& e) {
         ErrorLogger.Log() << e.what();

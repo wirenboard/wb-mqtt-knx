@@ -143,7 +143,7 @@ int main(int argc, char** argv)
         if (knxLegacyDevice) {
             knxClientService->Subscribe(knxLegacyDevice);
         }
-        knxClientService->Subscribe(static_cast<knx::PSubscriber<knx::TTelegram, knx::TKnxError>>(knxGroupObjectController));
+        knxClientService->Subscribe(knxGroupObjectController);
 
         configurator.ConfigureObjectController(*knxGroupObjectController, *groupObjectBuilder);
         tickTimer.Subscribe(knxGroupObjectController);

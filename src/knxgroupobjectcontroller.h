@@ -8,12 +8,12 @@
 #include <map>
 #include <memory>
 #include <utility>
-#include "knxerror.h"
+#include "knxevent.h"
 
 namespace knx
 {
     class TKnxGroupObjectController: public IKnxGroupObjectController,
-                                     public ISubscriber<TTelegram, TKnxError>,
+                                     public ISubscriber<TKnxEvent, TTelegram>,
                                      public ISubscriber<TTickTimerEvent>,
                                      public object::ISenderGroupObject,
                                      public std::enable_shared_from_this<TKnxGroupObjectController>
@@ -36,7 +36,7 @@ namespace knx
             bool RequestedRead = false;
         };
 
-        void Notify(const TTelegram& knxTelegram, const TKnxError& error) override;
+        void Notify( const TKnxEvent& event, const TTelegram& knxTelegram) override;
 
         void Notify(const TTickTimerEvent& timerEvent) override;
 
