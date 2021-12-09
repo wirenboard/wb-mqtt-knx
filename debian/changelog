@@ -1,3 +1,9 @@
+wb-mqtt-knx (1.2.0) unstable; urgency=medium
+
+  * Extended the range of group address
+
+ -- Roman Kochkin <roman.kochkin@wirenboard.ru>  Wed, 08 Dec 2021 16:05:00 +0300
+
 wb-mqtt-knx (1.1.0) unstable; urgency=medium
 
   * Changed names of controls for KNX group objects

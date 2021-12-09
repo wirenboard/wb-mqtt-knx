@@ -1,5 +1,6 @@
 #include "knxconverter.h"
 #include "knxexception.h"
+#include "knxgroupaddress.h"
 #include "knxutils.h"
 #include <algorithm>
 #include <array>
@@ -61,8 +62,9 @@ namespace
 
         if (telegram.IsGroupAddressed()) {
             // group address
-            ss << "g:" << ((receiverAddress >> 11) & 0xf) << "/" << ((receiverAddress >> 8) & 0x7);
-            ss << "/" << (receiverAddress & 0xff);
+            TKnxGroupAddress groupAddress{receiverAddress};
+            ss << "g:" << groupAddress.GetMainGroup() << "/" << groupAddress.GetMiddleGroup();
+            ss << "/" << groupAddress.GetSubGroup();
         } else {
             // individual address
             ss << "i:" << (receiverAddress >> 12) << "/" << ((receiverAddress >> 8) & 0xf);
@@ -95,28 +97,15 @@ namespace
 
     eibaddr_t StringToKnxAddress(const std::string& addr, bool groupBit)
     {
-        std::vector<std::string> tokens;
         eibaddr_t address = 0;
         std::string errorMessage = "Invalid address: " + addr;
 
         try {
-            tokens = WBMQTT::StringSplit(addr, "/");
             if (groupBit) {
-                if (tokens.size() == 2) {
-                    uint16_t main = std::stoi(tokens[0]);
-                    uint16_t sub = std::stoi(tokens[1]);
-
-                    address = ((main & 0xf) << 11) | (sub & 0x7ff);
-                } else if (tokens.size() == 3) {
-                    uint16_t main = std::stoi(tokens[0]);
-                    uint16_t middle = std::stoi(tokens[1]);
-                    uint16_t sub = std::stoi(tokens[2]);
-
-                    address = ((main & 0xf) << 11) | ((middle & 0x7) << 8) | (sub & 0xff);
-                } else {
-                    wb_throw(TKnxException, errorMessage);
-                }
+                TKnxGroupAddress groupAddress(addr);
+                address = groupAddress.GetEibAddress();
             } else {
+                auto tokens = WBMQTT::StringSplit(addr, "/");
                 if (tokens.size() == 3) {
                     uint16_t area = std::stoi(tokens[0]);
                     uint16_t line = std::stoi(tokens[1]);
