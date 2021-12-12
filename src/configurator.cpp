@@ -6,7 +6,6 @@ void Configurator::ConfigureObjectController(IKnxGroupObjectController& controll
                                              object::IGroupObjectMqttBuilder& groupObjectBuilder)
 {
     auto devices = ConfigRoot["devices"];
-    auto readPoolInterval = std::chrono::milliseconds(ConfigRoot["readPoolInterval"].asInt());
 
     for (const auto& device: devices) {
         auto deviceIdStr = device["deviceId"].asString();
@@ -20,12 +19,16 @@ void Configurator::ConfigureObjectController(IKnxGroupObjectController& controll
             auto groupAddressStr = control["groupAddress"].asString();
             auto dataPointStr = control["dataPointType"].asString();
             auto isReadOnlyBool = control["readOnly"].asBool();
-            auto enableReadPool = control["enableReadPool"].asBool();
+            auto readPoolTimeout = std::chrono::milliseconds(control["readPoolTimeout"].asInt());
+
+            TGroupObjectSettings goSettings;
+            goSettings.ReadRequestAfterStart = true;
+            goSettings.ReadRequestPollInterval = std::chrono::milliseconds(control["readPoolInterval"].asInt());
+            goSettings.ReadResponseTimeout = std::chrono::milliseconds(control["readPoolTimeout"].asInt());
 
             auto groupObject = groupObjectBuilder.Create({dataPointStr, controlIdStr, controlNameStr, isReadOnlyBool});
             controller.AddGroupObject(knx::TKnxGroupAddress{groupAddressStr},
-                                      groupObject,
-                                      enableReadPool ? readPoolInterval : std::chrono::milliseconds::zero());
+                                      groupObject,goSettings);
         }
 
         groupObjectBuilder.RemoveUnusedControls();

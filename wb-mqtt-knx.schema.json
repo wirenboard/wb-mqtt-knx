@@ -81,19 +81,28 @@
           "default": "1.xxx_B1",
           "propertyOrder": 4
         },
-        "enableReadPool": {
-          "type": "boolean",
-          "title": "Enable READ polling",
-          "default": false,
-          "_format": "checkbox",
+        "readPoolInterval": {
+          "type": "integer",
+          "title": "READ poll interval for Devices (ms)",
+          "minimum": 0,
+          "maximum": 100000,
+          "default": 0,
           "propertyOrder": 5
+        },
+        "readPoolTimeout": {
+          "type": "integer",
+          "title": "READ poll timeout for Devices (ms)",
+          "minimum": 0,
+          "maximum": 100000,
+          "default": 0,
+          "propertyOrder": 6
         },
         "readOnly": {
           "type": "boolean",
           "title": "Read only",
           "default": false,
           "_format": "checkbox",
-          "propertyOrder": 6
+          "propertyOrder": 7
         }
       },
       "required": [
@@ -126,14 +135,6 @@
       "default": true,
       "_format": "checkbox",
       "propertyOrder": 3
-    },
-    "readPoolInterval": {
-      "type": "integer",
-      "title": "READ poll interval for Devices (ms)",
-      "minimum": 100,
-      "maximum": 100000,
-      "default": 1000,
-      "propertyOrder": 4
     },
     "devices": {
       "type": "array",

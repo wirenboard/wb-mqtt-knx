@@ -15,7 +15,7 @@ namespace
 {
     const auto KNX_DRIVER_INIT_TIMEOUT_S = std::chrono::seconds(30);
     const auto KNX_DRIVER_STOP_TIMEOUT_S = std::chrono::seconds(60); // topic cleanup can take a lot of time
-    const auto KNX_READ_TICK_PERIOD = std::chrono::milliseconds(100);
+    const auto KNX_READ_TICK_PERIOD = std::chrono::milliseconds(50);
 
     WBMQTT::TLogger ErrorLogger("ERROR: [knx] ", WBMQTT::TLogger::StdErr, WBMQTT::TLogger::RED);
     WBMQTT::TLogger VerboseLogger("INFO: [knx] ", WBMQTT::TLogger::StdErr, WBMQTT::TLogger::WHITE, false);
@@ -144,9 +144,9 @@ int main(int argc, char** argv)
             knxClientService->Subscribe(knxLegacyDevice);
         }
         knxClientService->Subscribe(knxGroupObjectController);
+        tickTimer.Subscribe(knxGroupObjectController);
 
         configurator.ConfigureObjectController(*knxGroupObjectController, *groupObjectBuilder);
-        tickTimer.Subscribe(knxGroupObjectController);
 
         knxClientService->Start();
         tickTimer.Start();

@@ -9,12 +9,21 @@ TKnxGroupObjectController::TKnxGroupObjectController(PSender<TTelegram> pSender,
 
 bool TKnxGroupObjectController::AddGroupObject(const knx::TKnxGroupAddress& groupAddress,
                                                const object::PGroupObject& groupObject,
-                                               std::chrono::milliseconds pollInterval)
+                                               const TGroupObjectSettings& settings)
 {
     if (groupObject) {
         groupObject->SetKnxSender(groupAddress, shared_from_this());
+
+        auto pItem = std::make_unique<TGroupObjectListItem>();
+        pItem->GroupObject = groupObject;
+        pItem->Settings = settings;
+        pItem->PollInterval = static_cast<uint32_t>(settings.ReadRequestPollInterval.count() / TickInterval.count());
+        pItem->Timeout = static_cast<uint32_t>(settings.ReadResponseTimeout.count() / TickInterval.count());
+        pItem->Counter = pItem->PollInterval;
+
         return GroupObjectList
-            .insert({groupAddress, {groupObject, static_cast<uint32_t>(pollInterval.count() / TickInterval.count())}})
+            .emplace(groupAddress,
+                     std::move(pItem))
             .second;
     }
     return false;
@@ -27,12 +36,18 @@ bool TKnxGroupObjectController::RemoveGroupObject(const TKnxGroupAddress& addres
 
 void TKnxGroupObjectController::Notify(const TKnxEvent& event, const TTelegram& knxTelegram)
 {
-    if (event != TKnxEvent::ReceivedTelegram) {
-        for (auto& item: GroupObjectList) {
-            item.second.groupObject->KnxNotifyEvent(event);
+    if (event == TKnxEvent::KnxdSocketConnected) {
+        for (auto& itemPair: GroupObjectList) {
+            auto& address = itemPair.first;
+            auto& item = itemPair.second;
+            if (item->Settings.ReadRequestAfterStart) {
+                Send({address, telegram::TApci::GroupValueRead, {0}});
+            }
         }
+    } else if (event != TKnxEvent::ReceivedTelegram) {
         return;
     }
+
     if (knxTelegram.IsGroupAddressed()) {
         TKnxGroupAddress address(knxTelegram.GetReceiverAddress());
 
@@ -41,9 +56,9 @@ void TKnxGroupObjectController::Notify(const TKnxEvent& event, const TTelegram& 
             auto& item = groupObjectIterator->second;
             auto apci = knxTelegram.Tpdu().GetAPCI();
             if (apci == telegram::TApci::GroupValueResponse) {
-                item.RequestedRead = false;
+                item->StartTimeoutTimer = false;
             }
-            item.groupObject->KnxNotify({address, knxTelegram.Tpdu().GetAPCI(), knxTelegram.Tpdu().GetPayload()});
+            item->GroupObject->KnxNotify({address, knxTelegram.Tpdu().GetAPCI(), knxTelegram.Tpdu().GetPayload()});
         }
     }
 }
@@ -67,16 +82,24 @@ void TKnxGroupObjectController::Notify(const TTickTimerEvent& timerEvent)
         for (auto& itemPair: GroupObjectList) {
             auto& address = itemPair.first;
             auto& item = itemPair.second;
-            if (item.pollInterval) {
-                if (item.counter > 0) {
-                    --item.counter;
+
+            if (item->Timeout && item->StartTimeoutTimer) {
+                if (item->TimeoutCounter > 0) {
+                    --item->TimeoutCounter;
                 } else {
-                    if (item.RequestedRead) {
-                        item.groupObject->KnxNotifyEvent(TKnxEvent::PoolReadTimeoutError);
-                    }
-                    item.counter = item.pollInterval;
+                    item->StartTimeoutTimer = false;
+                    item->GroupObject->KnxNotifyEvent(TKnxEvent::PoolReadTimeoutError);
+                }
+            }
+
+            if (item->PollInterval) {
+                if (item->Counter > 0) {
+                    --item->Counter;
+                } else {
+                    item->Counter = item->PollInterval;
                     Send({address, telegram::TApci::GroupValueRead, {0}});
-                    item.RequestedRead = true;
+                    item->StartTimeoutTimer = true;
+                    item->TimeoutCounter = item->Timeout;
                 }
             }
         }

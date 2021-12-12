@@ -1,6 +1,7 @@
 #pragma once
 #include "iknxgroupobjectcontroller.h"
 #include "isubscriber.h"
+#include "knxevent.h"
 #include "knxgroupaddress.h"
 #include "knxgroupobject/igroupobject.h"
 #include "knxtelegram.h"
@@ -8,7 +9,6 @@
 #include <map>
 #include <memory>
 #include <utility>
-#include "knxevent.h"
 
 namespace knx
 {
@@ -24,19 +24,22 @@ namespace knx
 
         bool AddGroupObject(const knx::TKnxGroupAddress& groupAddress,
                             const object::PGroupObject& groupObject,
-                            std::chrono::milliseconds pollInterval) override;
+                            const TGroupObjectSettings& settings) override;
         bool RemoveGroupObject(const TKnxGroupAddress& address) override;
 
     private:
         struct TGroupObjectListItem
         {
-            object::PGroupObject groupObject;
-            uint32_t pollInterval{0};
-            uint32_t counter{0};
-            bool RequestedRead = false;
+            object::PGroupObject GroupObject;
+            TGroupObjectSettings Settings;
+            uint32_t PollInterval{0};
+            uint32_t Timeout{0};
+            uint32_t Counter{0};
+            uint32_t TimeoutCounter{0};
+            std::atomic<bool> StartTimeoutTimer{false};
         };
 
-        void Notify( const TKnxEvent& event, const TTelegram& knxTelegram) override;
+        void Notify(const TKnxEvent& event, const TTelegram& knxTelegram) override;
 
         void Notify(const TTickTimerEvent& timerEvent) override;
 
@@ -44,6 +47,6 @@ namespace knx
 
         PSender<TTelegram> Sender;
         std::chrono::milliseconds TickInterval;
-        std::map<TKnxGroupAddress, TGroupObjectListItem> GroupObjectList;
+        std::map<TKnxGroupAddress, std::unique_ptr<TGroupObjectListItem>> GroupObjectList;
     };
 }
