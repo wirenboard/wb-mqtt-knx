@@ -16,6 +16,7 @@ add_executable(${PROJECT_NAME}_test ${TEST_LIST}
         ../src/knxgroupobject/dpt9.cpp
         ../src/knxgroupobject/dptraw.cpp
         ../src/knxutils.cpp
+        ../src/knxgroupobjectcontroller.cpp
         )
 
 target_link_libraries(${PROJECT_NAME}_test gtest gtest_main gmock wbmqtt1 pthread)

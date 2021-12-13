@@ -11,8 +11,7 @@
 namespace knx
 {
     /// \brief Class for transmitting and receiving KNX telegrams
-    class TKnxClientService: public ISender<TTelegram>,
-                             public TObserver<TKnxEvent, TTelegram>
+    class TKnxClientService: public ISender<TTelegram>, public TObserver<TKnxEvent, TTelegram>
     {
     public:
         /// Constructor

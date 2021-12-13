@@ -10,7 +10,7 @@ public:
     MOCK_METHOD3(AddGroupObject,
                  bool(const knx::TKnxGroupAddress& groupAddress,
                       const knx::object::PGroupObject&,
-                      std::chrono::milliseconds));
+                      const knx::TGroupObjectSettings&));
     MOCK_METHOD1(RemoveGroupObject, bool(const knx::TKnxGroupAddress& a));
 
     virtual ~TKnxGroupObjectControllerMock() = default;

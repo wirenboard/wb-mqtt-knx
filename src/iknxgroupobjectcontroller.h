@@ -9,11 +9,13 @@
 
 namespace knx
 {
+    /// Group object settings
     struct TGroupObjectSettings
     {
-        bool ReadRequestAfterStart{false};
-        std::chrono::milliseconds ReadRequestPollInterval{0};
-        std::chrono::milliseconds ReadResponseTimeout{0};
+        bool ReadRequestAfterStart{false}; ///< Send a read request after the start of the knxd client
+        std::chrono::milliseconds ReadRequestPollInterval{0}; ///< Period of sending a read request
+        std::chrono::milliseconds ReadResponseTimeout{0};     ///< Time to wait for a response to a read request
+                                                              ///< Must be less than the polling period.
     };
 
     /// Class containing group objects and routing incoming KNX messages to group objects

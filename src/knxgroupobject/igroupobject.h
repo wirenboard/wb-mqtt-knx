@@ -1,10 +1,10 @@
 #pragma once
 
 #include "../isender.h"
+#include "../knxevent.h"
 #include "../knxgroupaddress.h"
 #include "../knxtelegram.h"
 #include <memory>
-#include "../knxevent.h"
 
 namespace knx
 {

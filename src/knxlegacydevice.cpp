@@ -68,7 +68,7 @@ void TKnxLegacyDevice::Deinit()
     }
 }
 
-void TKnxLegacyDevice::Notify( const TKnxEvent&, const TTelegram& t)
+void TKnxLegacyDevice::Notify(const TKnxEvent&, const TTelegram& t)
 {
     try {
         const auto mqttData = converter::KnxTelegramToMqtt(t);

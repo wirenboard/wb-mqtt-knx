@@ -11,7 +11,7 @@ bool TKnxGroupObjectController::AddGroupObject(const knx::TKnxGroupAddress& grou
                                                const object::PGroupObject& groupObject,
                                                const TGroupObjectSettings& settings)
 {
-    if (groupObject) {
+    if (groupObject && (GroupObjectList.find(groupAddress) == GroupObjectList.end())) {
         groupObject->SetKnxSender(groupAddress, shared_from_this());
 
         auto pItem = std::make_unique<TGroupObjectListItem>();
@@ -21,10 +21,7 @@ bool TKnxGroupObjectController::AddGroupObject(const knx::TKnxGroupAddress& grou
         pItem->Timeout = static_cast<uint32_t>(settings.ReadResponseTimeout.count() / TickInterval.count());
         pItem->Counter = pItem->PollInterval;
 
-        return GroupObjectList
-            .emplace(groupAddress,
-                     std::move(pItem))
-            .second;
+        return GroupObjectList.emplace(groupAddress, std::move(pItem)).second;
     }
     return false;
 }

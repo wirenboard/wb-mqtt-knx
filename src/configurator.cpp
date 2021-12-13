@@ -27,8 +27,7 @@ void Configurator::ConfigureObjectController(IKnxGroupObjectController& controll
             goSettings.ReadResponseTimeout = std::chrono::milliseconds(control["readPoolTimeout"].asInt());
 
             auto groupObject = groupObjectBuilder.Create({dataPointStr, controlIdStr, controlNameStr, isReadOnlyBool});
-            controller.AddGroupObject(knx::TKnxGroupAddress{groupAddressStr},
-                                      groupObject,goSettings);
+            controller.AddGroupObject(knx::TKnxGroupAddress{groupAddressStr}, groupObject, goSettings);
         }
 
         groupObjectBuilder.RemoveUnusedControls();
