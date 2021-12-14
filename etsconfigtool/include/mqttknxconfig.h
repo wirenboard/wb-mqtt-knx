@@ -36,6 +36,11 @@ namespace knx
                            const std::string& title,
                            const std::vector<TControlConfig>& controls);
 
+            /// Check configuration file according to scheme
+            /// \param schemaPath path to the json file of the schema
+            /// \exception std::runtime_error Throws on validation error
+            void Validate(const std::string& schemaPath);
+
             /// Save config file
             /// \param path the path to the Saved file
             void SaveConfig(const std::string& path);

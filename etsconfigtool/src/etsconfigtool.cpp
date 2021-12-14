@@ -125,3 +125,8 @@ void TEtsConfigTool::ParseGroupAddress(tinyxml2::XMLElement* mainGroup)
         Config.AddDevice(deviceId, deviceTitle, controlList);
     }
 }
+
+void TEtsConfigTool::ValidateWbMqttConfig(const std::string& schemaPath)
+{
+    Config.Validate(schemaPath);
+}

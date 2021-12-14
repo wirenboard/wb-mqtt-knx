@@ -18,6 +18,11 @@ namespace knx
             /// \exception knx::TKnxException If the export file is missing or has an incorrect format
             void LoadEtsExport(const std::string& filePath);
 
+            /// Check configuration file according to scheme
+            /// \param schemaPath path to the json file of the schema
+            /// \exception std::runtime_error Throws on validation error
+            void ValidateWbMqttConfig(const std::string& schemaPath);
+
             /// Save wb-mqtt-knx config
             /// \param filePath file path for saving
             void SaveWbMqttConfig(const std::string& filePath);

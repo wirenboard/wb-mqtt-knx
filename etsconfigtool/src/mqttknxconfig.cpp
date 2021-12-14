@@ -35,6 +35,12 @@ void TMqttKnxConfig::AddDevice(const std::string& id,
     RootObject["devices"].append(DeviceObjectValue);
 }
 
+void TMqttKnxConfig::Validate(const std::string& schemaPath)
+{
+    auto schemaRoot = WBMQTT::JSON::Parse(schemaPath);
+    WBMQTT::JSON::Validate(RootObject, schemaRoot);
+}
+
 void TMqttKnxConfig::SaveConfig(const std::string& path)
 {
     std::ofstream fileStream;
