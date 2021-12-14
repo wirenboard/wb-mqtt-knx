@@ -23,6 +23,10 @@ namespace knx
             /// \exception std::runtime_error Throws on validation error
             void ValidateWbMqttConfig(const std::string& schemaPath);
 
+            /// Get JSON Root Object from Config
+            /// \return root object from config
+            Json::Value GetWbMqttConfig();
+
             /// Save wb-mqtt-knx config
             /// \param filePath file path for saving
             void SaveWbMqttConfig(const std::string& filePath);

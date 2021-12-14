@@ -1,6 +1,9 @@
 #include "config.h"
 #include "etsconfigtool.h"
+#include "gmock/gmock.h"
 #include "gtest/gtest.h"
+
+using namespace testing;
 
 class EtsConfigToolTest: public ::testing::Test
 {
@@ -27,11 +30,11 @@ TEST_F(EtsConfigToolTest, SaveConfig)
     converter.SaveWbMqttConfig(tempConfigFilePathStr);
 
     auto configRoot = WBMQTT::JSON::Parse(tempConfigFilePathStr);
+    unlink(tempConfigFilePathStr.c_str());
+
     auto schemaRoot = WBMQTT::JSON::Parse(SchemaPath);
 
     EXPECT_NO_THROW(WBMQTT::JSON::Validate(configRoot, schemaRoot));
-
-    unlink(tempConfigFilePathStr.c_str());
 }
 
 TEST_F(EtsConfigToolTest, LoadEtsExport3Level)
@@ -74,4 +77,44 @@ TEST_F(EtsConfigToolTest, LoadEtsExportNoRoot)
 {
     knx::tool::TEtsConfigTool converter;
     EXPECT_THROW(converter.LoadEtsExport(TestConfigDir + "ets_export_no_root.xml"), knx::TKnxException);
+}
+
+TEST_F(EtsConfigToolTest, CheckConfig)
+{
+    std::vector<std::string> configNameList = {"ets_export_free_level_style.xml",
+                                               "ets_export_2level_style.xml",
+                                               "ets_export_3level_style.xml"};
+    for (const auto& configName: configNameList) {
+        knx::tool::TEtsConfigTool converter;
+        EXPECT_NO_THROW(converter.LoadEtsExport(TestConfigDir + configName));
+
+        Json::Value root = converter.GetWbMqttConfig();
+
+        EXPECT_EQ(root["configVersion"].asInt(), 1);
+        EXPECT_EQ(root["debug"].asBool(), false);
+        EXPECT_TRUE(!root["devices"].empty());
+
+        for (const auto& device: root["devices"]) {
+            EXPECT_TRUE(!device["deviceId"].empty());
+            EXPECT_TRUE(!device["deviceTitle"].empty());
+
+            EXPECT_THAT(device["deviceId"].asString(), StartsWith("knx_main"));
+
+            for (const auto& control: device["controls"]) {
+                EXPECT_TRUE(!control["controlId"].empty());
+                EXPECT_TRUE(!control["controlTitle"].empty());
+                EXPECT_TRUE(!control["dataPointType"].empty());
+                EXPECT_TRUE(!control["groupAddress"].empty());
+                EXPECT_TRUE(!control["readOnly"].empty());
+
+                std::unique_ptr<knx::TKnxGroupAddress> address;
+                EXPECT_NO_THROW(address = std::make_unique<knx::TKnxGroupAddress>(control["groupAddress"].asString()));
+
+                EXPECT_EQ(control["controlId"].asString(),
+                          std::string("control") + std::to_string(address->GetMainGroup()) + "_" +
+                              std::to_string(address->GetMiddleGroup()) + "_" + std::to_string(address->GetSubGroup()));
+                EXPECT_FALSE(control["readOnly"].asBool());
+            }
+        }
+    }
 }

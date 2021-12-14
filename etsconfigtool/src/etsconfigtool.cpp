@@ -130,3 +130,8 @@ void TEtsConfigTool::ValidateWbMqttConfig(const std::string& schemaPath)
 {
     Config.Validate(schemaPath);
 }
+
+Json::Value TEtsConfigTool::GetWbMqttConfig()
+{
+    return Config.GetRoot();
+}

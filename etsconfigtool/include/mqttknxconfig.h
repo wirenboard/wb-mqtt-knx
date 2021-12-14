@@ -36,6 +36,13 @@ namespace knx
                            const std::string& title,
                            const std::vector<TControlConfig>& controls);
 
+            /// Get Root Object from Config
+            /// \return root object from config
+            Json::Value GetRoot()
+            {
+                return RootObject;
+            }
+
             /// Check configuration file according to scheme
             /// \param schemaPath path to the json file of the schema
             /// \exception std::runtime_error Throws on validation error
