@@ -72,3 +72,9 @@ TEST_F(EtsConfigToolTest, LoadEtsExportRootCorrupt)
     knx::tool::TEtsConfigTool converter;
     EXPECT_THROW(converter.LoadEtsExport(TestConfigDir + "ets_export_root_corrupt.xml"), knx::TKnxException);
 }
+
+TEST_F(EtsConfigToolTest, LoadEtsExportNoRoot)
+{
+    knx::tool::TEtsConfigTool converter;
+    EXPECT_THROW(converter.LoadEtsExport(TestConfigDir + "ets_export_no_root.xml"), knx::TKnxException);
+}

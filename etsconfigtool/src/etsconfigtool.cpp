@@ -58,17 +58,13 @@ void TEtsConfigTool::LoadEtsExport(const std::string& filePath)
     tinyxml2::XMLDocument xmlDoc;
     auto result = xmlDoc.LoadFile(filePath.c_str());
     if (result != tinyxml2::XMLError::XML_SUCCESS) {
-        if (result == tinyxml2::XMLError::XML_ERROR_FILE_NOT_FOUND) {
-            wb_throw(TKnxException, "ETS export file not found");
-        } else {
-            wb_throw(TKnxException,
-                     "tinyxml2::LoadFile() error= XMLError::" + std::to_string(static_cast<int32_t>(result)));
-        }
+        wb_throw(TKnxException, "XMLDocument error: " + std::string{xmlDoc.ErrorName()});
     }
+
     auto root = xmlDoc.RootElement();
 
     if (root == nullptr) {
-        wb_throw(TKnxException, "ETS export RootElement is corrupt");
+        wb_throw(TKnxException, "ETS export RootElement is corrupted");
     }
 
     for (auto mainGroup = root->FirstChildElement(); mainGroup != nullptr; mainGroup = mainGroup->NextSiblingElement())

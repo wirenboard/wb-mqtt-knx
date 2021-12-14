@@ -5,7 +5,6 @@ using namespace knx::tool;
 
 void TMqttKnxConfig::AddHeader(uint32_t configVersion, bool debug, bool enableLegacyKnxDevice)
 {
-    RootObject = Json::Value(Json::objectValue);
     RootObject["configVersion"] = configVersion;
     RootObject["debug"] = debug;
     RootObject["devices"] = Json::Value(Json::arrayValue);
