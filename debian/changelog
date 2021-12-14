@@ -1,3 +1,11 @@
+wb-mqtt-knx (1.3.0) unstable; urgency=medium
+
+  * Added a periodic request for reading group objects of KNX devices.
+  * Added polling timeout.
+  * Added sending read requests for devices at startup.
+
+ -- Roman Kochkin <roman.kochkin@wirenboard.ru>  Wed, 14 Dec 2021 08:56:00 +0300
+
 wb-mqtt-knx (1.2.0) unstable; urgency=medium
 
   * Extended the range of group address
