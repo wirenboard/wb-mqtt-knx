@@ -1,8 +1,14 @@
 #include "mqttbuilder.h"
 #include "dpt1.h"
+#include "dpt12.h"
+#include "dpt13.h"
+#include "dpt14.h"
 #include "dpt2.h"
+#include "dpt4.h"
 #include "dpt5.h"
 #include "dpt6.h"
+#include "dpt7.h"
+#include "dpt8.h"
 #include "dpt9.h"
 #include "dptraw.h"
 #include "mqtt.h"
@@ -41,9 +47,15 @@ PGroupObject TGroupObjectMqttBuilder::Create(const TGroupObjectMqttParameter& pa
         {"Raw_Value", &CreateInst<TDptRaw>},
         {"1.xxx_B1", &CreateInst<TDpt1>},
         {"2.xxx_B2", &CreateInst<TDpt2>},
+        {"4.xxx_Character_Set", &CreateInst<TDpt4>},
         {"5.xxx_8-Bit_Unsigned_Value", &CreateInst<TDpt5>},
         {"6.xxx_V8", &CreateInst<TDpt6>},
-        {"9.xxx_2-Octet_Float_Value", &CreateInst<TDpt9>}};
+        {"7.xxx_2-Octet_Unsigned_Value", &CreateInst<TDpt7>},
+        {"8.xxx_2-Octet_Signed_Value", &CreateInst<TDpt8>},
+        {"9.xxx_2-Octet_Float_Value", &CreateInst<TDpt9>},
+        {"12.001_4-Octet_Unsigned_Value", &CreateInst<TDpt12>},
+        {"13.xxx_4-Octet_Signed_Value", &CreateInst<TDpt13>},
+        {"14.xxx_4-Octet_Float_Value", &CreateInst<TDpt14>}};
 
     auto it = dptsMap.find(parameter.Type);
     if (it == dptsMap.end())
@@ -56,15 +68,9 @@ PGroupObject TGroupObjectMqttBuilder::Create(const TGroupObjectMqttParameter& pa
                                                            MqttDeviceList.back(),
                                                            ErrorLogger);
     //        "3.xxx_B1U3",
-    //        "4.xxx_Character_Set",
     //        "6.020_Status_with_Mode",
-    //        "7.xxx_2-Octet_Unsigned_Value",
-    //        "8.xxx_2-Octet_Signed_Value",
     //        "10.001_Time",
     //        "11.001_Date",
-    //        "12.001_4-Octet_Unsigned_Value",
-    //        "13.xxx_4-Octet_Signed_Value",
-    //        "14.xxx_4-Octet_Float_Value",
     //        "15.000_Access_Data",
     //        "16.xxx_String",
     //        "17.xxx_Scene_Number",

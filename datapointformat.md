@@ -2,10 +2,20 @@
 
 ## Топики на остнове типа DataPoint
 
-/devices/<knx_device_id>/controls/<knx_device_control_id>_<datapoint_field>
+Топик для приёма и отправки DataPoint типов содержащих только одно поле данных:
+
+`/devices/<knx_device_id>/controls/<knx_device_control_id>`
+
+`/devices/<knx_device_id>/controls/<knx_device_control_id>/on`
+
+Топик для приёма и отправки DataPoint типов содержащих несколько полей данных:
+
+`/devices/<knx_device_id>/controls/<knx_device_control_id>_<datapoint_field>`
+
+`/devices/<knx_device_id>/controls/<knx_device_control_id>_<datapoint_field>/on`
 
 где:
-* **knx_device_id** - имя группы групповых объектов (каламбур);
+* **knx_device_id** - имя виртуальной группы групповых объектов;
 * **knx_device_control_id** - имя группового объекта;
 * **datapoint_field** - имя поля из DataPoint типа.
 
@@ -40,6 +50,12 @@
 | c | switch | 0, 1 |
 | v | switch | 0, 1 |
 
+### 4.xxx_Character_Set
+
+| datapoint_field | type | range |
+|-------------|------|---|
+| Character | text | - |
+
 ### 5.xxx_8-Bit_Unsigned_Value
 
 | datapoint_field | type | range |
@@ -52,11 +68,41 @@
 | ---- | ---- | ----|
 | RelSignedValue | value | -128 ... 127 |
 
+### 7.xxx_2-Octet_Unsigned_Value
+
+| datapoint_field | type | range |
+| ---- | ---- | ----|
+| UnsignedValue | value | 0 ... 65535 |
+
+### 8.xxx_2-Octet_Signed_Value
+
+| datapoint_field | type | range              |
+|-----------------| ---- |--------------------|
+| SignedValue     | value | -32 768 ... 32 767 |
+
 ### 9.xxx_2-Octet_Float_Value
 
 | datapoint_field | type | range |
 | ---- | ---- | ----|
 | FloatValue | value | -671 088,64 ... 670 760,96 |
+
+### 12.001_4-Octet_Unsigned_Value
+
+| datapoint_field | type | range |
+| ---- | ---- | ----|
+| UnsignedValue | value | 0 ... 4 294 967 295 |
+
+### 13.xxx_4-Octet_Signed_Value
+
+| datapoint_field | type | range                             |
+|-----------------| ---- |-----------------------------------|
+| SignedValue     | value | -2 147 483 648  ... 2 147 483 647 |
+
+### 14.xxx_4-Octet_Float_Value
+
+| datapoint_field | type | range                         |
+| ---- | ---- |-------------------------------|
+| FloatValue | value | IEEE754::MIN ... IEEE754::MAX |
 
 ## Информация по датапоинтам
 <https://www.knx.org/wAssets/docs/downloads/Certification/Interworking-Datapoint-types/03_07_02-Datapoint-Types-v02.02.01-AS.pdf>
