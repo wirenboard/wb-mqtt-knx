@@ -83,7 +83,8 @@
             "9.xxx_2-Octet_Float_Value",
             "12.001_4-Octet_Unsigned_Value",
             "13.xxx_4-Octet_Signed_Value",
-            "14.xxx_4-Octet_Float_Value"
+            "14.xxx_4-Octet_Float_Value",
+            "20.xxx_N8"
           ],
           "default": "1.xxx_B1",
           "propertyOrder": 4

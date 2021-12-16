@@ -1,29 +1,29 @@
 #include "../src/knxexception.h"
-#include "../src/knxgroupobject/dpt5.h"
+#include "../src/knxgroupobject/dptbaseu8.h"
 #include "gtest/gtest.h"
 
-class Dpt5Test: public ::testing::Test
+class DptBaseU8Test: public ::testing::Test
 {
 protected:
     void SetUp() override
     {
-        Dpt = std::make_unique<knx::object::TDpt5>();
+        Dpt = std::make_unique<knx::object::TDptBaseU8>();
     }
 
     void TearDown() override
     {}
 
-    std::unique_ptr<knx::object::TDpt5> Dpt;
+    std::unique_ptr<knx::object::TDptBaseU8> Dpt;
 };
 
-TEST_F(Dpt5Test, InitVal)
+TEST_F(DptBaseU8Test, InitVal)
 {
     EXPECT_EQ(0, Dpt->ToMqtt().at(0).As<double>());
     std::vector<uint8_t> vec = {0x00, 0x00};
     EXPECT_EQ(vec, Dpt->ToKnx());
 }
 
-TEST_F(Dpt5Test, toMqttTest)
+TEST_F(DptBaseU8Test, toMqttTest)
 {
     EXPECT_NO_THROW(Dpt->FromKnx({0x00, 25}));
     EXPECT_EQ(25, Dpt->ToMqtt().at(0).As<double>());
@@ -31,7 +31,7 @@ TEST_F(Dpt5Test, toMqttTest)
     EXPECT_EQ(255, Dpt->ToMqtt().at(0).As<double>());
 }
 
-TEST_F(Dpt5Test, toKnxTest)
+TEST_F(DptBaseU8Test, toKnxTest)
 {
     EXPECT_NO_THROW(Dpt->FromMqtt(0, 45.0));
     std::vector<uint8_t> vec = {0, 45};
@@ -41,12 +41,12 @@ TEST_F(Dpt5Test, toKnxTest)
     EXPECT_EQ(vec, Dpt->ToKnx());
 }
 
-TEST_F(Dpt5Test, fromKnxNegativeTest)
+TEST_F(DptBaseU8Test, fromKnxNegativeTest)
 {
     EXPECT_THROW(Dpt->FromKnx({0x00}), knx::TKnxException);
 }
 
-TEST_F(Dpt5Test, formMqttNegativeTest)
+TEST_F(DptBaseU8Test, formMqttNegativeTest)
 {
     EXPECT_THROW(Dpt->FromMqtt(0, "a"), std::exception);
 }

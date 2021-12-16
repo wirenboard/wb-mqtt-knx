@@ -4,6 +4,7 @@
 #include "dpt13.h"
 #include "dpt14.h"
 #include "dpt2.h"
+#include "dpt20.h"
 #include "dpt3.h"
 #include "dpt4.h"
 #include "dpt5.h"
@@ -57,7 +58,8 @@ PGroupObject TGroupObjectMqttBuilder::Create(const TGroupObjectMqttParameter& pa
         {"9.xxx_2-Octet_Float_Value", &CreateInst<TDpt9>},
         {"12.001_4-Octet_Unsigned_Value", &CreateInst<TDpt12>},
         {"13.xxx_4-Octet_Signed_Value", &CreateInst<TDpt13>},
-        {"14.xxx_4-Octet_Float_Value", &CreateInst<TDpt14>}};
+        {"14.xxx_4-Octet_Float_Value", &CreateInst<TDpt14>},
+        {"20.xxx_N8", &CreateInst<TDpt20>}};
 
     auto it = dptsMap.find(parameter.Type);
     if (it == dptsMap.end())

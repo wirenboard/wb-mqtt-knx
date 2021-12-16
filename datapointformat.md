@@ -50,6 +50,13 @@
 | c | switch | 0, 1 |
 | v | switch | 0, 1 |
 
+### 3.xxx_B1U3
+
+| datapoint_field | type   | range   |
+|-----------------|--------|---------|
+| c               | switch | 0, 1    |
+| StepCode        | value  | 0 ... 7 |
+
 ### 4.xxx_Character_Set
 
 | datapoint_field | type | range |
@@ -103,6 +110,12 @@
 | datapoint_field | type | range                         |
 | ---- | ---- |-------------------------------|
 | FloatValue | value | IEEE754::MIN ... IEEE754::MAX |
+
+### 20.xxx_N8
+
+| datapoint_field | type | range |
+|-----------------| ---- | ----|
+| field1          | value | 0 ... 255 |
 
 ## Информация по датапоинтам
 <https://www.knx.org/wAssets/docs/downloads/Certification/Interworking-Datapoint-types/03_07_02-Datapoint-Types-v02.02.01-AS.pdf>
