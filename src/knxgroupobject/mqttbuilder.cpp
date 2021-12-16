@@ -4,6 +4,7 @@
 #include "dpt13.h"
 #include "dpt14.h"
 #include "dpt2.h"
+#include "dpt3.h"
 #include "dpt4.h"
 #include "dpt5.h"
 #include "dpt6.h"
@@ -47,6 +48,7 @@ PGroupObject TGroupObjectMqttBuilder::Create(const TGroupObjectMqttParameter& pa
         {"Raw_Value", &CreateInst<TDptRaw>},
         {"1.xxx_B1", &CreateInst<TDpt1>},
         {"2.xxx_B2", &CreateInst<TDpt2>},
+        {"3.xxx_B1U3", &CreateInst<TDpt3>},
         {"4.xxx_Character_Set", &CreateInst<TDpt4>},
         {"5.xxx_8-Bit_Unsigned_Value", &CreateInst<TDpt5>},
         {"6.xxx_V8", &CreateInst<TDpt6>},
@@ -67,7 +69,6 @@ PGroupObject TGroupObjectMqttBuilder::Create(const TGroupObjectMqttParameter& pa
                                                            parameter.isReadOnly,
                                                            MqttDeviceList.back(),
                                                            ErrorLogger);
-    //        "3.xxx_B1U3",
     //        "6.020_Status_with_Mode",
     //        "10.001_Time",
     //        "11.001_Date",
