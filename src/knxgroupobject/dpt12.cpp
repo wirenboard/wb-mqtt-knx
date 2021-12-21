@@ -1,11 +1,12 @@
 #include "dpt12.h"
 #include "../knxexception.h"
 #include "datapointerror.h"
+#include <limits>
 
 using namespace knx::object;
 std::vector<DptDescriptorField> TDpt12::getDescriptor() const
 {
-    return {{"UnsignedValue", "value", 0, 4294967295}};
+    return {{"UnsignedValue", "value", 0, std::numeric_limits<uint32_t>::max()}};
 }
 
 void TDpt12::FromMqtt(uint32_t controlIndex, const WBMQTT::TAny& value)
