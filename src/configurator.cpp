@@ -19,12 +19,11 @@ void Configurator::ConfigureObjectController(IKnxGroupObjectController& controll
             auto groupAddressStr = control["groupAddress"].asString();
             auto dataPointStr = control["dataPointType"].asString();
             auto isReadOnlyBool = control["readOnly"].asBool();
-            auto readPoolTimeout = std::chrono::milliseconds(control["readPoolTimeout"].asInt());
 
             TGroupObjectSettings goSettings;
             goSettings.ReadRequestAfterStart = true;
-            goSettings.ReadRequestPollInterval = std::chrono::milliseconds(control["readPoolInterval"].asInt());
-            goSettings.ReadResponseTimeout = std::chrono::milliseconds(control["readPoolTimeout"].asInt());
+            goSettings.ReadRequestPollInterval = std::chrono::milliseconds(control["readPollInterval"].asInt());
+            goSettings.ReadResponseTimeout = std::chrono::milliseconds(control["readPollTimeout"].asInt());
 
             auto groupObject = groupObjectBuilder.Create({dataPointStr, controlIdStr, controlNameStr, isReadOnlyBool});
             controller.AddGroupObject(knx::TKnxGroupAddress{groupAddressStr}, groupObject, goSettings);

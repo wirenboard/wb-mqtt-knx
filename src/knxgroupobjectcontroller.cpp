@@ -85,7 +85,7 @@ void TKnxGroupObjectController::Notify(const TTickTimerEvent& timerEvent)
                     --item->TimeoutCounter;
                 } else {
                     item->StartTimeoutTimer = false;
-                    item->GroupObject->KnxNotifyEvent(TKnxEvent::PoolReadTimeoutError);
+                    item->GroupObject->KnxNotifyEvent(TKnxEvent::PollReadTimeoutError);
                 }
             }
 

@@ -122,7 +122,7 @@ void TGroupObjectMqtt::KnxNotifyEvent(const TKnxEvent& event)
         case TKnxEvent::KnxdSocketConnected:
             errorMessage = "";
             break;
-        case TKnxEvent::PoolReadTimeoutError:
+        case TKnxEvent::PollReadTimeoutError:
             errorMessage = "Timed out waiting for a response to a read request";
             break;
         case TKnxEvent::KnxdSocketError:

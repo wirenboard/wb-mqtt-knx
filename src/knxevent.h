@@ -9,6 +9,6 @@ namespace knx
         ReceivedTelegram,
         KnxdSocketConnected,
         KnxdSocketError,
-        PoolReadTimeoutError
+        PollReadTimeoutError
     };
 }

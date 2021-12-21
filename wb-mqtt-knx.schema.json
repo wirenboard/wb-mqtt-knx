@@ -81,7 +81,7 @@
           "default": "1.xxx_B1",
           "propertyOrder": 4
         },
-        "readPoolInterval": {
+        "readPollInterval": {
           "type": "integer",
           "title": "READ poll interval for Devices (ms)",
           "minimum": 0,
@@ -89,7 +89,7 @@
           "default": 0,
           "propertyOrder": 5
         },
-        "readPoolTimeout": {
+        "readPollTimeout": {
           "type": "integer",
           "title": "READ poll timeout for Devices (ms)",
           "minimum": 0,

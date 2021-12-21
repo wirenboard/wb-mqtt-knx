@@ -149,7 +149,7 @@ TEST_F(KnxGroupObjectControllerTest, RecvTelegram)
     eventObserverStub.NotifyAll(knx::TKnxEvent::ReceivedTelegram, knxTelegram);
 }
 
-TEST_F(KnxGroupObjectControllerTest, PoolRead)
+TEST_F(KnxGroupObjectControllerTest, PollRead)
 {
     TEventObserverStub eventObserverStub;
     TTickTimerObserverStub tickTimerObserverStub;
@@ -191,7 +191,7 @@ TEST_F(KnxGroupObjectControllerTest, PoolRead)
     eventObserverStub.NotifyAll(knx::TKnxEvent::ReceivedTelegram, knxTelegram);
 }
 
-TEST_F(KnxGroupObjectControllerTest, PoolReadTimeout)
+TEST_F(KnxGroupObjectControllerTest, PollReadTimeout)
 {
     TEventObserverStub eventObserverStub;
     TTickTimerObserverStub tickTimerObserverStub;
@@ -220,7 +220,7 @@ TEST_F(KnxGroupObjectControllerTest, PoolReadTimeout)
         }));
 
     EXPECT_CALL(*groupObjectMock, KnxNotifyEvent(_)).WillOnce(Invoke([](const knx::TKnxEvent& event) {
-        EXPECT_EQ(event, knx::TKnxEvent::PoolReadTimeoutError);
+        EXPECT_EQ(event, knx::TKnxEvent::PollReadTimeoutError);
     }));
 
     EXPECT_TRUE(Controller->AddGroupObject(address, groupObjectMock, goSettings));

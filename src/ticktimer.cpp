@@ -12,7 +12,7 @@ void TTickTimer::Start()
         wb_throw(knx::TKnxException, "Attempt to start already started driver");
     }
 
-    Worker = WBMQTT::MakeThread("KnxClient thread", {[this] { Processing(); }});
+    Worker = WBMQTT::MakeThread("wb-mqtt-knx TimerThread", {[this] { Processing(); }});
 }
 
 void TTickTimer::Stop()
