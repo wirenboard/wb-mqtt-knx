@@ -59,4 +59,5 @@ int main(int argc, char** argv)
         std::cerr << exception.what();
         exit(1);
     }
+    return 0;
 }
