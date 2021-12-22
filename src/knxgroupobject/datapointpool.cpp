@@ -33,7 +33,7 @@ namespace
         std::string Name;
         PDpt (*Instance)();
         uint32_t GeneralGroupId;
-        bool HasSubGroup{true};
+        bool HasSubGroup{false};
         uint32_t SubGroupId{0};
     };
 
