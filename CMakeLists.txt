@@ -42,6 +42,9 @@ endif ()
 enable_testing()
 add_subdirectory(test)
 
+# Added ets.xml <-> wb-mqtt-knx.conf tool
+add_subdirectory(etsconfigtool)
+
 # tell CMake to generate config.h
 configure_file (
         "${PROJECT_SOURCE_DIR}/src/config.h.in"

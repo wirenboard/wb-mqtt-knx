@@ -71,3 +71,17 @@ $ mosquitto_pub -t '/devices/knx/controls/data/on' -m "g:9/7/55 GroupValueWrite 
 
 Все поддерживаемые типы датапоинтов описаны в:
 <https://github.com/wirenboard/wb-mqtt-knx/blob/master/datapointformat.md>
+
+## Экспорт из ETS
+
+Для импорта из инструмента ETS в файл конфигурации для работы с групповыми объектами `wb-mqtt-knx.conf`, 
+можно воспользоваться консольной утилитой `wb-knx-ets-tool`.
+Утилита принимает на вход XML файлы экспорта из инструмента ETS версии 5 и 6. 
+
+Использование:
+
+`$ wb-knx-ets-tool ETS_CONFIG WB_MQTT_KNX_CONFIG`
+
+, где
+* `ETS_CONFIG` - XML файл экспорта групповых объектов
+* `WB_MQTT_KNX_CONFIG` - файл конфигурации для работы с групповыми объектами `wb-mqtt-knx.conf`
