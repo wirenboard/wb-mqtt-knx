@@ -37,7 +37,7 @@ namespace
         uint32_t SubGroupId{0};
     };
 
-    static const std::vector<TDptsCatalogItem> DptsCatalog = {
+    const std::vector<TDptsCatalogItem> DptsCatalog = {
         {"Raw_Value", &CreateInst<TDptRaw>, 0}, // Default value
         {"1.xxx_B1", &CreateInst<TDpt1>, 1},
         {"2.xxx_B2", &CreateInst<TDpt2>, 2},

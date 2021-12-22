@@ -1,5 +1,6 @@
 #include "etsconfigtool.h"
 #include "../src/knxexception.h"
+#include "../src/knxgroupobject/datapointpool.h"
 #include <algorithm>
 #include <iostream>
 #include <unordered_map>
@@ -15,20 +16,12 @@ namespace
 
     std::string DatapointTypeExportToConfig(const std::string& dpts)
     {
-        auto token = WBMQTT::StringSplit(dpts, ",");
+        auto firstDpts = WBMQTT::StringSplit(dpts, ",").at(0);
+        auto firstDptsTokens = WBMQTT::StringSplit(firstDpts, "-");
+        uint32_t generalType = std::stoi(firstDptsTokens.at(1));
+        uint32_t subType = std::stoi(firstDptsTokens.at(2));
 
-        uint32_t generalType = std::stoi(WBMQTT::StringSplit(WBMQTT::StringSplit(dpts, ",").at(0), "-").at(1));
-
-        static const std::unordered_map<uint32_t, std::string> generalTypeMap = {{1, "1.xxx_B1"},
-                                                                                 {2, "2.xxx_B2"},
-                                                                                 {5, "5.xxx_8-Bit_Unsigned_Value"},
-                                                                                 {6, "6.xxx_V8"},
-                                                                                 {9, "9.xxx_2-Octet_Float_Value"}};
-        auto it = generalTypeMap.find(generalType);
-        if (it != generalTypeMap.end()) {
-            return it->second;
-        }
-        return "Raw_Value";
+        return knx::object::DataPointPool::GetDataPointNameById(generalType, subType);
     }
 
     void AddToControlConfig(tinyxml2::XMLElement* groupAddress, std::vector<knx::tool::TControlConfig>& controlList)

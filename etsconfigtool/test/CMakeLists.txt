@@ -2,12 +2,14 @@
 enable_testing()
 aux_source_directory(./ TEST_LIST)
 aux_source_directory(./mock TEST_LIST)
+aux_source_directory(../../src/knxgroupobject TEST_LIST)
 
 add_executable(${PROJECT_NAME}_test ${TEST_LIST}
         ../src/etsconfigtool.cpp
         ../src/mqttknxconfig.cpp
         ../../src/knxgroupaddress.cpp
         ../../src/knxexception.cpp
+        ../../src/knxutils.cpp
         )
 
 target_include_directories(${PROJECT_NAME}_test PRIVATE ../include)
