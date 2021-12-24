@@ -14,8 +14,10 @@ void TDpt2::FromMqtt(uint32_t controlIndex, const WBMQTT::TAny& value)
     switch (controlIndex) {
         case 0:
             FieldC = value.As<bool>();
+            break;
         case 1:
             FieldV = value.As<bool>();
+            break;
         default:
             wb_throw(TKnxException, datapointError::MQTT_INVALID_INDEX);
     }

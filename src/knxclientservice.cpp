@@ -56,7 +56,7 @@ namespace knx
             return;
 
         if (!KnxdConnection->IsConnected())
-            wb_throw(TKnxException, "Failed the knxd connection");
+            HandleLoopError("Failed the knxd connection");
 
         if (telegram.IsGroupAddressed()) {
             auto tpduPayload = telegram.Tpdu().GetRaw();
@@ -70,11 +70,11 @@ namespace knx
                     DebugLogger.Log() << "Sent to knxd: " << ToLog(telegram);
                 }
             } else {
-                wb_throw(TKnxException, "Failed to send group telegram");
+                HandleLoopError("Failed to send group telegram");
             }
 
         } else {
-            wb_throw(TKnxException, "Sending individual telegrams is not supported by knxd");
+            HandleLoopError("Sending individual telegrams is not supported by knxd");
         }
     }
 
@@ -102,7 +102,7 @@ namespace knx
                 HandleLoopError("failed to open EIB GroupSocket connection");
                 continue;
             }
-
+            NotifyAllSubscribers(TKnxEvent::KnxdSocketConnected, TTelegram{});
             KnxdReceiveProcessing();
         }
     }
@@ -172,6 +172,7 @@ namespace knx
                                                       &destEibAddress);
             if (packetLen == EIB_ERROR_RETURN_VALUE) {
                 HandleLoopError(std::string("Failed to get a group TPDU: ") + std::strerror(errno));
+                NotifyAllSubscribers(TKnxEvent::KnxdSocketError, TTelegram{});
                 break;
             }
 
@@ -188,7 +189,7 @@ namespace knx
                 if (DebugLogger.IsEnabled()) {
                     DebugLogger.Log() << "Received from knxd: " << ToLog(knxTelegram);
                 }
-                NotifyAllSubscribers(knxTelegram);
+                NotifyAllSubscribers(TKnxEvent::ReceivedTelegram, knxTelegram);
             } catch (const TKnxException& e) {
                 ErrorLogger.Log() << e.what();
             } catch (const std::exception& e) {

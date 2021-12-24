@@ -48,7 +48,7 @@ TEST_F(ConfiguratorTest, CongigureController)
     std::vector<knx::TKnxGroupAddress> addressList{{1, 1, 100}, {1, 2}, {1, 2, 56}, {1, 2, 140}};
 
     for (const auto& groupAddress: addressList) {
-        EXPECT_CALL(*goController, AddGroupObject(groupAddress, _)).Times(1);
+        EXPECT_CALL(*goController, AddGroupObject(groupAddress, _, _)).Times(1);
     }
 
     auto groupObjectMqttBuilder = std::make_shared<TGroupObjectMqttBuilderMock>();

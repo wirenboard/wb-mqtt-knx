@@ -4,6 +4,7 @@
 #include "knxgroupobject/mqttbuilder.h"
 #include "knxgroupobjectcontroller.h"
 #include "knxlegacydevice.h"
+#include "ticktimer.h"
 #include <getopt.h>
 #include <unistd.h>
 #include <wblib/log.h>
@@ -14,6 +15,7 @@ namespace
 {
     const auto KNX_DRIVER_INIT_TIMEOUT_S = std::chrono::seconds(30);
     const auto KNX_DRIVER_STOP_TIMEOUT_S = std::chrono::seconds(60); // topic cleanup can take a lot of time
+    const auto KNX_READ_TICK_PERIOD = std::chrono::milliseconds(50);
 
     WBMQTT::TLogger ErrorLogger("ERROR: [knx] ", WBMQTT::TLogger::StdErr, WBMQTT::TLogger::RED);
     WBMQTT::TLogger VerboseLogger("INFO: [knx] ", WBMQTT::TLogger::StdErr, WBMQTT::TLogger::WHITE, false);
@@ -116,11 +118,17 @@ int main(int argc, char** argv)
                                                                       VerboseLogger,
                                                                       InfoLogger);
         }
-        auto knxGroupObjectController = std::make_shared<knx::TKnxGroupObjectController>(knxClientService);
+        knx::TTickTimer tickTimer;
+        tickTimer.SetTickPeriod(KNX_READ_TICK_PERIOD);
+        auto knxGroupObjectController =
+            std::make_shared<knx::TKnxGroupObjectController>(knxClientService, KNX_READ_TICK_PERIOD);
 
         auto groupObjectBuilder = std::make_shared<knx::object::TGroupObjectMqttBuilder>(mqttDriver, ErrorLogger);
 
         WBMQTT::SignalHandling::OnSignals({SIGINT, SIGTERM}, [&] {
+            tickTimer.Stop();
+            tickTimer.Unsubscribe(knxGroupObjectController);
+
             knxClientService->Unsubscribe(knxGroupObjectController);
             groupObjectBuilder->Clear();
 
@@ -136,10 +144,12 @@ int main(int argc, char** argv)
             knxClientService->Subscribe(knxLegacyDevice);
         }
         knxClientService->Subscribe(knxGroupObjectController);
+        tickTimer.Subscribe(knxGroupObjectController);
 
         configurator.ConfigureObjectController(*knxGroupObjectController, *groupObjectBuilder);
 
         knxClientService->Start();
+        tickTimer.Start();
 
         initialized.Complete();
         WBMQTT::SignalHandling::Wait();

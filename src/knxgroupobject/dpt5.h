@@ -1,5 +1,5 @@
 #pragma once
-#include "idpt.h"
+#include "dptbaseu8.h"
 
 namespace knx
 {
@@ -10,17 +10,10 @@ namespace knx
         /// - ID: 5.xxx
         /// - Format: 8 bit: U8
         /// - Field names: UnsignedValue
-        class TDpt5: public IDpt
+        class TDpt5: public TDptBaseU8
         {
         public:
             std::vector<DptDescriptorField> getDescriptor() const override;
-            void FromMqtt(uint32_t controlIndex, const WBMQTT::TAny& value) override;
-            void FromKnx(const std::vector<uint8_t>& payload) override;
-            std::vector<uint8_t> ToKnx() override;
-            std::vector<WBMQTT::TAny> ToMqtt() override;
-
-        private:
-            uint8_t FieldUnsignedValue = 0;
         };
     }
 }

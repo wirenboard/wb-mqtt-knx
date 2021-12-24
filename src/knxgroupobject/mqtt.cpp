@@ -111,3 +111,26 @@ void TGroupObjectMqtt::SetKnxSender(const knx::TKnxGroupAddress& groupAddress, P
     SelfKnxAddress = groupAddress;
     KnxSender = std::move(sender);
 }
+
+void TGroupObjectMqtt::KnxNotifyEvent(const TKnxEvent& event)
+{
+    std::string errorMessage;
+    switch (event) {
+        case TKnxEvent::None:
+        case TKnxEvent::ReceivedTelegram:
+            return;
+        case TKnxEvent::KnxdSocketConnected:
+            errorMessage = "";
+            break;
+        case TKnxEvent::PollReadTimeoutError:
+            errorMessage = "Timed out waiting for a response to a read request";
+            break;
+        case TKnxEvent::KnxdSocketError:
+            errorMessage = "knxd socket error";
+    }
+
+    auto tx = MqttLocalDevice->GetDriver()->BeginTx();
+    for (const auto& control: ControlList) {
+        control->SetError(tx, errorMessage).Wait();
+    }
+}

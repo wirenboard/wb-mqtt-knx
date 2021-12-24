@@ -3,11 +3,11 @@ Maintainer: Yury Usishchev <y.usishchev@contactless.ru>
 Section: misc
 Priority: optional
 Standards-Version: 3.9.2
-Build-Depends: debhelper (>= 10), pkg-config, libwbmqtt1-3-dev (>= 3.2.0), knxd-dev (>= 0.14.51-1), knxd-tools (>= 0.14.51-1)
+Build-Depends: debhelper (>= 10), pkg-config, libwbmqtt1-3-dev (>= 3.2.0), knxd-dev (>= 0.14.51-1), knxd-tools (>= 0.14.51-1), libtinyxml2-dev (>= 4.0.1-1)
 
 Package: wb-mqtt-knx
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, libwbmqtt1-3 (>= 3.2.0), knxd-tools (>= 0.14.51-1), knxd (>= 0.14.51-1)
+Depends: ${shlibs:Depends}, ${misc:Depends}, libwbmqtt1-3 (>= 3.2.0), knxd-tools (>= 0.14.51-1), knxd (>= 0.14.51-1), libtinyxml2-4 (>= 4.0.1-1)
 Breaks:
 Description: Wiren Board MQTT to KNX gateway
              wb-mqtt-knx service sends unprocessed knx telegrams to mqtt and receives from there
