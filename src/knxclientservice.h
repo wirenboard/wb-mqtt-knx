@@ -46,6 +46,7 @@ namespace knx
 
         std::atomic<bool> IsStarted{false};
         std::unique_ptr<std::thread> Worker;
+        std::mutex SendMutex;
 
         WBMQTT::TLogger& ErrorLogger;
         WBMQTT::TLogger& DebugLogger;

@@ -60,11 +60,14 @@ namespace knx
 
         if (telegram.IsGroupAddressed()) {
             auto tpduPayload = telegram.Tpdu().GetRaw();
-
-            const int32_t sendResult = EIBSendGroup(KnxdConnection->GetEIBConnection(),
-                                                    telegram.GetReceiverAddress(),
-                                                    static_cast<int32_t>(tpduPayload.size()),
-                                                    tpduPayload.data());
+            int32_t sendResult;
+            {
+                std::lock_guard<std::mutex> lg(SendMutex);
+                sendResult = EIBSendGroup(KnxdConnection->GetEIBConnection(),
+                                          telegram.GetReceiverAddress(),
+                                          static_cast<int32_t>(tpduPayload.size()),
+                                          tpduPayload.data());
+            }
             if (sendResult != EIB_ERROR_RETURN_VALUE) {
                 if (DebugLogger.IsEnabled()) {
                     DebugLogger.Log() << "Sent to knxd: " << ToLog(telegram);
