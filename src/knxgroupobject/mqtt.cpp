@@ -52,6 +52,7 @@ TGroupObjectMqtt::TGroupObjectMqtt(PDpt pDpt,
 void TGroupObjectMqtt::MqttNotify(WBMQTT::PControl& pControl, uint32_t index, const WBMQTT::TAny& value)
 {
     std::vector<uint8_t> data;
+    auto tx = MqttLocalDevice->GetDriver()->CreateUnsafeTx();
 
     {
         std::lock_guard<std::mutex> lg(DptExchangeMutex);
@@ -59,7 +60,6 @@ void TGroupObjectMqtt::MqttNotify(WBMQTT::PControl& pControl, uint32_t index, co
             Dpt->FromMqtt(index, value);
             data = Dpt->ToKnx();
         } catch (const std::exception& exception) {
-            auto tx = MqttLocalDevice->GetDriver()->BeginTx();
             auto setErrorFuture = pControl->SetError(tx, exception.what());
             ErrorLogger.Log() << "Invalid Mqtt Control value: "
                               << MqttLocalDevice->GetId() + "." + pControl->GetId() + " : " << exception.what();
@@ -69,6 +69,8 @@ void TGroupObjectMqtt::MqttNotify(WBMQTT::PControl& pControl, uint32_t index, co
     }
 
     KnxSender->Send({SelfKnxAddress, telegram::TApci::GroupValueWrite, data});
+
+    pControl->SetValue(tx, WBMQTT::TAny(value)).Wait();
 }
 
 void TGroupObjectMqtt::KnxNotify(const TGroupObjectTransaction& transaction)
