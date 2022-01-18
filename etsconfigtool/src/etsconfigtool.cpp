@@ -16,12 +16,22 @@ namespace
 
     std::string DatapointTypeExportToConfig(const std::string& dpts)
     {
-        auto firstDpts = WBMQTT::StringSplit(dpts, ",").at(0);
-        auto firstDptsTokens = WBMQTT::StringSplit(firstDpts, "-");
-        uint32_t generalType = std::stoi(firstDptsTokens.at(1));
-        uint32_t subType = std::stoi(firstDptsTokens.at(2));
+        uint32_t generalType;
+        uint32_t subType = 0;
 
-        return knx::object::DataPointPool::GetDataPointNameById(generalType, subType);
+        try {
+            auto firstDpts = WBMQTT::StringSplit(dpts, ",").at(0);
+            auto firstDptsTokens = WBMQTT::StringSplit(firstDpts, "-");
+            generalType = std::stoi(firstDptsTokens.at(1));
+            if (firstDptsTokens.size() == 3) {
+                subType = std::stoi(firstDptsTokens.at(2));
+            }
+
+            return knx::object::DataPointPool::GetDataPointNameById(generalType, subType);
+        } catch (const std::out_of_range& oor) {
+            std::cerr << "DatapointTypeExportToConfig( " << dpts << " ): Out of Range error: " << oor.what() << '\n';
+            return "";
+        }
     }
 
     void AddToControlConfig(tinyxml2::XMLElement* groupAddress, std::vector<knx::tool::TControlConfig>& controlList)
@@ -39,7 +49,9 @@ namespace
             control.GroupAddress = knxGroupAddress;
             control.DatapointType = DatapointTypeExportToConfig(dpts);
             control.ReadOnly = DEFAULT_IS_CONTROL_READONLY;
-            controlList.push_back(control);
+            if (!control.DatapointType.empty()) {
+                controlList.push_back(control);
+            }
         }
     }
 }

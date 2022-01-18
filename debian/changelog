@@ -1,3 +1,9 @@
+wb-mqtt-knx (1.4.1) unstable; urgency=medium
+
+  * Extended the dpts format for the ETS import tool
+
+ -- Roman Kochkin <roman.kochkin@wirenboard.ru>  Tue, 18 Jan 2022 21:16:00 +0300
+
 wb-mqtt-knx (1.4.0) unstable; urgency=medium
 
   * Added value forwarding from MQTT topic /on to the main topic
