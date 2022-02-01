@@ -20,9 +20,13 @@ add_executable(${PROJECT_NAME}_test ${TEST_LIST}
         ../src/knxgroupobject/dpt7.cpp
         ../src/knxgroupobject/dpt8.cpp
         ../src/knxgroupobject/dpt9.cpp
+        ../src/knxgroupobject/dpt10.cpp
+        ../src/knxgroupobject/dpt11.cpp
         ../src/knxgroupobject/dpt12.cpp
         ../src/knxgroupobject/dpt13.cpp
         ../src/knxgroupobject/dpt14.cpp
+        ../src/knxgroupobject/dpt17.cpp
+        ../src/knxgroupobject/dpt18.cpp
         ../src/knxgroupobject/dpt20.cpp
         ../src/knxgroupobject/dptraw.cpp
         ../src/knxutils.cpp

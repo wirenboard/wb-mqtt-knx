@@ -81,9 +81,13 @@
             "7.xxx_2-Octet_Unsigned_Value",
             "8.xxx_2-Octet_Signed_Value",
             "9.xxx_2-Octet_Float_Value",
+            "10.001_Time",
+            "11.001_Date",
             "12.001_4-Octet_Unsigned_Value",
             "13.xxx_4-Octet_Signed_Value",
             "14.xxx_4-Octet_Float_Value",
+            "17.001_SceneNumber",
+            "18.001_SceneControl",
             "20.xxx_N8"
           ],
           "default": "1.xxx_B1",

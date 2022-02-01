@@ -1,8 +1,12 @@
 #include "datapointpool.h"
 #include "dpt1.h"
+#include "dpt10.h"
+#include "dpt11.h"
 #include "dpt12.h"
 #include "dpt13.h"
 #include "dpt14.h"
+#include "dpt17.h"
+#include "dpt18.h"
 #include "dpt2.h"
 #include "dpt20.h"
 #include "dpt3.h"
@@ -48,19 +52,19 @@ namespace
         {"7.xxx_2-Octet_Unsigned_Value", &CreateInst<TDpt7>, 7},
         {"8.xxx_2-Octet_Signed_Value", &CreateInst<TDpt8>, 8},
         {"9.xxx_2-Octet_Float_Value", &CreateInst<TDpt9>, 9},
+        {"10.001_Time", &CreateInst<TDpt10>, 10, true, 1},
+        {"11.001_Date", &CreateInst<TDpt11>, 11, true, 1},
         {"12.001_4-Octet_Unsigned_Value", &CreateInst<TDpt12>, 12, true, 1},
         {"13.xxx_4-Octet_Signed_Value", &CreateInst<TDpt13>, 13},
         {"14.xxx_4-Octet_Float_Value", &CreateInst<TDpt14>, 14},
+        {"17.001_SceneNumber", &CreateInst<TDpt17>, 17, true, 1},
+        {"18.001_SceneControl", &CreateInst<TDpt18>, 18, true, 1},
         {"20.xxx_N8", &CreateInst<TDpt20>, 20}};
 
     // TODO Add Dpts
     //        "6.020_Status_with_Mode",
-    //        "10.001_Time",
-    //        "11.001_Date",
     //        "15.000_Access_Data",
     //        "16.xxx_String",
-    //        "17.xxx_Scene_Number",
-    //        "18.001_Scene_Control",
     //        "19.001_DateTime",
 }
 
