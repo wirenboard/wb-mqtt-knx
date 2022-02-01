@@ -21,7 +21,7 @@ namespace knx
             std::vector<WBMQTT::TAny> ToMqtt() override;
 
         private:
-            uint32_t SceneNumber{0};
+            uint32_t SceneNumber{1};
         };
     }
 }

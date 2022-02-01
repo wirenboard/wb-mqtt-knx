@@ -26,7 +26,7 @@ namespace knx
                 Activate = 0,
                 Learn = 1
             };
-            uint32_t SceneNumber{0};
+            uint32_t SceneNumber{1};
             EControlField Control{EControlField::Activate};
         };
     }

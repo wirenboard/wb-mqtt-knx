@@ -1,3 +1,13 @@
+wb-mqtt-knx (1.5.0) unstable; urgency=medium
+
+  * Added types of KNX Data Points:
+      * 10.001_Time
+      * 11.001_Date
+      * 17.001_SceneNumber
+      * 18.001_SceneControl
+
+ -- Roman Kochkin <roman.kochkin@wirenboard.ru>  Tue, 18 Jan 2022 21:16:00 +0300
+
 wb-mqtt-knx (1.4.1) unstable; urgency=medium
 
   * Extended the dpts format for the ETS import tool

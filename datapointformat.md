@@ -93,6 +93,23 @@
 | ---- | ---- | ----|
 | FloatValue | value | -671 088,64 ... 670 760,96 |
 
+### 10.001_Time
+
+| datapoint_field | type  | range    |
+|-----------------|-------|----------|
+| Day             | value | 0 ... 7  |
+| Hour            | value | 0 ... 23 |
+| Minutes         | value | 0 ... 59 |
+| Seconds         | value | 0 ... 59 |
+
+### 11.001_Date
+
+| datapoint_field | type  | range    |
+|-----------------|-------|----------|
+| Day             | value | 1 ... 31 |
+| Month           | value | 1 ... 12 |
+| Year            | value | 0 ... 99 |
+
 ### 12.001_4-Octet_Unsigned_Value
 
 | datapoint_field | type | range |
@@ -110,6 +127,25 @@
 | datapoint_field | type | range                         |
 | ---- | ---- |-------------------------------|
 | FloatValue | value | IEEE754::MIN ... IEEE754::MAX |
+
+### 17.001_SceneNumber
+
+Ассоциация KNX рекомендует отображать номера сцен в ETS, другом ПО и контроллерах от 1 до 64, 
+тоесть со смещением на 1 по сравнению с фактически передаваемым значением на шину KNX. [KNX Datapoint Types, p. 43, NOTE 8](https://www.knx.org/wAssets/docs/downloads/Certification/Interworking-Datapoint-types/03_07_02-Datapoint-Types-v02.02.01-AS.pdf)  
+
+| datapoint_field | type  | range    |
+|-----------------|-------|----------|
+| SceneNumber     | value | 1 ... 64 |
+
+### 18.001_SceneControl
+
+Ассоциация KNX рекомендует отображать номера сцен в ETS, другом ПО и контроллерах от 1 до 64,
+тоесть со смещением на 1 по сравнению с фактически передаваемым значением на шину KNX. [KNX Datapoint Types, p. 43, NOTE 8](https://www.knx.org/wAssets/docs/downloads/Certification/Interworking-Datapoint-types/03_07_02-Datapoint-Types-v02.02.01-AS.pdf)
+
+| datapoint_field | type    | range    |
+|-----------------|---------|----------|
+| Control         | switch  | 0, 1 |
+| SceneNumber     | value   | 1 ... 64 |
 
 ### 20.xxx_N8
 

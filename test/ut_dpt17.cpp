@@ -23,7 +23,7 @@ protected:
     {}
 
     std::unique_ptr<knx::object::TDpt17> Dpt;
-    std::vector<TestSample> Samples = {{0, {0x00, 0x00}}, {1, {0x00, 1}}, {63, {0x00, 63}}, {31, {0x00, 31}}};
+    std::vector<TestSample> Samples = {{1, {0x00, 0x00}}, {2, {0x00, 1}}, {64, {0x00, 63}}, {32, {0x00, 31}}};
 };
 
 TEST_F(Dpt17Test, InitVal)

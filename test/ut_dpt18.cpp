@@ -24,10 +24,10 @@ protected:
     {}
 
     std::unique_ptr<knx::object::TDpt18> Dpt;
-    std::vector<TestSample> Samples = {{false, 0, {0x00, 0x00}},
-                                       {true, 1, {0x00, 1 << 7 | 1}},
-                                       {true, 63, {0x00, 1 << 7 | 63}},
-                                       {false, 31, {0x00, 31}}};
+    std::vector<TestSample> Samples = {{false, 1, {0x00, 0x00}},
+                                       {true, 2, {0x00, 1 << 7 | 1}},
+                                       {true, 64, {0x00, 1 << 7 | 63}},
+                                       {false, 32, {0x00, 31}}};
 };
 
 TEST_F(Dpt18Test, InitVal)
