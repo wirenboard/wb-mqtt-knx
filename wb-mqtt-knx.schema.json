@@ -10,7 +10,7 @@
         "deviceId": {
           "type": "string",
           "title": "Device ID",
-          "pattern": "^[\\w]+$",
+          "pattern": "^[^$#+\\/\"']+$",
           "options": {
             "patternmessage": "Incorrect Device ID"
           },
@@ -50,7 +50,7 @@
         "controlId": {
           "type": "string",
           "title": "Control ID",
-          "pattern": "^[^$#+\\/]+$",
+          "pattern": "^[^$#+\\/\"']+$",
           "options": {
             "patternmessage": "Incorrect Control ID"
           },
