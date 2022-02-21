@@ -1,3 +1,9 @@
+wb-mqtt-knx (1.4.2) unstable; urgency=medium
+
+  * Added restrictions to the Device ID and Control ID fields for the JSON schema.
+
+ -- Roman Kochkin <roman.kochkin@wirenboard.ru>  Tue, 15 Feb 2022 16:19:00 +0300
+
 wb-mqtt-knx (1.4.1) unstable; urgency=medium
 
   * Extended the dpts format for the ETS import tool

@@ -10,7 +10,10 @@
         "deviceId": {
           "type": "string",
           "title": "Device ID",
-          "minLength": "1",
+          "pattern": "^[^$#+\\/\"']+$",
+          "options": {
+            "patternmessage": "Incorrect Device ID"
+          },
           "propertyOrder": 1
         },
         "deviceTitle": {
@@ -47,7 +50,10 @@
         "controlId": {
           "type": "string",
           "title": "Control ID",
-          "minLength": "1",
+          "pattern": "^[^$#+\\/\"']+$",
+          "options": {
+            "patternmessage": "Incorrect Control ID"
+          },
           "propertyOrder": 1
         },
         "controlTitle": {
