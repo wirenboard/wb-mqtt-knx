@@ -50,7 +50,7 @@
         "controlId": {
           "type": "string",
           "title": "Control ID",
-          "pattern": "^[\\w]+$",
+          "pattern": "^[^$#+\\/]+$",
           "options": {
             "patternmessage": "Incorrect Control ID"
           },
