@@ -29,12 +29,13 @@ namespace knx
                     Value = Json::Value(value.test(0));
                     break;
                 case EFieldType::UNSIGNED_INT:
+                case EFieldType::ENUM:
                     Value = Json::Value(value.to_ullong() & ((1 << BitWidth) - 1));
                     break;
                 case EFieldType::INT:
                     // TODO;
                     break;
-                case EFieldType::ENUMERATE:
+                case EFieldType::FLOAT:
                     // TODO;
                     break;
             }
@@ -56,13 +57,14 @@ namespace knx
                 case EFieldType::BIT:
                     return Value.asBool();
                     break;
+                case EFieldType::ENUM:
                 case EFieldType::UNSIGNED_INT:
                     return Value.asUInt64();
                     break;
                 case EFieldType::INT:
                     // TODO
                     break;
-                case EFieldType::ENUMERATE:
+                case EFieldType::FLOAT:
                     // TODO!!!
                     break;
             }

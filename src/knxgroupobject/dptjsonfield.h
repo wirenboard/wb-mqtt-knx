@@ -18,7 +18,8 @@ namespace knx
                 BIT,
                 UNSIGNED_INT,
                 INT,
-                ENUMERATE
+                ENUM,
+                FLOAT
             };
 
             explicit TDptJsonField(const std::string& name, EFieldType type, uint32_t width);
