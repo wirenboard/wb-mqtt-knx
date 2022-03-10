@@ -2,6 +2,47 @@
   "type": "object",
   "title": "KNX Group Object Configuration",
   "definitions": {
+    "datapointTypeMqtt": {
+      "type": "string",
+      "title": "MQTT",
+      "enum": [
+        "Raw_Value",
+        "1.xxx_B1",
+        "2.xxx_B2",
+        "3.xxx_B1U3",
+        "4.xxx_Character_Set",
+        "5.xxx_8-Bit_Unsigned_Value",
+        "6.xxx_V8",
+        "7.xxx_2-Octet_Unsigned_Value",
+        "8.xxx_2-Octet_Signed_Value",
+        "9.xxx_2-Octet_Float_Value",
+        "12.001_4-Octet_Unsigned_Value",
+        "13.xxx_4-Octet_Signed_Value",
+        "14.xxx_4-Octet_Float_Value",
+        "20.xxx_N8"
+      ],
+      "default": "1.xxx_B1"
+    },
+    "datapointTypeJSON": {
+      "type": "string",
+      "title": "JSON",
+      "enum": [
+        "1.xxx_B1_JSON",
+        "2.xxx_B2_JSON",
+        "3.xxx_B1U3_JSON",
+        "4.xxx_Character_Set_JSON",
+        "5.xxx_8-Bit_Unsigned_Value_JSON",
+        "6.xxx_V8_JSON",
+        "7.xxx_2-Octet_Unsigned_Value_JSON",
+        "8.xxx_2-Octet_Signed_Value_JSON",
+        "9.xxx_2-Octet_Float_Value_JSON",
+        "12.001_4-Octet_Unsigned_Value_JSON",
+        "13.xxx_4-Octet_Signed_Value_JSON",
+        "14.xxx_4-Octet_Float_Value_JSON",
+        "20.xxx_N8_JSON"
+      ],
+      "default": "1.xxx_B1_JSON"
+    },
     "device": {
       "headerTemplate": "device_header_template",
       "type": "object",
@@ -74,25 +115,11 @@
           }
         },
         "dataPointType": {
-          "type": "string",
           "title": "Data point type",
-          "enum": [
-            "Raw_Value",
-            "1.xxx_B1",
-            "2.xxx_B2",
-            "3.xxx_B1U3",
-            "4.xxx_Character_Set",
-            "5.xxx_8-Bit_Unsigned_Value",
-            "6.xxx_V8",
-            "7.xxx_2-Octet_Unsigned_Value",
-            "8.xxx_2-Octet_Signed_Value",
-            "9.xxx_2-Octet_Float_Value",
-            "12.001_4-Octet_Unsigned_Value",
-            "13.xxx_4-Octet_Signed_Value",
-            "14.xxx_4-Octet_Float_Value",
-            "20.xxx_N8"
+          "oneOf": [
+            { "$ref": "#/definitions/datapointTypeMqtt" },
+            { "$ref": "#/definitions/datapointTypeJSON" }
           ],
-          "default": "1.xxx_B1",
           "propertyOrder": 4
         },
         "readPollInterval": {
