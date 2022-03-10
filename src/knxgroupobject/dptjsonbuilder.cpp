@@ -15,6 +15,28 @@ namespace
         {'U', knx::object::TDptJsonField::EFieldType::UNSIGNED_INT},
         {'V', knx::object::TDptJsonField::EFieldType::INT},
         {'F', knx::object::TDptJsonField::EFieldType::FLOAT}};
+
+    std::vector<EncodingResult> ParseEncodingString(const std::string& str)
+    {
+        auto encodingStr = str;
+        std::regex encodingRegex("([BNAUVFr])([0-9]+)");
+        std::smatch sm;
+        std::vector<EncodingResult> encodedFieldList;
+
+        while (std::regex_search(encodingStr, sm, encodingRegex)) {
+            auto fieldType = sm.str(1)[0];
+            auto fieldSize = std::stoul(sm.str(2));
+            if (fieldType == 'B') {
+                for (uint32_t i = 0; i < fieldSize; ++i) {
+                    encodedFieldList.push_back({fieldType, 1});
+                }
+            } else {
+                encodedFieldList.push_back({fieldType, fieldSize});
+            }
+            encodingStr = sm.suffix();
+        }
+        return encodedFieldList;
+    }
 }
 
 namespace knx
@@ -42,43 +64,23 @@ namespace knx
             }
             auto descriptor = DescriptorMap[id];
             auto encodingStr = descriptor["encoding"].asString();
-            std::regex encodingRegex("([a-zA-Z])([0-9]+)");
-            std::smatch sm;
-            std::vector<EncodingResult> encodedFieldList;
+            auto encodedFieldList = ParseEncodingString(encodingStr);
             uint32_t sumSize = 0;
-            while (std::regex_search(encodingStr, sm, encodingRegex)) {
-                auto fieldType = sm.str(1)[0];
-                auto fieldSize = std::stoul(sm.str(2));
-                sumSize += fieldSize;
-
-                encodedFieldList.push_back({fieldType, fieldSize});
-                encodingStr = sm.suffix();
+            for (const auto& field: encodedFieldList) {
+                sumSize += field.width;
             }
             auto dptJson = std::make_shared<TDptJson>();
             auto jsonFieldIterator = descriptor["field"].begin();
             uint32_t bitPosition = sumSize <= 6 ? 8U - sumSize : 8U;
             for (const auto& encodedField: encodedFieldList) {
                 if (encodedField.typeCode != 'r') {
-                    if (encodedField.typeCode == 'B') {
-                        for (uint32_t i = 0; i < encodedField.width; ++i) {
-                            TDptJsonField field((*jsonFieldIterator)["name"].asString(),
-                                                EncodingMap[encodedField.typeCode],
-                                                1);
-                            dptJson->AddField(field, bitPosition);
-                            ++jsonFieldIterator;
-                            ++bitPosition;
-                        }
-                    } else {
-                        TDptJsonField field((*jsonFieldIterator)["name"].asString(),
-                                            EncodingMap[encodedField.typeCode],
-                                            encodedField.width);
-                        dptJson->AddField(field, bitPosition);
-                        ++jsonFieldIterator;
-                        bitPosition += encodedField.width;
-                    }
-                } else {
-                    bitPosition += encodedField.width;
+                    TDptJsonField field((*jsonFieldIterator)["name"].asString(),
+                                        EncodingMap[encodedField.typeCode],
+                                        encodedField.width);
+                    dptJson->AddField(field, bitPosition);
+                    ++jsonFieldIterator;
                 }
+                bitPosition += encodedField.width;
             }
             return dptJson;
         }
