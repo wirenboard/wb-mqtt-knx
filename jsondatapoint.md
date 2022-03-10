@@ -3,8 +3,32 @@
 ```json
 [
   {
+    "id": 1,
+    "name": "B1",
+    "encoding" : "B1",
+    "field" : [
+      {"name" : "b"}
+    ],
+    "datapoint" : [
+      {
+        "subid" : 1,
+        "name" : "Switch",
+        "field" : [
+          {"name":  "switch"}
+        ]
+      },
+      {
+        "subid" : 2,
+        "name" : "Bool",
+        "field" : [
+          {"name":  "bool"}
+        ]
+      }
+    ]
+  },
+  {
     "id": 10,
-    "name": "DPT_TimeOfDay",
+    "name": "Time",
     "encoding": "N3U5r2U6r2U6",
     "field": [
       {
@@ -23,7 +47,7 @@
     "datapoint": [
       {
         "subid": 1,
-        "name": "DPT_TimeOfDaySpecial",
+        "name": "TimeOfDay",
         "field": [
           {
             "name": "Day"
