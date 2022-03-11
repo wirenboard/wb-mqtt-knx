@@ -28,18 +28,10 @@
       "title": "JSON",
       "enum": [
         "1.xxx_B1_JSON",
+        "1.001_Switch_JSON",
+        "1.001_Bool_JSON",
         "2.xxx_B2_JSON",
-        "3.xxx_B1U3_JSON",
-        "4.xxx_Character_Set_JSON",
-        "5.xxx_8-Bit_Unsigned_Value_JSON",
-        "6.xxx_V8_JSON",
-        "7.xxx_2-Octet_Unsigned_Value_JSON",
-        "8.xxx_2-Octet_Signed_Value_JSON",
-        "9.xxx_2-Octet_Float_Value_JSON",
-        "12.001_4-Octet_Unsigned_Value_JSON",
-        "13.xxx_4-Octet_Signed_Value_JSON",
-        "14.xxx_4-Octet_Float_Value_JSON",
-        "20.xxx_N8_JSON"
+        "10.001_TimeOfDay_JSON"
       ],
       "default": "1.xxx_B1_JSON"
     },
