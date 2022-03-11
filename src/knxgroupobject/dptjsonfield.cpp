@@ -34,7 +34,15 @@ namespace knx
                     Value = Json::Value(value.to_ullong() & ((1 << BitWidth) - 1));
                     break;
                 case EFieldType::INT:
-                    // TODO;
+                    if (BitWidth == 8) {
+                        Value = Json::Value(static_cast<int8_t>(value.to_ulong() & 0xFF));
+                    } else if (BitWidth == 16) {
+                        Value = Json::Value(static_cast<int16_t>(value.to_ulong() & 0xFFFF));
+                    } else if (BitWidth == 32) {
+                        Value = Json::Value(static_cast<int32_t>(value.to_ulong()));
+                    } else if (BitWidth == 64) {
+                        Value = Json::Value(static_cast<int64_t>(value.to_ullong()));
+                    }
                     break;
                 case EFieldType::FLOAT: {
                     if (BitWidth == 16) {
@@ -58,17 +66,14 @@ namespace knx
                         return static_cast<uint8_t>(str[0]);
                     }
                     return 0;
-                } break;
+                }
                 case EFieldType::BIT:
                     return Value.asBool();
-                    break;
                 case EFieldType::ENUM:
                 case EFieldType::UNSIGNED_INT:
                     return Value.asUInt64();
-                    break;
                 case EFieldType::INT:
-                    // TODO
-                    break;
+                    return Value.asInt64();
                 case EFieldType::FLOAT: {
                     if (BitWidth == 16) {
                         return datapointUtils::FloatToRaw16(Value.asFloat());
