@@ -28,6 +28,7 @@ add_executable(${PROJECT_NAME}_test ${TEST_LIST}
         ../src/knxgroupobject/dptjson.cpp
         ../src/knxgroupobject/dptjsonfield.cpp
         ../src/knxgroupobject/dptjsonbuilder.cpp
+        ../src/knxgroupobject/datapointid.cpp
         ../src/knxutils.cpp
         ../src/knxgroupobjectcontroller.cpp
         )

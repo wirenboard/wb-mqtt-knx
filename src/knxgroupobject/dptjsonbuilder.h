@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../knxexception.h"
+#include "datapointid.h"
 #include "dptjson.h"
 #include "idpt.h"
 #include <bitset>
@@ -16,7 +17,7 @@ namespace knx
         public:
             explicit TDptJsonBuilder(const std::string& descriptorPath, const std::string& descriptorSchemaPath);
 
-            PDpt Create(uint32_t id, bool hasSubId = false, uint32_t subId = 0);
+            PDpt Create(const TDatapointId& datapointId);
 
         private:
             Json::Value DescriptorRoot;

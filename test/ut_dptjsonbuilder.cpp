@@ -28,7 +28,7 @@ protected:
 
 TEST_F(DptJsonBuilderTest, createB1DptTest)
 {
-    auto dptB1 = JsonDptBuilder->Create(1);
+    auto dptB1 = JsonDptBuilder->Create(knx::object::TDatapointId(1));
     dptB1->FromKnx({0x01});
     auto jsonStr = dptB1->ToMqtt().at(0).As<std::string>();
 
@@ -38,7 +38,7 @@ TEST_F(DptJsonBuilderTest, createB1DptTest)
 
 TEST_F(DptJsonBuilderTest, createB2DptTest)
 {
-    auto dptB2 = JsonDptBuilder->Create(2);
+    auto dptB2 = JsonDptBuilder->Create(knx::object::TDatapointId(2));
     dptB2->FromKnx({0x02});
     auto jsonStr = dptB2->ToMqtt().at(0).As<std::string>();
 
@@ -49,7 +49,7 @@ TEST_F(DptJsonBuilderTest, createB2DptTest)
 
 TEST_F(DptJsonBuilderTest, createTimeOfDayDptTest)
 {
-    auto dptTime = JsonDptBuilder->Create(10);
+    auto dptTime = JsonDptBuilder->Create(knx::object::TDatapointId(10));
     dptTime->FromKnx({0x00, (1 << 5) | 21, 35, 19});
     auto jsonStr = dptTime->ToMqtt().at(0).As<std::string>();
 

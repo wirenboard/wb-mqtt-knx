@@ -57,12 +57,12 @@ namespace knx
             }
         }
 
-        PDpt TDptJsonBuilder::Create(uint32_t id, bool hasSubId, uint32_t subId)
+        PDpt TDptJsonBuilder::Create(const TDatapointId& datapointId)
         {
-            if (DescriptorMap.find(id) == DescriptorMap.end()) {
+            if (DescriptorMap.find(datapointId.GetMain()) == DescriptorMap.end()) {
                 return nullptr;
             }
-            auto descriptor = DescriptorMap[id];
+            auto descriptor = DescriptorMap[datapointId.GetMain()];
             auto encodingStr = descriptor["encoding"].asString();
             auto encodedFieldList = ParseEncodingString(encodingStr);
             uint32_t sumSize = 0;
