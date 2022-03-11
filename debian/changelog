@@ -1,3 +1,9 @@
+wb-mqtt-knx (1.5.0) unstable; urgency=medium
+
+  * Added support for JSON KNX datapoints
+
+ -- Roman Kochkin <roman.kochkin@wirenboard.ru>  Fri, 11 Mar 2022 08:12:00 +0300
+
 wb-mqtt-knx (1.4.2) unstable; urgency=medium
 
   * Added restrictions to the Device ID and Control ID fields for the JSON schema.
