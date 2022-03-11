@@ -1,6 +1,7 @@
 #include "../src/knxexception.h"
 #include "../src/knxgroupobject/dptjsonbuilder.h"
 #include "config.h"
+#include "testutils.h"
 #include "gtest/gtest.h"
 
 class DptJsonBuilderTest: public ::testing::Test
@@ -16,14 +17,6 @@ protected:
     {}
 
     std::unique_ptr<knx::object::TDptJsonBuilder> JsonDptBuilder;
-
-    Json::Value ParseJson(const std::string& jsonStr)
-    {
-        std::stringstream sstr(jsonStr);
-        Json::Value jsonObject;
-        sstr >> jsonObject;
-        return jsonObject;
-    }
 };
 
 TEST_F(DptJsonBuilderTest, createB1DptTest)
@@ -32,7 +25,7 @@ TEST_F(DptJsonBuilderTest, createB1DptTest)
     dptB1->FromKnx({0x01});
     auto jsonStr = dptB1->ToMqtt().at(0).As<std::string>();
 
-    auto jsonObject = ParseJson(jsonStr);
+    auto jsonObject = testUtils::ParseJson(jsonStr);
     EXPECT_EQ(true, jsonObject["b"].asBool());
 }
 
@@ -42,7 +35,7 @@ TEST_F(DptJsonBuilderTest, createB2DptTest)
     dptB2->FromKnx({0x02});
     auto jsonStr = dptB2->ToMqtt().at(0).As<std::string>();
 
-    auto jsonObject = ParseJson(jsonStr);
+    auto jsonObject = testUtils::ParseJson(jsonStr);
     EXPECT_EQ(true, jsonObject["c"].asBool());
     EXPECT_EQ(false, jsonObject["v"].asBool());
 }
@@ -53,7 +46,7 @@ TEST_F(DptJsonBuilderTest, createTimeOfDayDptTest)
     dptTime->FromKnx({0x00, (1 << 5) | 21, 35, 19});
     auto jsonStr = dptTime->ToMqtt().at(0).As<std::string>();
 
-    auto jsonObject = ParseJson(jsonStr);
+    auto jsonObject = testUtils::ParseJson(jsonStr);
     EXPECT_EQ(1, jsonObject["Day"].asUInt());
     EXPECT_EQ(21, jsonObject["Hour"].asUInt());
     EXPECT_EQ(35, jsonObject["Minutes"].asUInt());
