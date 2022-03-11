@@ -29,7 +29,7 @@
       "enum": [
         "1.xxx_B1_JSON",
         "1.001_Switch_JSON",
-        "1.001_Bool_JSON",
+        "1.002_Bool_JSON",
         "2.xxx_B2_JSON",
         "10.001_TimeOfDay_JSON"
       ],
