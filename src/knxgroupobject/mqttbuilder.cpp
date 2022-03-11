@@ -1,11 +1,15 @@
 #include "mqttbuilder.h"
 #include "datapointpool.h"
 #include "mqtt.h"
+#include <regex>
 
 using namespace knx::object;
 
-TGroupObjectMqttBuilder::TGroupObjectMqttBuilder(WBMQTT::PDeviceDriver pMqttDeviceDriver, WBMQTT::TLogger& errorLogger)
+TGroupObjectMqttBuilder::TGroupObjectMqttBuilder(WBMQTT::PDeviceDriver pMqttDeviceDriver,
+                                                 object::IDptBuilder& dptJsonBuilder,
+                                                 WBMQTT::TLogger& errorLogger)
     : MqttDeviceDriver(std::move(pMqttDeviceDriver)),
+      DptJsonBuilder(dptJsonBuilder),
       ErrorLogger(errorLogger)
 {}
 
@@ -23,7 +27,23 @@ PGroupObject TGroupObjectMqttBuilder::Create(const TGroupObjectMqttParameter& pa
     if (MqttDeviceList.empty())
         return nullptr;
 
-    return std::make_shared<knx::object::TGroupObjectMqtt>(DataPointPool::MakeDataPointByName(parameter.Type),
+    PDpt datapoint;
+
+    std::regex hasJsonRegex("_JSON\\s*$");
+    if (std::regex_search(parameter.Type, hasJsonRegex)) {
+        TDatapointId datapointId;
+        if (!datapointId.SetFromString(parameter.Type)) {
+            return nullptr;
+        }
+        datapoint = DptJsonBuilder.Create(datapointId);
+        if (datapoint == nullptr) {
+            return nullptr;
+        }
+    } else {
+        datapoint = DataPointPool::MakeDataPointByName(parameter.Type);
+    }
+
+    return std::make_shared<knx::object::TGroupObjectMqtt>(datapoint,
                                                            parameter.ControlId,
                                                            parameter.ControlTitle,
                                                            parameter.isReadOnly,

@@ -4,6 +4,7 @@
 #include "datapointid.h"
 #include "dptjson.h"
 #include "idpt.h"
+#include "idptbuilder.h"
 #include <bitset>
 #include <regex>
 #include <wblib/json_utils.h>
@@ -12,12 +13,12 @@ namespace knx
 {
     namespace object
     {
-        class TDptJsonBuilder
+        class TDptJsonBuilder: public IDptBuilder
         {
         public:
             explicit TDptJsonBuilder(const std::string& descriptorPath, const std::string& descriptorSchemaPath);
 
-            PDpt Create(const TDatapointId& datapointId);
+            PDpt Create(const TDatapointId& datapointId) override;
 
         private:
             Json::Value DescriptorRoot;

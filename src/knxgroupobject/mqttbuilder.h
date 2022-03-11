@@ -1,4 +1,5 @@
 #pragma once
+#include "idptbuilder.h"
 #include "igroupobject.h"
 #include "imqttbuilder.h"
 #include <wblib/log.h>
@@ -17,7 +18,9 @@ namespace knx
             /// Constructor
             /// \param pMqttDeviceDriver wb-mqtt Device Driver
             /// \param errorLogger error logger instance
-            explicit TGroupObjectMqttBuilder(WBMQTT::PDeviceDriver pMqttDeviceDriver, WBMQTT::TLogger& errorLogger);
+            explicit TGroupObjectMqttBuilder(WBMQTT::PDeviceDriver pMqttDeviceDriver,
+                                             object::IDptBuilder& dptJsonBuilder,
+                                             WBMQTT::TLogger& errorLogger);
 
             void LinkDevice(const std::string& id, const std::string& name) override;
             PGroupObject Create(const TGroupObjectMqttParameter& parameter) override;
@@ -26,6 +29,7 @@ namespace knx
 
         private:
             WBMQTT::PDeviceDriver MqttDeviceDriver;
+            object::IDptBuilder& DptJsonBuilder;
             std::vector<WBMQTT::PLocalDevice> MqttDeviceList;
             WBMQTT::TLogger& ErrorLogger;
         };
