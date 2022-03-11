@@ -63,6 +63,19 @@ namespace knx
                 return nullptr;
             }
             auto descriptor = DescriptorMap[datapointId.GetMain()];
+
+            auto fieldJsonValue = descriptor["field"];
+            if (datapointId.HasSubId()) {
+                auto subId = datapointId.GetSub();
+                auto datapointJsonArray = descriptor["datapoint"];
+                auto datapointIterator =
+                    std::find_if(datapointJsonArray.begin(),
+                                 datapointJsonArray.end(),
+                                 [subId](const Json::Value& value) { return value["subid"].asUInt() == subId; });
+                if (datapointIterator != datapointJsonArray.end()) {
+                    fieldJsonValue = (*datapointIterator)["field"];
+                }
+            }
             auto encodingStr = descriptor["encoding"].asString();
             auto encodedFieldList = ParseEncodingString(encodingStr);
             uint32_t sumSize = 0;
@@ -70,7 +83,7 @@ namespace knx
                 sumSize += field.width;
             }
             auto dptJson = std::make_shared<TDptJson>();
-            auto jsonFieldIterator = descriptor["field"].begin();
+            auto jsonFieldIterator = fieldJsonValue.begin();
             uint32_t bitPosition = sumSize <= 6 ? 8U - sumSize : 8U;
             for (const auto& encodedField: encodedFieldList) {
                 if (encodedField.typeCode != 'r') {

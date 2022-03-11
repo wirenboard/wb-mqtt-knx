@@ -29,6 +29,16 @@ TEST_F(DptJsonBuilderTest, createB1DptTest)
     EXPECT_EQ(true, jsonObject["b"].asBool());
 }
 
+TEST_F(DptJsonBuilderTest, createB1Sub2DptTest)
+{
+    auto dptB1 = JsonDptBuilder->Create(knx::object::TDatapointId(1, 2));
+    dptB1->FromKnx({0x01});
+    auto jsonStr = dptB1->ToMqtt().at(0).As<std::string>();
+
+    auto jsonObject = testUtils::ParseJson(jsonStr);
+    EXPECT_EQ(true, jsonObject["bool"].asBool());
+}
+
 TEST_F(DptJsonBuilderTest, createB2DptTest)
 {
     auto dptB2 = JsonDptBuilder->Create(knx::object::TDatapointId(2));
