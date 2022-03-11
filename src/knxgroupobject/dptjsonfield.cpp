@@ -1,3 +1,4 @@
+#include "datapointutils.h"
 #include "dptjsonbuilder.h"
 
 namespace knx
@@ -35,9 +36,13 @@ namespace knx
                 case EFieldType::INT:
                     // TODO;
                     break;
-                case EFieldType::FLOAT:
-                    // TODO;
-                    break;
+                case EFieldType::FLOAT: {
+                    if (BitWidth == 16) {
+                        Value = Json::Value(datapointUtils::RawToFloat16(value.to_ulong()));
+                    } else if (BitWidth == 32) {
+                        Value = Json::Value(datapointUtils::RawToFloat32(value.to_ulong()));
+                    }
+                } break;
             }
         }
         void TDptJsonField::SetValue(const Json::Value& value)
@@ -64,9 +69,13 @@ namespace knx
                 case EFieldType::INT:
                     // TODO
                     break;
-                case EFieldType::FLOAT:
-                    // TODO!!!
-                    break;
+                case EFieldType::FLOAT: {
+                    if (BitWidth == 16) {
+                        return datapointUtils::FloatToRaw16(Value.asFloat());
+                    } else if (BitWidth == 32) {
+                        return datapointUtils::FloatToRaw32(Value.asFloat());
+                    }
+                } break;
             }
             return {}; // TODO!!!
         }
