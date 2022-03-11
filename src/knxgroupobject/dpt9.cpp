@@ -1,6 +1,7 @@
 #include "dpt9.h"
 #include "../knxexception.h"
 #include "datapointerror.h"
+#include "datapointutils.h"
 #include <cmath>
 
 using namespace knx::object;
@@ -22,11 +23,7 @@ void TDpt9::FromMqtt(uint32_t controlIndex, const WBMQTT::TAny& value)
 void TDpt9::FromKnx(const std::vector<uint8_t>& payload)
 {
     if (payload.size() == 3) {
-        bool isNegative = payload[1] & (1 << 7);
-        auto mantissa = static_cast<int16_t>((isNegative ? (0x1F << 11) : 0) |
-                                             (static_cast<uint16_t>(payload[1] & 0x07) << 8) | payload[2]);
-        uint32_t exp = (payload[1] >> 3) & 0x0F;
-        FieldFloatValue = (static_cast<double>(mantissa) * 0.01) * std::pow(2, exp);
+        FieldFloatValue = datapointUtils::RawToFloat16(payload[1] << 8 | payload[2]);
     } else {
         wb_throw(TKnxException, datapointError::KNX_INVALID_PAYLOAD_SIZE);
     }
@@ -34,15 +31,7 @@ void TDpt9::FromKnx(const std::vector<uint8_t>& payload)
 
 std::vector<uint8_t> TDpt9::ToKnx()
 {
-    auto mantissa = static_cast<int32_t>(std::round(FieldFloatValue * 100));
-    uint32_t exp = 0;
-    while ((mantissa < -2048) || (mantissa > 2047)) {
-        mantissa >>= 1;
-        ++exp;
-    }
-
-    auto dValue = (static_cast<int16_t>(mantissa) & 0x87FF) | ((exp & 0x0F) << 11);
-
+    auto dValue = datapointUtils::FloatToRaw16(FieldFloatValue);
     return {0, static_cast<uint8_t>(dValue >> 8), static_cast<uint8_t>(dValue & 0xFF)};
 }
 
