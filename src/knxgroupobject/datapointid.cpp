@@ -36,13 +36,13 @@ namespace knx
             return HasSub;
         }
 
-        bool TDatapointId::SetFromString(const std::string& stringIndex)
+        bool TDatapointId::SetFromString(const std::string& stringId)
         {
             std::regex indexRegex("([0-9]+)\\.([xX0-9]+)");
             std::regex hasNotSubIndex("[xX]+");
             std::smatch sm;
 
-            if (std::regex_search(stringIndex, sm, indexRegex)) {
+            if (std::regex_search(stringId, sm, indexRegex)) {
                 Main = std::stoul(sm.str(1));
                 if (!std::regex_search(sm.str(2), hasNotSubIndex)) {
                     SetSub(std::stoul(sm.str(2)));

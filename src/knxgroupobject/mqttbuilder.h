@@ -17,6 +17,7 @@ namespace knx
 
             /// Constructor
             /// \param pMqttDeviceDriver wb-mqtt Device Driver
+            /// \param dptJsonBuilder JSON datapoint builder
             /// \param errorLogger error logger instance
             explicit TGroupObjectMqttBuilder(WBMQTT::PDeviceDriver pMqttDeviceDriver,
                                              object::IDptBuilder& dptJsonBuilder,

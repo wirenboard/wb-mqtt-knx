@@ -9,9 +9,13 @@ namespace knx
 {
     namespace object
     {
+        /// \brief JSON datapoint class
         class TDptJson: public IDpt
         {
         public:
+            /// Configuring JSON Datapoint by adding data fields
+            /// \param field Datapoint field
+            /// \param BitBeginPosition most significant bit position
             void AddField(const TDptJsonField& field, uint32_t BitBeginPosition);
 
             std::vector<DptDescriptorField> getDescriptor() const override;
