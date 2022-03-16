@@ -25,7 +25,6 @@ namespace knx
 
         private:
             Json::Value DescriptorRoot;
-            Json::Value SchemaRoot;
             std::map<uint32_t, Json::Value> DescriptorMap;
         };
 
