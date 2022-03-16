@@ -1,6 +1,7 @@
 #include "datapointid.h"
-#include <regex>
 #include <iomanip>
+#include <regex>
+
 namespace knx
 {
     namespace object
