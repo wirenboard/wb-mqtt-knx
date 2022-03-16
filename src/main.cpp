@@ -124,7 +124,7 @@ int main(int argc, char** argv)
         auto knxGroupObjectController =
             std::make_shared<knx::TKnxGroupObjectController>(knxClientService, KNX_READ_TICK_PERIOD);
 
-        knx::object::TDptJsonBuilder dptJsonBuilder(DEFAULT_CONFIG_JSON_DATAPOINT_FILE_PATH, "");
+        knx::object::TDptJsonBuilder dptJsonBuilder(DEFAULT_CONFIG_JSON_DATAPOINT_FILE_PATH);
         auto groupObjectBuilder =
             std::make_shared<knx::object::TGroupObjectMqttBuilder>(mqttDriver, dptJsonBuilder, ErrorLogger);
 

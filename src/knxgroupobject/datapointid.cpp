@@ -1,5 +1,6 @@
 #include "datapointid.h"
 #include <regex>
+#include <iomanip>
 namespace knx
 {
     namespace object
@@ -57,7 +58,7 @@ namespace knx
             std::stringstream ss;
             ss << Main;
             if (HasSub) {
-                ss << "." << Sub;
+                ss << "." << std::setw(3) << std::setfill('0') << Sub;
             } else {
                 ss << ".xxx";
             }

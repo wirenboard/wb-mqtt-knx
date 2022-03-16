@@ -10,7 +10,7 @@ protected:
     std::string SourceDir = CMAKE_SOURCE_DIR;
     void SetUp() override
     {
-        JsonDptBuilder = std::make_unique<knx::object::TDptJsonBuilder>(SourceDir + "/wb-mqtt-knx-jsondpt.conf", "");
+        JsonDptBuilder = std::make_unique<knx::object::TDptJsonBuilder>(SourceDir + "/wb-mqtt-knx-jsondpt.conf");
     }
 
     void TearDown() override

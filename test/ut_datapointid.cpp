@@ -27,7 +27,7 @@ TEST_F(DatapointIdTest, mainSubIdTest)
     EXPECT_EQ(true, datapointId.HasSubId());
     EXPECT_EQ(221, datapointId.GetMain());
     EXPECT_EQ(32, datapointId.GetSub());
-    EXPECT_EQ("221.32", datapointId.ToString());
+    EXPECT_EQ("221.032", datapointId.ToString());
 }
 
 TEST_F(DatapointIdTest, fromStringTest)

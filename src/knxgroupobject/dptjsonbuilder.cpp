@@ -43,16 +43,13 @@ namespace knx
 {
     namespace object
     {
-        TDptJsonBuilder::TDptJsonBuilder(const std::string& descriptorPath, const std::string& descriptorSchemaPath)
+        TDptJsonBuilder::TDptJsonBuilder(const std::string& descriptorPath)
         {
             DescriptorRoot = WBMQTT::JSON::Parse(descriptorPath);
-            if (!descriptorSchemaPath.empty()) {
-                SchemaRoot = WBMQTT::JSON::Parse(descriptorSchemaPath);
-                WBMQTT::JSON::Validate(DescriptorRoot, SchemaRoot);
-            }
+
             for (const auto& descriptor: DescriptorRoot) {
                 if (!DescriptorMap.insert({descriptor["id"].asUInt(), descriptor}).second) {
-                    wb_throw(TKnxException, "Duplicate ID in JSON dpt descriptor"); // TODO Add description
+                    wb_throw(TKnxException, "Duplicate ID in JSON dpt descriptor");
                 }
             }
         }

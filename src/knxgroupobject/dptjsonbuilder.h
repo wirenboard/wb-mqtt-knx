@@ -19,8 +19,7 @@ namespace knx
         public:
             /// Constructor
             /// \param descriptorPath Path to the JSON Datapoint Descriptor file
-            /// \param descriptorSchemaPath Scheme for verification The JSON Datapoint Descriptor File
-            explicit TDptJsonBuilder(const std::string& descriptorPath, const std::string& descriptorSchemaPath);
+            explicit TDptJsonBuilder(const std::string& descriptorPath);
 
             PDpt Create(const TDatapointId& datapointId) override;
 
