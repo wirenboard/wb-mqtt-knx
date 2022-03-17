@@ -8,6 +8,8 @@ namespace knx
 {
     namespace object
     {
+        using TJsonFieldRawValue = std::bitset<112>;
+
         /// \brief Class for setting up json datapoint fields
         class TDptJsonField
         {
@@ -39,7 +41,7 @@ namespace knx
 
             /// Set field value from raw value of a KNX telegram
             /// \param value raw value from a KNX telegramm
-            void SetValue(std::bitset<64> value);
+            void SetValue(TJsonFieldRawValue value);
 
             /// Set field value
             /// \param value JSON value
@@ -47,7 +49,7 @@ namespace knx
 
             /// Get raw value from a KNX telegram
             /// \return raw value
-            std::bitset<64> GetRawValue() const;
+            TJsonFieldRawValue GetRawValue() const;
 
             /// Get JSON value
             /// \return JSON value

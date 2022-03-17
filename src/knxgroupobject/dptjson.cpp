@@ -48,7 +48,7 @@ namespace knx
                 wb_throw(TKnxException, "Incorrect payload size"); // TODO Add description
             }
             for (auto& field: JsonFieldList) {
-                std::bitset<64> rawValue;
+                TJsonFieldRawValue rawValue;
                 uint32_t bitCount = field.BitBeginPosition + field.JsonField.GetBitWidth() - 1;
                 uint32_t bitPosition = 0;
                 for (uint32_t i = bitCount; i >= field.BitBeginPosition; --i) {

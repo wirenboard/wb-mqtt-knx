@@ -1,3 +1,4 @@
+#include "dptjsonfield.h"
 #include "datapointutils.h"
 #include "dptjsonbuilder.h"
 
@@ -19,12 +20,24 @@ namespace knx
         {
             return BitWidth;
         }
-        void TDptJsonField::SetValue(std::bitset<64> value)
+        void TDptJsonField::SetValue(TJsonFieldRawValue value)
         {
             switch (FieldType) {
                 case EFieldType::CHAR: {
-                    std::string str(1, static_cast<char>(value.to_ullong()));
-                    Value = Json::Value(str);
+                    if (BitWidth == 8) {
+                        std::string str(1, static_cast<char>(value.to_ullong()));
+                        Value = Json::Value(str);
+                    } else if (BitWidth == 112) {
+                        std::string str;
+                        for (int i = 0; i < 112 / 8; ++i) {
+                            auto lowByte = (value & TJsonFieldRawValue(0xFF)).to_ulong();
+                            if (lowByte != 0) {
+                                str.insert(0, std::string(1, static_cast<char>(lowByte)));
+                            }
+                            value >>= 8;
+                        }
+                        Value = Json::Value(str);
+                    }
                 } break;
                 case EFieldType::BIT:
                     Value = Json::Value(value.test(0));
@@ -57,15 +70,26 @@ namespace knx
         {
             Value = value;
         }
-        std::bitset<64> TDptJsonField::GetRawValue() const
+        TJsonFieldRawValue TDptJsonField::GetRawValue() const
         {
             switch (FieldType) {
                 case EFieldType::CHAR: {
-                    auto str = Value.asString();
-                    if (!str.empty()) {
-                        return static_cast<uint8_t>(str[0]);
+                    if (BitWidth == 8) {
+                        auto str = Value.asString();
+                        if (!str.empty()) {
+                            return static_cast<uint8_t>(str[0]);
+                        }
+                        return 0;
+                    } else if (BitWidth == 112) {
+                        TJsonFieldRawValue value;
+                        auto str = Value.asString();
+                        for (const auto& ch: str) {
+                            value |= TJsonFieldRawValue(ch);
+                            value <<= 8;
+                        }
+                        value <<= 112 - (str.size() + 1) * 8;
+                        return value;
                     }
-                    return 0;
                 }
                 case EFieldType::BIT:
                     return Value.asBool();

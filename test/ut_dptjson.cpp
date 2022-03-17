@@ -66,6 +66,19 @@ protected:
             "float16Field":27.52,"float32Field":-0.0012346,"int8Field":-25,
             "int16Field":-486, "int32Field": -65233336})";
     }
+
+    void ConfigureJsonDptString()
+    {
+        knx::object::TDptJsonField jsonCharField("charField", knx::object::TDptJsonField::EFieldType::CHAR, 8);
+        knx::object::TDptJsonField jsonStringField("stringField", knx::object::TDptJsonField::EFieldType::CHAR, 112);
+
+        Dpt->AddField(jsonCharField, 8);
+        Dpt->AddField(jsonStringField, 16);
+
+        KnxPayload = {0x00, 'p', 'H', 'e', 'l', 'l', 'o', ',', ' ', 'w', 'o', 'r', 'l', 'd', 0x00, 0x00};
+
+        JsonSample = R"({"charField": "p", "stringField": "Hello, world"})";
+    }
 };
 
 TEST_F(DptJsonTest, toMqttTest)
@@ -87,9 +100,31 @@ TEST_F(DptJsonTest, toMqttTest)
     EXPECT_EQ(-65233336, jsonObject["int32Field"].asInt());
 }
 
+TEST_F(DptJsonTest, toMqttStringFieldTest)
+{
+    ConfigureJsonDptString();
+
+    Dpt->FromKnx(KnxPayload);
+    auto jsonStr = Dpt->ToMqtt()[0].As<std::string>();
+
+    auto jsonObject = testUtils::ParseJson(jsonStr);
+
+    EXPECT_EQ("p", jsonObject["charField"].asString());
+    EXPECT_EQ("Hello, world", jsonObject["stringField"].asString());
+}
+
 TEST_F(DptJsonTest, toKnxTest)
 {
     ConfigureJsonDpt();
+
+    Dpt->FromMqtt(0, JsonSample);
+
+    EXPECT_EQ(KnxPayload, Dpt->ToKnx());
+}
+
+TEST_F(DptJsonTest, toKnxStringFieldTest)
+{
+    ConfigureJsonDptString();
 
     Dpt->FromMqtt(0, JsonSample);
 
