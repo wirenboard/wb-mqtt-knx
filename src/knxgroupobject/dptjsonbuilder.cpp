@@ -62,6 +62,8 @@ namespace knx
             auto descriptor = DescriptorMap[datapointId.GetMain()];
 
             auto fieldJsonValue = descriptor["field"];
+            auto encodingStr = descriptor["encoding"].asString();
+
             if (datapointId.HasSubId()) {
                 auto subId = datapointId.GetSub();
                 auto datapointJsonArray = descriptor["datapoint"];
@@ -70,10 +72,15 @@ namespace knx
                                  datapointJsonArray.end(),
                                  [subId](const Json::Value& value) { return value["subid"].asUInt() == subId; });
                 if (datapointIterator != datapointJsonArray.end()) {
-                    fieldJsonValue = (*datapointIterator)["field"];
+                    if ((*datapointIterator).isMember("field")) {
+                        fieldJsonValue = (*datapointIterator)["field"];
+                    }
+                    if ((*datapointIterator).isMember("encoding")) {
+                        encodingStr = (*datapointIterator)["encoding"].asString();
+                    }
                 }
             }
-            auto encodingStr = descriptor["encoding"].asString();
+
             auto encodedFieldList = ParseEncodingString(encodingStr);
             uint32_t sumSize = 0;
             for (const auto& field: encodedFieldList) {
