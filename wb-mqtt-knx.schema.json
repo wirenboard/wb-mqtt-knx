@@ -20,8 +20,7 @@
         "13.xxx_4-Octet_Signed_Value",
         "14.xxx_4-Octet_Float_Value",
         "20.xxx_N8"
-      ],
-      "default": "1.xxx_B1"
+      ]
     },
     "datapointTypeJSON": {
       "type": "string",
@@ -65,8 +64,7 @@
         "27.xxx_Combined_Info_On_Off_JSON",
         "  27.001_Combined_Info_On_Off_JSON",
         "29.xxx_V64_JSON"
-      ],
-      "default": "1.xxx_B1_JSON"
+      ]
     },
     "device": {
       "headerTemplate": "device_header_template",
@@ -145,6 +143,7 @@
             { "$ref": "#/definitions/datapointTypeMqtt" },
             { "$ref": "#/definitions/datapointTypeJSON" }
           ],
+          "default": "1.xxx_B1",
           "propertyOrder": 4
         },
         "readPollInterval": {
