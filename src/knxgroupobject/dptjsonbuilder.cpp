@@ -57,7 +57,9 @@ namespace knx
         PDpt TDptJsonBuilder::Create(const TDatapointId& datapointId)
         {
             if (DescriptorMap.find(datapointId.GetMain()) == DescriptorMap.end()) {
-                return nullptr;
+                wb_throw(TKnxException,
+                         "Can't create JSON datapoint id: " + datapointId.ToString() +
+                             ". There is no matching descriptor in the descriptor file.");
             }
             auto descriptor = DescriptorMap[datapointId.GetMain()];
 
@@ -88,7 +90,13 @@ namespace knx
             }
             auto dptJson = std::make_shared<TDptJson>();
             auto jsonFieldIterator = fieldJsonValue.begin();
-            uint32_t bitPosition = sumSize <= 6 ? 8U - sumSize : 8U;
+
+            // This defines whether the first byte of the KNX payload can be filled.
+            // If the fields are longer than 6 bits, the first byte of the payload is left blank.
+            // In the case of a short payload, the number of blank bits before it is calculated.
+            const auto shortPayload = (sumSize <= 6);
+            uint32_t bitPosition = shortPayload ? 8U - sumSize : 8U;
+
             for (const auto& encodedField: encodedFieldList) {
                 if (encodedField.typeCode != 'r') {
                     TDptJsonField field((*jsonFieldIterator)["name"].asString(),

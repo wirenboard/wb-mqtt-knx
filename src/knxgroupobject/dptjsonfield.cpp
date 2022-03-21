@@ -1,17 +1,36 @@
 #include "dptjsonfield.h"
 #include "datapointutils.h"
 #include "dptjsonbuilder.h"
+#include <set>
 
 namespace knx
 {
     namespace object
     {
+        namespace
+        {
+            constexpr auto KNX_CHAR_BIT_WIDTH = 8;
+            constexpr auto KNX_CHAR_STRING_BIT_WIDTH = 112;
+
+            const std::map<TDptJsonField::EFieldType, std::set<uint32_t>> SupportedFixedBitWidthList = {
+                {TDptJsonField::EFieldType::CHAR, {KNX_CHAR_BIT_WIDTH, KNX_CHAR_STRING_BIT_WIDTH}},
+                {TDptJsonField::EFieldType::INT, {8, 16, 32, 64}},
+                {TDptJsonField::EFieldType::FLOAT, {16, 32}}};
+        }
 
         TDptJsonField::TDptJsonField(const std::string& name, TDptJsonField::EFieldType type, uint32_t width)
             : Name(name),
               FieldType(type),
               BitWidth(width)
-        {}
+        {
+            auto it = SupportedFixedBitWidthList.find(type);
+            if (it != SupportedFixedBitWidthList.end()) {
+                if (it->second.find(BitWidth) == it->second.end()) {
+                    wb_throw(TKnxException, "Unsupported bit width for field: " + name);
+                }
+            }
+        }
+
         std::string TDptJsonField::GetName() const
         {
             return Name;
@@ -24,12 +43,12 @@ namespace knx
         {
             switch (FieldType) {
                 case EFieldType::CHAR: {
-                    if (BitWidth == 8) {
+                    if (BitWidth == KNX_CHAR_BIT_WIDTH) {
                         std::string str(1, static_cast<char>(value.to_ullong()));
                         Value = Json::Value(str);
-                    } else if (BitWidth == 112) {
+                    } else if (BitWidth == KNX_CHAR_STRING_BIT_WIDTH) {
                         std::string str;
-                        for (int i = 0; i < 112 / 8; ++i) {
+                        for (int i = 0; i < KNX_CHAR_STRING_BIT_WIDTH / 8; ++i) {
                             auto lowByte = (value & TJsonFieldRawValue(0xFF)).to_ulong();
                             if (lowByte != 0) {
                                 str.insert(0, std::string(1, static_cast<char>(lowByte)));
@@ -74,20 +93,26 @@ namespace knx
         {
             switch (FieldType) {
                 case EFieldType::CHAR: {
-                    if (BitWidth == 8) {
+                    if (BitWidth == KNX_CHAR_BIT_WIDTH) {
                         auto str = Value.asString();
                         if (!str.empty()) {
                             return static_cast<uint8_t>(str[0]);
+                        } else {
+                            return 0;
                         }
-                        return 0;
-                    } else if (BitWidth == 112) {
+                    } else if (BitWidth == KNX_CHAR_STRING_BIT_WIDTH) {
                         TJsonFieldRawValue value;
                         auto str = Value.asString();
+                        if (str.empty()) {
+                            return value;
+                        } else if (str.size() > KNX_CHAR_STRING_BIT_WIDTH) {
+                            str = str.substr(0, KNX_CHAR_STRING_BIT_WIDTH - 1);
+                        }
                         for (const auto& ch: str) {
                             value |= TJsonFieldRawValue(ch);
                             value <<= 8;
                         }
-                        value <<= 112 - (str.size() + 1) * 8;
+                        value <<= KNX_CHAR_STRING_BIT_WIDTH - (str.size() + 1) * 8;
                         return value;
                     }
                 }
@@ -104,14 +129,13 @@ namespace knx
                     } else if (BitWidth == 32) {
                         return datapointUtils::FloatToRaw32(Value.asFloat());
                     }
-                } break;
+                }
             }
-            return {}; // TODO!!!
+            wb_throw(TKnxException, "Unsupported JSON field type or width");
         }
         Json::Value TDptJsonField::GetValue() const
         {
             return Value;
         }
-
     }
 }
