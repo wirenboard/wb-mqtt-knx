@@ -1,5 +1,8 @@
 #include "dptjsonbuilder.h"
 
+/// Json datapoint description file documentation:
+/// https://github.com/wirenboard/wb-mqtt-knx/blob/master/jsondatapoint.md
+
 namespace
 {
     struct EncodingResult
