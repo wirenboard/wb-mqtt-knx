@@ -4,6 +4,7 @@ project(wb-mqtt-knx)
 
 set(DEFAULT_CONFIG_FILE_PATH "/etc/wb-mqtt-knx.conf" CACHE STRING "Set default json config path")
 set(DEFAULT_CONFIG_SCHEMA_FILE_PATH "/usr/share/wb-mqtt-confed/schemas/wb-mqtt-knx.schema.json" CACHE STRING "Set default json config schema path")
+set(DEFAULT_CONFIG_JSON_DATAPOINT_FILE_PATH "/usr/share/wb-mqtt-knx/wb-mqtt-knx-jsondpt.conf" CACHE STRING "Set default json datapoint config path")
 
 execute_process (
         COMMAND bash -c "head -1 ${PROJECT_SOURCE_DIR}/debian/changelog | awk '{ printf $2; }' | sed 's/[\(\)]//g'"
@@ -54,4 +55,5 @@ configure_file (
 install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
 install(FILES ${PROJECT_SOURCE_DIR}/wb-mqtt-knx.schema.json DESTINATION /usr/share/wb-mqtt-confed/schemas)
 install(FILES ${PROJECT_SOURCE_DIR}/wb-mqtt-knx.conf DESTINATION /etc)
+install(FILES ${PROJECT_SOURCE_DIR}/wb-mqtt-knx-jsondpt.conf DESTINATION /usr/share/wb-mqtt-knx)
 install(FILES ${PROJECT_SOURCE_DIR}/wb-mqtt-knx.wbconfigs DESTINATION /etc/wb-configs.d RENAME 42wb-mqtt-knx)

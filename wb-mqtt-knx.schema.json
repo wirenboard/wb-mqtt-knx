@@ -2,6 +2,70 @@
   "type": "object",
   "title": "KNX Group Object Configuration",
   "definitions": {
+    "datapointTypeMqtt": {
+      "type": "string",
+      "title": "MQTT",
+      "enum": [
+        "Raw_Value",
+        "1.xxx_B1",
+        "2.xxx_B2",
+        "3.xxx_B1U3",
+        "4.xxx_Character_Set",
+        "5.xxx_8-Bit_Unsigned_Value",
+        "6.xxx_V8",
+        "7.xxx_2-Octet_Unsigned_Value",
+        "8.xxx_2-Octet_Signed_Value",
+        "9.xxx_2-Octet_Float_Value",
+        "12.001_4-Octet_Unsigned_Value",
+        "13.xxx_4-Octet_Signed_Value",
+        "14.xxx_4-Octet_Float_Value",
+        "20.xxx_N8"
+      ]
+    },
+    "datapointTypeJSON": {
+      "type": "string",
+      "title": "JSON",
+      "enum": [
+        "1.xxx_B1_JSON",
+        "  1.001_Switch_JSON",
+        "  1.002_Bool_JSON",
+        "  1.002_Enable_JSON",
+        "2.xxx_B2_JSON",
+        "3.xxx_B1U3_JSON",
+        "4.xxx_CharacterSet_JSON",
+        "5.xxx_8-Bit_Unsigned_Value_JSON",
+        "6.xxx_V8_JSON",
+        "  6.020_Status_with_Mode_JSON",
+        "7.xxx_2-Octet_Unsigned_Value_JSON",
+        "8.xxx_2-Octet_Signed_Value_JSON",
+        "9.xxx_2-Octet_Float_Value_JSON",
+        "10.xxx_Time_JSON",
+        "  10.001_Time_Of_Day_JSON",
+        "11.xxx_Date_JSON",
+        "  11.001_Date_JSON",
+        "12.xxx_4-Octet_Unsigned_Value_JSON",
+        "  12.001_Value-4-Ucount_JSON",
+        "13.xxx_4-Octet_Signed_Value_JSON",
+        "14.xxx_4-Octet_Float_Value_JSON",
+        "15.xxx_Access_Data_JSON",
+        "  15.000_Access_Data_JSON",
+        "16.xxx_String_JSON",
+        "17.xxx_SceneNumber_JSON",
+        "18.xxx_SceneControl_JSON",
+        "19.xxx_Date_Time_JSON",
+        "  19.001_Date_Time_JSON",
+        "20.xxx_N8_JSON",
+        "21.xxx_B8_JSON",
+        "  21.001_Status_Gen_JSON",
+        "  21.002_Device_Control_JSON",
+        "23.xxx_N2_JSON",
+        "26.xxx_Scene_Info_JSON",
+        "  26.001_Scene_Info_JSON",
+        "27.xxx_Combined_Info_On_Off_JSON",
+        "  27.001_Combined_Info_On_Off_JSON",
+        "29.xxx_V64_JSON"
+      ]
+    },
     "device": {
       "headerTemplate": "device_header_template",
       "type": "object",
@@ -74,23 +138,10 @@
           }
         },
         "dataPointType": {
-          "type": "string",
           "title": "Data point type",
-          "enum": [
-            "Raw_Value",
-            "1.xxx_B1",
-            "2.xxx_B2",
-            "3.xxx_B1U3",
-            "4.xxx_Character_Set",
-            "5.xxx_8-Bit_Unsigned_Value",
-            "6.xxx_V8",
-            "7.xxx_2-Octet_Unsigned_Value",
-            "8.xxx_2-Octet_Signed_Value",
-            "9.xxx_2-Octet_Float_Value",
-            "12.001_4-Octet_Unsigned_Value",
-            "13.xxx_4-Octet_Signed_Value",
-            "14.xxx_4-Octet_Float_Value",
-            "20.xxx_N8"
+          "oneOf": [
+            { "$ref": "#/definitions/datapointTypeMqtt" },
+            { "$ref": "#/definitions/datapointTypeJSON" }
           ],
           "default": "1.xxx_B1",
           "propertyOrder": 4

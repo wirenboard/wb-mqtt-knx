@@ -1,6 +1,7 @@
 #include "config.h"
 #include "configurator.h"
 #include "knxclientservice.h"
+#include "knxgroupobject/dptjsonbuilder.h"
 #include "knxgroupobject/mqttbuilder.h"
 #include "knxgroupobjectcontroller.h"
 #include "knxlegacydevice.h"
@@ -123,7 +124,9 @@ int main(int argc, char** argv)
         auto knxGroupObjectController =
             std::make_shared<knx::TKnxGroupObjectController>(knxClientService, KNX_READ_TICK_PERIOD);
 
-        auto groupObjectBuilder = std::make_shared<knx::object::TGroupObjectMqttBuilder>(mqttDriver, ErrorLogger);
+        knx::object::TDptJsonBuilder dptJsonBuilder(DEFAULT_CONFIG_JSON_DATAPOINT_FILE_PATH);
+        auto groupObjectBuilder =
+            std::make_shared<knx::object::TGroupObjectMqttBuilder>(mqttDriver, dptJsonBuilder, ErrorLogger);
 
         WBMQTT::SignalHandling::OnSignals({SIGINT, SIGTERM}, [&] {
             tickTimer.Stop();
