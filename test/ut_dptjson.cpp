@@ -113,6 +113,15 @@ TEST_F(DptJsonTest, toMqttStringFieldTest)
     EXPECT_EQ("Hello, world", jsonObject["stringField"].asString());
 }
 
+TEST_F(DptJsonTest, stringFieldTestNeg)
+{
+    ConfigureJsonDptString();
+    Dpt->FromMqtt(0, R"({"charField": "p", "stringField": "0123456789abcdef"})");
+
+    KnxPayload = {0x00, 'p', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd'};
+    EXPECT_EQ(KnxPayload, Dpt->ToKnx());
+}
+
 TEST_F(DptJsonTest, toKnxTest)
 {
     ConfigureJsonDpt();

@@ -105,14 +105,16 @@ namespace knx
                         auto str = Value.asString();
                         if (str.empty()) {
                             return value;
-                        } else if (str.size() > KNX_CHAR_STRING_BIT_WIDTH) {
-                            str = str.substr(0, KNX_CHAR_STRING_BIT_WIDTH - 1);
+                        } else if (str.size() > (KNX_CHAR_STRING_BIT_WIDTH / 8)) {
+                            str = str.substr(0, (KNX_CHAR_STRING_BIT_WIDTH / 8));
                         }
-                        for (const auto& ch: str) {
-                            value |= TJsonFieldRawValue(ch);
+
+                        value = TJsonFieldRawValue(str[0]);
+                        for (uint32_t i = 1; i < str.size(); ++i) {
                             value <<= 8;
+                            value |= TJsonFieldRawValue(str[i]);
                         }
-                        value <<= KNX_CHAR_STRING_BIT_WIDTH - (str.size() + 1) * 8;
+                        value <<= KNX_CHAR_STRING_BIT_WIDTH - (str.size() * 8);
                         return value;
                     }
                 }
