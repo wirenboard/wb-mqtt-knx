@@ -21,8 +21,9 @@ void Configurator::ConfigureObjectController(IKnxGroupObjectController& controll
             goSettings.DatapointType = control["dataPointType"].asString();
             goSettings.IsReadOnly = control["readOnly"].asBool();
 
-            if (control.isMember("feedbackGroupAddress") && !control["feedbackGroupAddress"].asString().empty()) {
-                goSettings.FeedbackGroupAddress = TKnxGroupAddress{control["feedbackGroupAddress"].asString()};
+            const auto feedbackGroupAdsressStr = "feedbackGroupAddress";
+            if (control.isMember(feedbackGroupAdsressStr) && !control[feedbackGroupAdsressStr].asString().empty()) {
+                goSettings.FeedbackGroupAddress = TKnxGroupAddress{control[feedbackGroupAdsressStr].asString()};
             }
             goSettings.ReadRequestAfterStart = true;
             goSettings.ReadRequestPollInterval = std::chrono::milliseconds(control["readPollInterval"].asInt());
