@@ -48,21 +48,23 @@ TEST_F(KnxGroupObjectControllerTest, AddObject)
 {
     knx::TKnxGroupAddress address{"1/1/1"};
     knx::TGroupObjectSettings goSettings;
+    goSettings.GroupAddress = address;
     auto groupObjectMock = std::make_shared<TGroupObjectMock>();
     EXPECT_CALL(*groupObjectMock, SetKnxSender(address, _)).Times(1);
 
-    EXPECT_TRUE(Controller->AddGroupObject(address, groupObjectMock, goSettings));
-    EXPECT_FALSE(Controller->AddGroupObject(address, groupObjectMock, goSettings));
+    EXPECT_TRUE(Controller->AddGroupObject(groupObjectMock, goSettings));
+    EXPECT_FALSE(Controller->AddGroupObject(groupObjectMock, goSettings));
 }
 
 TEST_F(KnxGroupObjectControllerTest, RemoveObject)
 {
     knx::TKnxGroupAddress address{"1/1/1"};
     knx::TGroupObjectSettings goSettings;
+    goSettings.GroupAddress = address;
     auto groupObjectMock = std::make_shared<TGroupObjectMock>();
     EXPECT_CALL(*groupObjectMock, SetKnxSender(address, _)).Times(1);
 
-    EXPECT_TRUE(Controller->AddGroupObject(address, groupObjectMock, goSettings));
+    EXPECT_TRUE(Controller->AddGroupObject(groupObjectMock, goSettings));
     EXPECT_TRUE(Controller->RemoveGroupObject(address));
     EXPECT_FALSE(Controller->RemoveGroupObject(address));
 }
@@ -74,12 +76,13 @@ TEST_F(KnxGroupObjectControllerTest, ReadRequestAfterStart)
 
     knx::TKnxGroupAddress address{"1/1/1"};
     knx::TGroupObjectSettings goSettings;
+    goSettings.GroupAddress = address;
     goSettings.ReadRequestAfterStart = true;
     auto groupObjectMock = std::make_shared<TGroupObjectMock>();
     EXPECT_CALL(*groupObjectMock, SetKnxSender(address, _)).Times(1);
     EXPECT_CALL(*TelegramSender, Send(_)).Times(1);
 
-    EXPECT_TRUE(Controller->AddGroupObject(address, groupObjectMock, goSettings));
+    EXPECT_TRUE(Controller->AddGroupObject(groupObjectMock, goSettings));
     eventObserverStub.Subscribe(Controller);
     tickTimerObserverStub.Subscribe(Controller);
 
@@ -96,6 +99,7 @@ TEST_F(KnxGroupObjectControllerTest, SendTelegram)
     std::vector<uint8_t> payload = {10, 20};
 
     knx::TGroupObjectSettings goSettings;
+    goSettings.GroupAddress = address;
     goSettings.ReadRequestAfterStart = false;
     auto groupObjectMock = std::make_shared<TGroupObjectMock>();
     EXPECT_CALL(*groupObjectMock, SetKnxSender(address, _))
@@ -107,7 +111,7 @@ TEST_F(KnxGroupObjectControllerTest, SendTelegram)
         EXPECT_EQ(telegram.GetReceiverAddress(), address.GetEibAddress());
     }));
 
-    EXPECT_TRUE(Controller->AddGroupObject(address, groupObjectMock, goSettings));
+    EXPECT_TRUE(Controller->AddGroupObject(groupObjectMock, goSettings));
     goSender->Send(knx::object::TGroupObjectTransaction{address, knx::telegram::TApci::GroupValueWrite, payload});
     eventObserverStub.Subscribe(Controller);
     tickTimerObserverStub.Subscribe(Controller);
@@ -130,6 +134,7 @@ TEST_F(KnxGroupObjectControllerTest, RecvTelegram)
     knxTelegram.Tpdu().SetPayload(payload);
 
     knx::TGroupObjectSettings goSettings;
+    goSettings.GroupAddress = address;
     goSettings.ReadRequestAfterStart = false;
     auto groupObjectMock = std::make_shared<TGroupObjectMock>();
     EXPECT_CALL(*groupObjectMock, SetKnxSender(address, _)).Times(1);
@@ -140,7 +145,7 @@ TEST_F(KnxGroupObjectControllerTest, RecvTelegram)
             EXPECT_EQ(knxTelegram.Tpdu().GetPayload(), transaction.Payload);
         }));
 
-    EXPECT_TRUE(Controller->AddGroupObject(address, groupObjectMock, goSettings));
+    EXPECT_TRUE(Controller->AddGroupObject(groupObjectMock, goSettings));
 
     eventObserverStub.Subscribe(Controller);
     tickTimerObserverStub.Subscribe(Controller);
@@ -164,6 +169,7 @@ TEST_F(KnxGroupObjectControllerTest, PollRead)
     knxTelegram.Tpdu().SetPayload(payload);
 
     knx::TGroupObjectSettings goSettings;
+    goSettings.GroupAddress = address;
     goSettings.ReadRequestAfterStart = false;
     goSettings.ReadRequestPollInterval = std::chrono::milliseconds(10 * TickTime);
 
@@ -176,7 +182,7 @@ TEST_F(KnxGroupObjectControllerTest, PollRead)
             EXPECT_EQ(knxTelegram.Tpdu().GetPayload(), transaction.Payload);
         }));
 
-    EXPECT_TRUE(Controller->AddGroupObject(address, groupObjectMock, goSettings));
+    EXPECT_TRUE(Controller->AddGroupObject(groupObjectMock, goSettings));
     EXPECT_CALL(*TelegramSender, Send(_)).WillOnce(Invoke([](const knx::TTelegram& telegram) {
         EXPECT_EQ(telegram.Tpdu().GetAPCI(), knx::telegram::TApci::GroupValueRead);
     }));
@@ -206,6 +212,7 @@ TEST_F(KnxGroupObjectControllerTest, PollReadTimeout)
     knxTelegram.Tpdu().SetPayload(payload);
 
     knx::TGroupObjectSettings goSettings;
+    goSettings.GroupAddress = address;
     goSettings.ReadRequestAfterStart = false;
     goSettings.ReadRequestPollInterval = std::chrono::milliseconds(10 * TickTime);
     goSettings.ReadResponseTimeout = std::chrono::milliseconds(5 * TickTime);
@@ -223,7 +230,7 @@ TEST_F(KnxGroupObjectControllerTest, PollReadTimeout)
         EXPECT_EQ(event, knx::TKnxEvent::PollReadTimeoutError);
     }));
 
-    EXPECT_TRUE(Controller->AddGroupObject(address, groupObjectMock, goSettings));
+    EXPECT_TRUE(Controller->AddGroupObject(groupObjectMock, goSettings));
     EXPECT_CALL(*TelegramSender, Send(_)).WillOnce(Invoke([](const knx::TTelegram& telegram) {
         EXPECT_EQ(telegram.Tpdu().GetAPCI(), knx::telegram::TApci::GroupValueRead);
     }));

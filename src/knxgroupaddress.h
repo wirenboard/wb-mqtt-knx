@@ -63,6 +63,11 @@ namespace knx
         /// \return comparison result
         bool operator==(const TKnxGroupAddress& rhs) const;
 
+        /// \brief Not Equal operator
+        /// \param rhs right value
+        /// \return comparison result
+        bool operator!=(const TKnxGroupAddress& rhs) const;
+
         /// \brief Converting a group address to a string
         std::string ToString() const;
 

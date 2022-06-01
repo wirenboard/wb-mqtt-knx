@@ -22,7 +22,7 @@ void TGroupObjectMqttBuilder::LinkDevice(const std::string& id, const std::strin
             .GetValue());
 }
 
-PGroupObject TGroupObjectMqttBuilder::Create(const TGroupObjectMqttParameter& parameter)
+PGroupObject TGroupObjectMqttBuilder::Create(const TGroupObjectSettings& settings)
 {
     if (MqttDeviceList.empty())
         return nullptr;
@@ -30,9 +30,9 @@ PGroupObject TGroupObjectMqttBuilder::Create(const TGroupObjectMqttParameter& pa
     PDpt datapoint;
 
     std::regex hasJsonRegex("_JSON\\s*$");
-    if (std::regex_search(parameter.Type, hasJsonRegex)) {
+    if (std::regex_search(settings.DatapointType, hasJsonRegex)) {
         TDatapointId datapointId;
-        if (!datapointId.SetFromString(parameter.Type)) {
+        if (!datapointId.SetFromString(settings.DatapointType)) {
             return nullptr;
         }
         datapoint = DptJsonBuilder.Create(datapointId);
@@ -40,15 +40,10 @@ PGroupObject TGroupObjectMqttBuilder::Create(const TGroupObjectMqttParameter& pa
             return nullptr;
         }
     } else {
-        datapoint = DataPointPool::MakeDataPointByName(parameter.Type);
+        datapoint = DataPointPool::MakeDataPointByName(settings.DatapointType);
     }
 
-    return std::make_shared<knx::object::TGroupObjectMqtt>(datapoint,
-                                                           parameter.ControlId,
-                                                           parameter.ControlTitle,
-                                                           parameter.isReadOnly,
-                                                           MqttDeviceList.back(),
-                                                           ErrorLogger);
+    return std::make_shared<knx::object::TGroupObjectMqtt>(datapoint, settings, MqttDeviceList.back(), ErrorLogger);
 }
 
 void TGroupObjectMqttBuilder::RemoveUnusedControls()

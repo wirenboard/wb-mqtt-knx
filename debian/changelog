@@ -1,3 +1,9 @@
+wb-mqtt-knx (1.6.0) unstable; urgency=medium
+
+  * Added processing group object feedback
+
+ -- Roman Kochkin <roman.kochkin@wirenboard.ru>  Tue, 31 May 2022 20:27:00 +0300
+
 wb-mqtt-knx (1.5.0) unstable; urgency=medium
 
   * Added support for JSON KNX datapoints

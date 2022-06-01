@@ -14,19 +14,22 @@ void Configurator::ConfigureObjectController(IKnxGroupObjectController& controll
         groupObjectBuilder.LinkDevice(deviceIdStr, deviceTitleStr);
 
         for (const auto& control: device["controls"]) {
-            auto controlIdStr = control["controlId"].asString();
-            auto controlNameStr = control["controlTitle"].asString();
-            auto groupAddressStr = control["groupAddress"].asString();
-            auto dataPointStr = control["dataPointType"].asString();
-            auto isReadOnlyBool = control["readOnly"].asBool();
-
             TGroupObjectSettings goSettings;
+            goSettings.ControlId = control["controlId"].asString();
+            goSettings.ControlTitle = control["controlTitle"].asString();
+            goSettings.GroupAddress = TKnxGroupAddress{control["groupAddress"].asString()};
+            goSettings.DatapointType = control["dataPointType"].asString();
+            goSettings.IsReadOnly = control["readOnly"].asBool();
+
+            if (control.isMember("feedbackGroupAddress") && !control["feedbackGroupAddress"].asString().empty()) {
+                goSettings.FeedbackGroupAddress = TKnxGroupAddress{control["feedbackGroupAddress"].asString()};
+            }
             goSettings.ReadRequestAfterStart = true;
             goSettings.ReadRequestPollInterval = std::chrono::milliseconds(control["readPollInterval"].asInt());
             goSettings.ReadResponseTimeout = std::chrono::milliseconds(control["readPollTimeout"].asInt());
 
-            auto groupObject = groupObjectBuilder.Create({dataPointStr, controlIdStr, controlNameStr, isReadOnlyBool});
-            controller.AddGroupObject(knx::TKnxGroupAddress{groupAddressStr}, groupObject, goSettings);
+            auto groupObject = groupObjectBuilder.Create(goSettings);
+            controller.AddGroupObject(groupObject, goSettings);
         }
 
         groupObjectBuilder.RemoveUnusedControls();
