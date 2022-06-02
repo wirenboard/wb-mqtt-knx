@@ -14,6 +14,11 @@ namespace
     constexpr auto DEFAULT_ENABLE_LEGACY_KNX_DEVICE = false;
     constexpr auto DEFAULT_IS_CONTROL_READONLY = false;
 
+    inline std::string DatapointTypeExportToConfigDefault()
+    {
+        return knx::object::DataPointPool::GetDataPointNameById(0, 0);
+    }
+
     std::string DatapointTypeExportToConfig(const std::string& dpts)
     {
         uint32_t generalType;
@@ -39,7 +44,7 @@ namespace
         auto name = groupAddress->Attribute("Name");
         auto address = groupAddress->Attribute("Address");
         auto dpts = groupAddress->Attribute("DPTs");
-        if ((name != nullptr) && (address != nullptr) && (dpts != nullptr)) {
+        if ((name != nullptr) && (address != nullptr)) {
             TControlConfig control;
             knx::TKnxGroupAddress knxGroupAddress(address);
             auto groupAddressStr = knxGroupAddress.ToString();
@@ -47,7 +52,11 @@ namespace
             control.Id = std::string("control") + groupAddressStr;
             control.Title = name;
             control.GroupAddress = knxGroupAddress;
-            control.DatapointType = DatapointTypeExportToConfig(dpts);
+            if (dpts != nullptr) {
+                control.DatapointType = DatapointTypeExportToConfig(dpts);
+            } else {
+                control.DatapointType = DatapointTypeExportToConfigDefault();
+            }
             control.ReadOnly = DEFAULT_IS_CONTROL_READONLY;
             if (!control.DatapointType.empty()) {
                 controlList.push_back(control);

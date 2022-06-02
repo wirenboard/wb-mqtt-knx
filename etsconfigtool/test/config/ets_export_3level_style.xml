@@ -27,7 +27,7 @@
       <GroupAddress Name="Setpoint shift feedback" Address="1/2/4" DPTs="DPST-5-5" />
     </GroupRange>
     <GroupRange Name="eee" RangeStart="3328" RangeEnd="3583">
-      <GroupAddress Name="iiii" Address="1/5/0" />
+      <GroupAddress Name="iiii" Address="1/5/1" />
     </GroupRange>
   </GroupRange>
 </GroupAddress-Export>

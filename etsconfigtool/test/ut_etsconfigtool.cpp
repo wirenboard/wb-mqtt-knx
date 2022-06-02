@@ -118,3 +118,11 @@ TEST_F(EtsConfigToolTest, CheckConfig)
         }
     }
 }
+
+TEST_F(EtsConfigToolTest, CheckConfigWithoutDtp)
+{
+    knx::tool::TEtsConfigTool converter;
+    EXPECT_NO_THROW(converter.LoadEtsExport(TestConfigDir + "ets_export_3level_style.xml"));
+    Json::Value root = converter.GetWbMqttConfig();
+    EXPECT_EQ("Raw_Value", root["devices"][2]["controls"][0]["dataPointType"].asString());
+}
