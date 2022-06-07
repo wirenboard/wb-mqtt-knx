@@ -76,8 +76,10 @@ PDpt DataPointPool::MakeDataPointByName(const std::string& name)
     return it->Instance();
 }
 
-std::string DataPointPool::GetDataPointNameById(uint32_t general, uint32_t sub)
+std::string DataPointPool::GetDataPointNameById(const knx::object::TDatapointId& id)
 {
+    auto general = id.GetMain();
+    auto sub = id.GetSub();
     auto it = std::find_if(DptsCatalog.begin(), DptsCatalog.end(), [general, sub](const TDptsCatalogItem& item) {
         return (item.HasSubGroup) && (item.GeneralGroupId == general) && (item.SubGroupId == sub);
     });

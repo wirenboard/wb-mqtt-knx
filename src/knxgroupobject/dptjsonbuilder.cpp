@@ -59,7 +59,7 @@ namespace knx
 
         PDpt TDptJsonBuilder::Create(const TDatapointId& datapointId)
         {
-            if (DescriptorMap.find(datapointId.GetMain()) == DescriptorMap.end()) {
+            if (!HasDpt(datapointId)) {
                 wb_throw(TKnxException,
                          "Can't create JSON datapoint id: " + datapointId.ToString() +
                              ". There is no matching descriptor in the descriptor file.");
@@ -111,6 +111,14 @@ namespace knx
                 bitPosition += encodedField.width;
             }
             return dptJson;
+        }
+
+        bool TDptJsonBuilder::HasDpt(const TDatapointId& datapointId)
+        {
+            if (DescriptorMap.find(datapointId.GetMain()) != DescriptorMap.end()) {
+                return true;
+            }
+            return false;
         }
 
     }

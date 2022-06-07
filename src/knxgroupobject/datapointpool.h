@@ -1,5 +1,6 @@
 #pragma once
 
+#include "datapointid.h"
 #include "idpt.h"
 
 namespace knx
@@ -15,10 +16,9 @@ namespace knx
             PDpt MakeDataPointByName(const std::string& name);
 
             /// \brief Finding the system name of a datapoint by number in the registry of datapoints X.XXX
-            /// \param general Main group before point
-            /// \param sub Subgroup after point
+            /// \param id a datapoint id
             /// \return DataPoint name
-            std::string GetDataPointNameById(uint32_t general, uint32_t sub);
+            std::string GetDataPointNameById(const knx::object::TDatapointId& id);
         }
     }
 }

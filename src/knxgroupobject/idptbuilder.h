@@ -14,6 +14,11 @@ namespace knx
             /// \param datapointId datapoint Id for creating
             /// \return Pointer to the created datapoint
             virtual PDpt Create(const TDatapointId& datapointId) = 0;
+
+            /// Is there a datapoint with this id
+            /// \param datapointId datapoint id
+            /// \retval true if true if contained in builder
+            virtual bool HasDpt(const TDatapointId& datapointId) = 0;
         };
     }
 }

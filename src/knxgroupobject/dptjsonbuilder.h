@@ -23,6 +23,8 @@ namespace knx
 
             PDpt Create(const TDatapointId& datapointId) override;
 
+            bool HasDpt(const TDatapointId& datapointId) override;
+
         private:
             Json::Value DescriptorRoot;
             std::map<uint32_t, Json::Value> DescriptorMap;

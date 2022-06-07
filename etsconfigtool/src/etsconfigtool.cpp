@@ -16,18 +16,16 @@ namespace
 
     std::string DatapointTypeExportToConfig(const std::string& dpts)
     {
-        uint32_t generalType;
-        uint32_t subType = 0;
-
         try {
+            knx::object::TDatapointId id;
             auto firstDpts = WBMQTT::StringSplit(dpts, ",").at(0);
             auto firstDptsTokens = WBMQTT::StringSplit(firstDpts, "-");
-            generalType = std::stoi(firstDptsTokens.at(1));
+            id.SetMain(std::stoi(firstDptsTokens.at(1)));
             if (firstDptsTokens.size() == 3) {
-                subType = std::stoi(firstDptsTokens.at(2));
+                id.SetSub(std::stoi(firstDptsTokens.at(2)));
             }
 
-            return knx::object::DataPointPool::GetDataPointNameById(generalType, subType);
+            return knx::object::DataPointPool::GetDataPointNameById(id);
         } catch (const std::out_of_range& oor) {
             std::cerr << "DatapointTypeExportToConfig( " << dpts << " ): Out of Range error: " << oor.what() << '\n';
             return "";
