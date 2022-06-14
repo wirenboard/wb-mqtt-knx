@@ -65,5 +65,19 @@ namespace knx
             }
             return ss.str();
         }
+
+        bool TDatapointId::operator==(const TDatapointId& other) const
+        {
+            if (HasSubId() == other.HasSubId() && GetMain() == other.GetMain()) {
+                if (HasSubId()) {
+                    if (GetSub() == other.GetSub()) {
+                        return true;
+                    }
+                } else {
+                    return true;
+                }
+            }
+            return false;
+        }
     }
 }

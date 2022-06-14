@@ -53,6 +53,11 @@ namespace knx
             /// \return String in format "1.xxx" "1.1"
             std::string ToString() const;
 
+            /// Equal operator
+            /// \param other object for comparing
+            /// \return true if equal
+            bool operator==(const TDatapointId& other) const;
+
         private:
             uint32_t Main{};
             uint32_t Sub{};

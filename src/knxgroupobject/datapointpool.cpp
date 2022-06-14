@@ -32,26 +32,24 @@ namespace
     {
         std::string Name;
         PDpt (*Instance)();
-        uint32_t GeneralGroupId;
-        bool HasSubGroup{false};
-        uint32_t SubGroupId{0};
+        TDatapointId Id;
     };
 
     const std::vector<TDptsCatalogItem> DptsCatalog = {
-        {"Raw_Value", &CreateInst<TDptRaw>, 0}, // Default value
-        {"1.xxx_B1", &CreateInst<TDpt1>, 1},
-        {"2.xxx_B2", &CreateInst<TDpt2>, 2},
-        {"3.xxx_B1U3", &CreateInst<TDpt3>, 3},
-        {"4.xxx_Character_Set", &CreateInst<TDpt4>, 4},
-        {"5.xxx_8-Bit_Unsigned_Value", &CreateInst<TDpt5>, 5},
-        {"6.xxx_V8", &CreateInst<TDpt6>, 6},
-        {"7.xxx_2-Octet_Unsigned_Value", &CreateInst<TDpt7>, 7},
-        {"8.xxx_2-Octet_Signed_Value", &CreateInst<TDpt8>, 8},
-        {"9.xxx_2-Octet_Float_Value", &CreateInst<TDpt9>, 9},
-        {"12.001_4-Octet_Unsigned_Value", &CreateInst<TDpt12>, 12, true, 1},
-        {"13.xxx_4-Octet_Signed_Value", &CreateInst<TDpt13>, 13},
-        {"14.xxx_4-Octet_Float_Value", &CreateInst<TDpt14>, 14},
-        {"20.xxx_N8", &CreateInst<TDpt20>, 20}};
+        {"Raw_Value", &CreateInst<TDptRaw>, TDatapointId{0}}, // Default value
+        {"1.xxx_B1", &CreateInst<TDpt1>, TDatapointId{1}},
+        {"2.xxx_B2", &CreateInst<TDpt2>, TDatapointId{2}},
+        {"3.xxx_B1U3", &CreateInst<TDpt3>, TDatapointId{3}},
+        {"4.xxx_Character_Set", &CreateInst<TDpt4>, TDatapointId{4}},
+        {"5.xxx_8-Bit_Unsigned_Value", &CreateInst<TDpt5>, TDatapointId{5}},
+        {"6.xxx_V8", &CreateInst<TDpt6>, TDatapointId{6}},
+        {"7.xxx_2-Octet_Unsigned_Value", &CreateInst<TDpt7>, TDatapointId{7}},
+        {"8.xxx_2-Octet_Signed_Value", &CreateInst<TDpt8>, TDatapointId{8}},
+        {"9.xxx_2-Octet_Float_Value", &CreateInst<TDpt9>, TDatapointId{9}},
+        {"12.001_4-Octet_Unsigned_Value", &CreateInst<TDpt12>, TDatapointId{12, 1}},
+        {"13.xxx_4-Octet_Signed_Value", &CreateInst<TDpt13>, TDatapointId{13}},
+        {"14.xxx_4-Octet_Float_Value", &CreateInst<TDpt14>, TDatapointId{14}},
+        {"20.xxx_N8", &CreateInst<TDpt20>, TDatapointId{20}}};
 
     // TODO Add Dpts
     //        "6.020_Status_with_Mode",
@@ -78,15 +76,13 @@ PDpt DataPointPool::MakeDataPointByName(const std::string& name)
 
 std::string DataPointPool::GetDataPointNameById(const knx::object::TDatapointId& id)
 {
-    auto general = id.GetMain();
-    auto sub = id.GetSub();
-    auto it = std::find_if(DptsCatalog.begin(), DptsCatalog.end(), [general, sub](const TDptsCatalogItem& item) {
-        return (item.HasSubGroup) && (item.GeneralGroupId == general) && (item.SubGroupId == sub);
+    auto it = std::find_if(DptsCatalog.begin(), DptsCatalog.end(), [id](const TDptsCatalogItem& item) {
+        return (item.Id.HasSubId()) && (item.Id.GetMain() == id.GetMain()) && (item.Id.GetSub() == id.GetSub());
     });
 
     if (it == DptsCatalog.end()) {
-        it = std::find_if(DptsCatalog.begin(), DptsCatalog.end(), [general](const TDptsCatalogItem& item) {
-            return (!item.HasSubGroup) && (item.GeneralGroupId == general);
+        it = std::find_if(DptsCatalog.begin(), DptsCatalog.end(), [id](const TDptsCatalogItem& item) {
+            return (!item.Id.HasSubId()) && (item.Id.GetMain() == id.GetMain());
         });
 
         if (it == DptsCatalog.end()) {
