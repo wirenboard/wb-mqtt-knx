@@ -21,11 +21,10 @@
 
 using namespace knx::object;
 
+const TDatapointId TDptWbMqttBuilder::DefaultDatapointId{0};
+
 namespace
 {
-
-    constexpr auto DEFAULT_DPT_INDEX = 0U;
-
     template<typename T> PDpt CreateInst()
     {
         return std::make_shared<T>();
@@ -90,8 +89,7 @@ std::experimental::optional<PDpt> TDptWbMqttBuilder::Create(const TDatapointId& 
         return item->Instance();
     }
 
-    wb_throw(TKnxException,
-             "Can't create JSON datapoint id: " + datapointId.ToString() + ". There is no matching descriptor");
+    return std::experimental::nullopt;
 }
 
 bool TDptWbMqttBuilder::HasDpt(const TDatapointId& datapointId) const

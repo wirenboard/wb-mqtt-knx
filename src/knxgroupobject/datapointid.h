@@ -15,12 +15,12 @@ namespace knx
 
             /// Constructor without sub ID (ex. 1.xxx)
             /// \param main main ID
-            explicit TDatapointId(uint32_t main);
+            explicit TDatapointId(uint32_t main) noexcept;
 
             /// Constructor with sub ID (ex. 1.001)
             /// \param main main ID
             /// \param sub sub ID
-            TDatapointId(uint32_t main, uint32_t sub);
+            TDatapointId(uint32_t main, uint32_t sub) noexcept;
 
             /// Getter Main ID
             /// \return Main ID

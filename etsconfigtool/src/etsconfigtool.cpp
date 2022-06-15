@@ -30,7 +30,7 @@ std::string TEtsConfigTool::DatapointTypeExportToConfig(const std::string& dpts)
         if (datapoint) {
             return *datapoint;
         }
-        return *DptWbMqttBuilder.GetDptConfigName(DptWbMqttBuilder.DefaultDatapointId);
+        return *DptWbMqttBuilder.GetDptConfigName(object::TDptWbMqttBuilder::DefaultDatapointId);
     } catch (const std::out_of_range& oor) {
         std::cerr << "DatapointTypeExportToConfig( " << dpts << " ): Out of Range error: " << oor.what() << '\n';
         return "";

@@ -15,7 +15,7 @@ namespace knx
             bool HasDpt(const TDatapointId& datapointId) const override;
             std::experimental::optional<std::string> GetDptConfigName(const TDatapointId& datapointId) const override;
 
-            const TDatapointId DefaultDatapointId{0};
+            static const TDatapointId DefaultDatapointId;
         };
     }
 }

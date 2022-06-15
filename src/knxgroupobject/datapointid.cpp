@@ -6,10 +6,10 @@ namespace knx
 {
     namespace object
     {
-        TDatapointId::TDatapointId(uint32_t main): Main(main), HasSub(false)
+        TDatapointId::TDatapointId(uint32_t main) noexcept: Main(main), HasSub(false)
         {}
 
-        TDatapointId::TDatapointId(uint32_t main, uint32_t sub): Main(main), Sub(sub), HasSub(true)
+        TDatapointId::TDatapointId(uint32_t main, uint32_t sub) noexcept: Main(main), Sub(sub), HasSub(true)
         {}
 
         uint32_t TDatapointId::GetMain() const
