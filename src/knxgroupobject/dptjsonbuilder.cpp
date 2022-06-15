@@ -58,13 +58,12 @@ namespace knx
             DatapointNameMapUpdate();
         }
 
-        PDpt TDptJsonBuilder::Create(const TDatapointId& datapointId)
+        std::experimental::optional<PDpt> TDptJsonBuilder::Create(const TDatapointId& datapointId)
         {
             if (!HasDpt(datapointId)) {
-                wb_throw(TKnxException,
-                         "Can't create JSON datapoint id: " + datapointId.ToString() +
-                             ". There is no matching descriptor in the descriptor file.");
+                return std::experimental::nullopt;
             }
+
             auto descriptor = DescriptorMap[datapointId.GetMain()];
 
             auto fieldJsonValue = descriptor["field"];
@@ -114,14 +113,9 @@ namespace knx
             return dptJson;
         }
 
-        bool TDptJsonBuilder::HasDpt(const TDatapointId& datapointId)
+        bool TDptJsonBuilder::HasDpt(const TDatapointId& datapointId) const
         {
-            try {
-                GetDptName(datapointId);
-            } catch (const TKnxException&) {
-                return false;
-            }
-            return true;
+            return FindItem(datapointId) ? true : false;
         }
 
         void TDptJsonBuilder::DatapointNameMapUpdate()
@@ -141,21 +135,34 @@ namespace knx
             }
         }
 
-        std::string TDptJsonBuilder::GetDptName(const TDatapointId& datapointId) const
+        std::experimental::optional<std::string> TDptJsonBuilder::GetDptConfigName(
+            const TDatapointId& datapointId) const
         {
-            auto it = DatapointNameMap.find(datapointId);
-            if (it != DatapointNameMap.end()) {
-                return it->second;
-            }
-            auto id = datapointId;
-            id.ClearSub();
-            it = DatapointNameMap.find(datapointId);
-            if (it != DatapointNameMap.end()) {
-                return it->second;
+            auto item = FindItem(datapointId);
+
+            if (item) {
+                return item->second;
             }
 
-            wb_throw(TKnxException, "Can not found Datapoint Name from Id");
+            return std::experimental::nullopt;
         }
 
+        std::experimental::optional<std::pair<knx::object::TDatapointId, std::string>> TDptJsonBuilder::FindItem(
+            const TDatapointId& datapointId) const
+        {
+            auto id = datapointId;
+            auto it = DatapointNameMap.find(id);
+            if (it != DatapointNameMap.end()) {
+                return *it;
+            }
+
+            id.ClearSub();
+            it = DatapointNameMap.find(id);
+            if (it != DatapointNameMap.end()) {
+                return *it;
+            }
+
+            return std::experimental::nullopt;
+        }
     }
 }

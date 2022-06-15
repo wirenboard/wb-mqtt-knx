@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../../src/knxgroupobject/datapointpool.h"
 #include "config.h"
 #include "mqttknxconfig.h"
 #include "tinyxml2.h"
@@ -35,7 +36,11 @@ namespace knx
             void ParseGroupAddress(tinyxml2::XMLElement* mainGroup);
             void ParseGroupAddress(tinyxml2::XMLElement* mainGroup, tinyxml2::XMLElement* middleGroup);
 
+            std::string DatapointTypeExportToConfig(const std::string& dpts);
+            void AddToControlConfig(tinyxml2::XMLElement* groupAddress,
+                                    std::vector<knx::tool::TControlConfig>& controlList);
             TMqttKnxConfig Config;
+            object::TDptWbMqttBuilder DptWbMqttBuilder;
         };
     }
 }

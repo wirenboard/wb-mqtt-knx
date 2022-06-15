@@ -7,9 +7,11 @@ using namespace knx::object;
 
 TGroupObjectMqttBuilder::TGroupObjectMqttBuilder(WBMQTT::PDeviceDriver pMqttDeviceDriver,
                                                  object::IDptBuilder& dptJsonBuilder,
+                                                 object::IDptBuilder& dptWbMqttBuilder,
                                                  WBMQTT::TLogger& errorLogger)
     : MqttDeviceDriver(std::move(pMqttDeviceDriver)),
       DptJsonBuilder(dptJsonBuilder),
+      DptWbMqttBuilder(dptJsonBuilder),
       ErrorLogger(errorLogger)
 {}
 
@@ -27,23 +29,30 @@ PGroupObject TGroupObjectMqttBuilder::Create(const TGroupObjectMqttParameter& pa
     if (MqttDeviceList.empty())
         return nullptr;
 
-    PDpt datapoint;
+    std::experimental::optional<PDpt> datapoint;
+    TDatapointId datapointId;
+    if (!datapointId.SetFromString(parameter.Type)) {
+        return nullptr;
+    }
 
     std::regex hasJsonRegex("_JSON\\s*$");
     if (std::regex_search(parameter.Type, hasJsonRegex)) {
-        TDatapointId datapointId;
-        if (!datapointId.SetFromString(parameter.Type)) {
-            return nullptr;
-        }
         datapoint = DptJsonBuilder.Create(datapointId);
-        if (datapoint == nullptr) {
-            return nullptr;
+        if (!datapoint) {
+            wb_throw(TKnxException,
+                     "Can't create JSON datapoint id: " + datapointId.ToString() +
+                         ". There is no matching descriptor in the descriptor file.");
         }
     } else {
-        datapoint = DataPointPool::MakeDataPointByName(parameter.Type);
+        datapoint = DptWbMqttBuilder.Create(datapointId);
+        if (!datapoint) {
+            wb_throw(TKnxException,
+                     "Can't create WB-MQTT datapoint id: " + datapointId.ToString() +
+                         ". Can not found Datapoint Name from Id");
+        }
     }
 
-    return std::make_shared<knx::object::TGroupObjectMqtt>(datapoint,
+    return std::make_shared<knx::object::TGroupObjectMqtt>(*datapoint,
                                                            parameter.ControlId,
                                                            parameter.ControlTitle,
                                                            parameter.isReadOnly,

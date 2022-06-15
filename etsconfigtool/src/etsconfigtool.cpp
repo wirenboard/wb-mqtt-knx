@@ -13,43 +13,48 @@ namespace
     constexpr auto DEFAULT_ENABLE_DEBUG = false;
     constexpr auto DEFAULT_ENABLE_LEGACY_KNX_DEVICE = false;
     constexpr auto DEFAULT_IS_CONTROL_READONLY = false;
+}
 
-    std::string DatapointTypeExportToConfig(const std::string& dpts)
-    {
-        try {
-            knx::object::TDatapointId id;
-            auto firstDpts = WBMQTT::StringSplit(dpts, ",").at(0);
-            auto firstDptsTokens = WBMQTT::StringSplit(firstDpts, "-");
-            id.SetMain(std::stoi(firstDptsTokens.at(1)));
-            if (firstDptsTokens.size() == 3) {
-                id.SetSub(std::stoi(firstDptsTokens.at(2)));
-            }
-
-            return knx::object::DataPointPool::GetDataPointNameById(id);
-        } catch (const std::out_of_range& oor) {
-            std::cerr << "DatapointTypeExportToConfig( " << dpts << " ): Out of Range error: " << oor.what() << '\n';
-            return "";
+std::string TEtsConfigTool::DatapointTypeExportToConfig(const std::string& dpts)
+{
+    try {
+        knx::object::TDatapointId id;
+        auto firstDpts = WBMQTT::StringSplit(dpts, ",").at(0);
+        auto firstDptsTokens = WBMQTT::StringSplit(firstDpts, "-");
+        id.SetMain(std::stoi(firstDptsTokens.at(1)));
+        if (firstDptsTokens.size() == 3) {
+            id.SetSub(std::stoi(firstDptsTokens.at(2)));
         }
-    }
 
-    void AddToControlConfig(tinyxml2::XMLElement* groupAddress, std::vector<knx::tool::TControlConfig>& controlList)
-    {
-        auto name = groupAddress->Attribute("Name");
-        auto address = groupAddress->Attribute("Address");
-        auto dpts = groupAddress->Attribute("DPTs");
-        if ((name != nullptr) && (address != nullptr) && (dpts != nullptr)) {
-            TControlConfig control;
-            knx::TKnxGroupAddress knxGroupAddress(address);
-            auto groupAddressStr = knxGroupAddress.ToString();
-            std::replace(groupAddressStr.begin(), groupAddressStr.end(), '/', '_');
-            control.Id = std::string("control") + groupAddressStr;
-            control.Title = name;
-            control.GroupAddress = knxGroupAddress;
-            control.DatapointType = DatapointTypeExportToConfig(dpts);
-            control.ReadOnly = DEFAULT_IS_CONTROL_READONLY;
-            if (!control.DatapointType.empty()) {
-                controlList.push_back(control);
-            }
+        auto datapoint = DptWbMqttBuilder.GetDptConfigName(id);
+        if (datapoint) {
+            return *datapoint;
+        }
+        return *DptWbMqttBuilder.GetDptConfigName(DptWbMqttBuilder.DefaultDatapointId);
+    } catch (const std::out_of_range& oor) {
+        std::cerr << "DatapointTypeExportToConfig( " << dpts << " ): Out of Range error: " << oor.what() << '\n';
+        return "";
+    }
+}
+
+void TEtsConfigTool::AddToControlConfig(tinyxml2::XMLElement* groupAddress,
+                                        std::vector<knx::tool::TControlConfig>& controlList)
+{
+    auto name = groupAddress->Attribute("Name");
+    auto address = groupAddress->Attribute("Address");
+    auto dpts = groupAddress->Attribute("DPTs");
+    if ((name != nullptr) && (address != nullptr) && (dpts != nullptr)) {
+        TControlConfig control;
+        knx::TKnxGroupAddress knxGroupAddress(address);
+        auto groupAddressStr = knxGroupAddress.ToString();
+        std::replace(groupAddressStr.begin(), groupAddressStr.end(), '/', '_');
+        control.Id = std::string("control") + groupAddressStr;
+        control.Title = name;
+        control.GroupAddress = knxGroupAddress;
+        control.DatapointType = DatapointTypeExportToConfig(dpts);
+        control.ReadOnly = DEFAULT_IS_CONTROL_READONLY;
+        if (!control.DatapointType.empty()) {
+            controlList.push_back(control);
         }
     }
 }
