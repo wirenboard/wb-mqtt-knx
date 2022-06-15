@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../../src/knxgroupobject/datapointpool.h"
+#include "../../src/knxgroupobject/dptwbmqttbuilder.h"
 #include "config.h"
 #include "mqttknxconfig.h"
 #include "tinyxml2.h"
