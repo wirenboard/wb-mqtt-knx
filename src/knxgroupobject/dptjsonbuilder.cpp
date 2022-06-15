@@ -55,6 +55,7 @@ namespace knx
                     wb_throw(TKnxException, "Duplicate ID in JSON dpt descriptor");
                 }
             }
+            DatapointNameMapUpdate();
         }
 
         PDpt TDptJsonBuilder::Create(const TDatapointId& datapointId)
@@ -115,10 +116,45 @@ namespace knx
 
         bool TDptJsonBuilder::HasDpt(const TDatapointId& datapointId)
         {
-            if (DescriptorMap.find(datapointId.GetMain()) != DescriptorMap.end()) {
-                return true;
+            try {
+                GetDptName(datapointId);
+            } catch (const TKnxException&) {
+                return false;
             }
-            return false;
+            return true;
+        }
+
+        void TDptJsonBuilder::DatapointNameMapUpdate()
+        {
+            for (const auto& el: DescriptorMap) {
+                auto mainId = el.first;
+                auto& descriptor = el.second;
+                const TDatapointId id{mainId};
+                DatapointNameMap[id] = id.ToString() + "_" + descriptor["name"].asString() + "_JSON";
+
+                for (const auto& datapoint: descriptor["datapoint"]) {
+                    auto datapointId = id;
+                    datapointId.SetSub(datapoint["subid"].asUInt());
+                    DatapointNameMap[datapointId] =
+                        datapointId.ToString() + "_" + datapoint["name"].asString() + "_JSON";
+                }
+            }
+        }
+
+        std::string TDptJsonBuilder::GetDptName(const TDatapointId& datapointId) const
+        {
+            auto it = DatapointNameMap.find(datapointId);
+            if (it != DatapointNameMap.end()) {
+                return it->second;
+            }
+            auto id = datapointId;
+            id.ClearSub();
+            it = DatapointNameMap.find(datapointId);
+            if (it != DatapointNameMap.end()) {
+                return it->second;
+            }
+
+            wb_throw(TKnxException, "Can not found Datapoint Name from Id");
         }
 
     }

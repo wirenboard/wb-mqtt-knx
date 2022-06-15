@@ -33,6 +33,12 @@ namespace knx
             HasSub = true;
         }
 
+        void TDatapointId::ClearSub()
+        {
+            HasSub = false;
+            Sub = 0;
+        }
+
         uint32_t TDatapointId::HasSubId() const
         {
             return HasSub;
@@ -66,15 +72,33 @@ namespace knx
             return ss.str();
         }
 
-        bool TDatapointId::operator==(const TDatapointId& other) const
+        bool TDatapointId::operator==(const TDatapointId& rhs) const
         {
-            if (HasSubId() == other.HasSubId() && GetMain() == other.GetMain()) {
-                if (HasSubId()) {
-                    if (GetSub() == other.GetSub()) {
+            if (HasSub == rhs.HasSub && Main == rhs.Main) {
+                if (HasSub) {
+                    if (Sub == rhs.Sub) {
                         return true;
                     }
                 } else {
                     return true;
+                }
+            }
+            return false;
+        }
+
+        bool TDatapointId::operator<(const TDatapointId& rhs) const
+        {
+            if (HasSub < rhs.HasSub) {
+                return true;
+            } else if (HasSub == rhs.HasSub) {
+                if (Main < rhs.Main) {
+                    return true;
+                } else if (Main == rhs.Main) {
+                    if (HasSub) {
+                        if (Sub < rhs.Sub) {
+                            return true;
+                        }
+                    }
                 }
             }
             return false;

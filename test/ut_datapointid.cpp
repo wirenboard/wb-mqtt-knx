@@ -68,3 +68,14 @@ TEST_F(DatapointIdTest, EqTest)
     a.SetSub(4);
     EXPECT_FALSE(a == b);
 }
+
+TEST_F(DatapointIdTest, LessTest)
+{
+    knx::object::TDatapointId a{12};
+    knx::object::TDatapointId b{12, 10};
+    EXPECT_TRUE(a < b);
+    a.SetSub(9);
+    EXPECT_TRUE(a < b);
+    b.SetMain(10);
+    EXPECT_FALSE(a < b);
+}

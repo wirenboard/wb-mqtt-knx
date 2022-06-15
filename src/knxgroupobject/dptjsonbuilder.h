@@ -25,9 +25,13 @@ namespace knx
 
             bool HasDpt(const TDatapointId& datapointId) override;
 
+            std::string GetDptName(const TDatapointId& datapointId) const;
+
         private:
             Json::Value DescriptorRoot;
             std::map<uint32_t, Json::Value> DescriptorMap;
+            std::map<TDatapointId, std::string> DatapointNameMap;
+            void DatapointNameMapUpdate();
         };
 
     }
