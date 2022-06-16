@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../../src/knxgroupobject/dptjsonbuilder.h"
 #include "../../src/knxgroupobject/dptwbmqttbuilder.h"
 #include "config.h"
 #include "mqttknxconfig.h"
@@ -14,6 +15,14 @@ namespace knx
         class TEtsConfigTool
         {
         public:
+            /// Constructor
+            /// \param mqttBuilder mqtt datapoint builder
+            /// \param jsonBuilder json datapoint builder
+            /// \param defaultId default datapoint ID if a datapoint description not found
+            TEtsConfigTool(const object::IDptBuilder& mqttBuilder,
+                           const object::IDptBuilder& jsonBuilder,
+                           const object::TDatapointId& defaultId);
+
             /// Load ETS export
             /// \param filePath ETS export xml file path
             /// \exception knx::TKnxException If the export file is missing or has an incorrect format
@@ -40,7 +49,9 @@ namespace knx
             void AddToControlConfig(tinyxml2::XMLElement* groupAddress,
                                     std::vector<knx::tool::TControlConfig>& controlList);
             TMqttKnxConfig Config;
-            object::TDptWbMqttBuilder DptWbMqttBuilder;
+            const object::IDptBuilder& MqttBuilder;
+            const object::IDptBuilder& JsonBuilder;
+            const object::TDatapointId DefaultId;
         };
     }
 }

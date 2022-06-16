@@ -15,6 +15,14 @@ namespace
     constexpr auto DEFAULT_IS_CONTROL_READONLY = false;
 }
 
+TEtsConfigTool::TEtsConfigTool(const knx::object::IDptBuilder& mqttBuilder,
+                               const knx::object::IDptBuilder& jsonBuilder,
+                               const knx::object::TDatapointId& defaultId)
+    : MqttBuilder(mqttBuilder),
+      JsonBuilder(jsonBuilder),
+      DefaultId(defaultId)
+{}
+
 std::string TEtsConfigTool::DatapointTypeExportToConfig(const std::string& dpts)
 {
     try {
@@ -26,11 +34,15 @@ std::string TEtsConfigTool::DatapointTypeExportToConfig(const std::string& dpts)
             id.SetSub(std::stoi(firstDptsTokens.at(2)));
         }
 
-        auto datapoint = DptWbMqttBuilder.GetDptConfigName(id);
+        auto datapoint = MqttBuilder.GetDptConfigName(id);
         if (datapoint) {
             return *datapoint;
         }
-        return *DptWbMqttBuilder.GetDptConfigName(object::TDptWbMqttBuilder::DefaultDatapointId);
+        datapoint = JsonBuilder.GetDptConfigName(id);
+        if (datapoint) {
+            return *datapoint;
+        }
+        return *MqttBuilder.GetDptConfigName(object::TDptWbMqttBuilder::DefaultDatapointId);
     } catch (const std::out_of_range& oor) {
         std::cerr << "DatapointTypeExportToConfig( " << dpts << " ): Out of Range error: " << oor.what() << '\n';
         return "";
