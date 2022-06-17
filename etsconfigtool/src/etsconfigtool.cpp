@@ -55,8 +55,8 @@ namespace
             if (dpts != nullptr) {
                 control.DatapointType = DatapointTypeExportToConfig(dpts);
             } else {
-                std::cout << "Warning: For '" << control.Id << "' missing datapoint type, assigned by default"
-                          << std::endl;
+                std::cout << "Warning: missing datapoint type for '" << control.Id
+                          << "', default ('Raw_Value') is assigned" << std::endl;
                 control.DatapointType = DatapointTypeExportToConfigDefault();
             }
             control.ReadOnly = DEFAULT_IS_CONTROL_READONLY;
