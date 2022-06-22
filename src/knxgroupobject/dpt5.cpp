@@ -6,3 +6,8 @@ std::vector<DptDescriptorField> TDpt5::getDescriptor() const
 {
     return {{"UnsignedValue", "value", std::numeric_limits<uint8_t>::min(), std::numeric_limits<uint8_t>::max()}};
 }
+
+TDatapointId TDpt5::GetId() const
+{
+    return TDatapointId{5};
+}

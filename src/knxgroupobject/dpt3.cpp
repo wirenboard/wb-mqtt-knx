@@ -42,3 +42,8 @@ std::vector<WBMQTT::TAny> TDpt3::ToMqtt()
 {
     return {FieldC, static_cast<double>(FieldStepCode)};
 }
+
+TDatapointId TDpt3::GetId() const
+{
+    return TDatapointId{3};
+}

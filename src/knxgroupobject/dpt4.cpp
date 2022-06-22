@@ -45,3 +45,8 @@ std::vector<WBMQTT::TAny> TDpt4::ToMqtt()
     }
     return {textValue};
 }
+
+TDatapointId TDpt4::GetId() const
+{
+    return TDatapointId{4};
+}

@@ -88,5 +88,13 @@ namespace knx
             builder["indentation"] = ""; // If you want whitespace-less output
             return {Json::writeString(builder, jsonObject)};
         }
+
+        TDatapointId TDptJson::GetId() const
+        {
+            return Id;
+        }
+
+        TDptJson::TDptJson(const TDatapointId& id): Id{id}
+        {}
     }
 }

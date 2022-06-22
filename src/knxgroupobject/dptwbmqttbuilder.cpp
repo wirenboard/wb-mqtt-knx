@@ -53,6 +53,22 @@ namespace
         {TDatapointId{14}, {"14.xxx_4-Octet_Float_Value", &CreateInst<TDpt14>}},
         {TDatapointId{20}, {"20.xxx_N8", &CreateInst<TDpt20>}}};
 
+    const std::vector<PDpt (*)()> Dpts = {&CreateInst<TDptRaw>,
+                                          &CreateInst<TDpt1>,
+                                          &CreateInst<TDpt2>,
+                                          &CreateInst<TDpt3>,
+                                          &CreateInst<TDpt4>,
+                                          &CreateInst<TDpt5>,
+                                          &CreateInst<TDpt6>,
+                                          &CreateInst<TDpt7>,
+                                          &CreateInst<TDpt8>,
+                                          &CreateInst<TDpt9>,
+                                          &CreateInst<TDpt12>,
+                                          &CreateInst<TDpt12>,
+                                          &CreateInst<TDpt13>,
+                                          &CreateInst<TDpt14>,
+                                          &CreateInst<TDpt20>};
+
     // TODO Add Dpts
     //        "6.020_Status_with_Mode",
     //        "10.001_Time",
@@ -81,12 +97,29 @@ namespace
     }
 }
 
+TDptWbMqttBuilder::TDptInstanceCreator TDptWbMqttBuilder::FindDptInstanceCreator(const TDatapointId& datapointId)
+{
+    auto id = datapointId;
+    auto it = DptInstanceCreatorMap.find(id);
+    if (it != DptInstanceCreatorMap.end()) {
+        return it->second;
+    }
+
+    id.ClearSub();
+    it = DptInstanceCreatorMap.find(id);
+    if (it != DptInstanceCreatorMap.end()) {
+        return it->second;
+    }
+
+    return nullptr;
+}
+
 std::experimental::optional<PDpt> TDptWbMqttBuilder::Create(const TDatapointId& datapointId)
 {
-    auto item = FindItem(datapointId);
+    auto item = FindDptInstanceCreator(datapointId);
 
     if (item) {
-        return item->Instance();
+        return item();
     }
 
     return std::experimental::nullopt;
@@ -106,4 +139,12 @@ std::experimental::optional<std::string> TDptWbMqttBuilder::GetDptConfigName(con
         return item->Name;
     }
     return std::experimental::nullopt;
+}
+
+TDptWbMqttBuilder::TDptWbMqttBuilder()
+{
+    for (const auto& dptInstanceCreator: Dpts) {
+        auto dpt = dptInstanceCreator();
+        DptInstanceCreatorMap[dpt->GetId()] = dptInstanceCreator;
+    }
 }

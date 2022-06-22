@@ -8,7 +8,7 @@ class DptJsonTest: public ::testing::Test
 protected:
     void SetUp() override
     {
-        Dpt = std::make_unique<knx::object::TDptJson>();
+        Dpt = std::make_unique<knx::object::TDptJson>(knx::object::TDatapointId{});
     }
 
     void TearDown() override

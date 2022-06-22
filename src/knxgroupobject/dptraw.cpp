@@ -53,3 +53,8 @@ std::vector<WBMQTT::TAny> TDptRaw::ToMqtt()
 
     return {ss.str()};
 }
+
+TDatapointId TDptRaw::GetId() const
+{
+    return TDatapointId{0};
+}
