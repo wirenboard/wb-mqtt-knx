@@ -17,6 +17,9 @@ namespace knx
 
             static const TDatapointId DefaultDatapointId;
 
+            /// Virtual destructor
+            virtual ~TBaseDptConfig() = default;
+
         protected:
             virtual const std::map<TDatapointId, std::string>& GetConfigNameMap() const = 0;
         };

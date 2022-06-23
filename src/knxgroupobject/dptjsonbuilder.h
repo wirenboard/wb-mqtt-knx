@@ -23,17 +23,9 @@ namespace knx
 
             std::experimental::optional<PDpt> Create(const TDatapointId& datapointId) override;
 
-            bool HasDpt(const TDatapointId& datapointId) const override;
-
-            std::experimental::optional<std::string> GetDptConfigName(const TDatapointId& datapointId) const override;
-
         private:
             Json::Value DescriptorRoot;
             std::map<uint32_t, Json::Value> DescriptorMap;
-            std::map<TDatapointId, std::string> DatapointNameMap;
-            void DatapointNameMapUpdate();
-            std::experimental::optional<std::pair<knx::object::TDatapointId, std::string>> FindItem(
-                const TDatapointId& datapointId) const;
         };
 
     }

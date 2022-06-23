@@ -55,12 +55,11 @@ namespace knx
                     wb_throw(TKnxException, "Duplicate ID in JSON dpt descriptor");
                 }
             }
-            DatapointNameMapUpdate();
         }
 
         std::experimental::optional<PDpt> TDptJsonBuilder::Create(const TDatapointId& datapointId)
         {
-            if (!HasDpt(datapointId)) {
+            if (DescriptorMap.find(datapointId.GetMain()) == DescriptorMap.end()) {
                 return std::experimental::nullopt;
             }
 
@@ -111,58 +110,6 @@ namespace knx
                 bitPosition += encodedField.width;
             }
             return dptJson;
-        }
-
-        bool TDptJsonBuilder::HasDpt(const TDatapointId& datapointId) const
-        {
-            return FindItem(datapointId) ? true : false;
-        }
-
-        void TDptJsonBuilder::DatapointNameMapUpdate()
-        {
-            for (const auto& el: DescriptorMap) {
-                auto mainId = el.first;
-                auto& descriptor = el.second;
-                const TDatapointId id{mainId};
-                DatapointNameMap[id] = id.ToString() + "_" + descriptor["name"].asString() + "_JSON";
-
-                for (const auto& datapoint: descriptor["datapoint"]) {
-                    auto datapointId = id;
-                    datapointId.SetSub(datapoint["subid"].asUInt());
-                    DatapointNameMap[datapointId] =
-                        datapointId.ToString() + "_" + datapoint["name"].asString() + "_JSON";
-                }
-            }
-        }
-
-        std::experimental::optional<std::string> TDptJsonBuilder::GetDptConfigName(
-            const TDatapointId& datapointId) const
-        {
-            auto item = FindItem(datapointId);
-
-            if (item) {
-                return item->second;
-            }
-
-            return std::experimental::nullopt;
-        }
-
-        std::experimental::optional<std::pair<knx::object::TDatapointId, std::string>> TDptJsonBuilder::FindItem(
-            const TDatapointId& datapointId) const
-        {
-            auto id = datapointId;
-            auto it = DatapointNameMap.find(id);
-            if (it != DatapointNameMap.end()) {
-                return *it;
-            }
-
-            id.ClearSub();
-            it = DatapointNameMap.find(id);
-            if (it != DatapointNameMap.end()) {
-                return *it;
-            }
-
-            return std::experimental::nullopt;
         }
     }
 }

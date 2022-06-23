@@ -14,8 +14,6 @@ namespace knx
         public:
             explicit TDptWbMqttBuilder();
             std::experimental::optional<PDpt> Create(const TDatapointId& datapointId) override;
-            bool HasDpt(const TDatapointId& datapointId) const override;
-            std::experimental::optional<std::string> GetDptConfigName(const TDatapointId& datapointId) const override;
 
             static const TDatapointId DefaultDatapointId;
 

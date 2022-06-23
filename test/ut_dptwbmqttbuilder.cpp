@@ -1,13 +1,11 @@
 #include "../src/knxexception.h"
 #include "../src/knxgroupobject/dptwbmqttbuilder.h"
-#include "config.h"
 #include "testutils.h"
 #include "gtest/gtest.h"
 
 class DptWbMqttBuilderTest: public ::testing::Test
 {
 protected:
-    std::string SourceDir = CMAKE_SOURCE_DIR;
     void SetUp() override
     {
         DptWbMqttBuilder = std::make_unique<knx::object::TDptWbMqttBuilder>();
@@ -41,24 +39,4 @@ TEST_F(DptWbMqttBuilderTest, createDptNegTest)
 {
     auto dpt = DptWbMqttBuilder->Create(knx::object::TDatapointId{1000});
     EXPECT_FALSE(dpt);
-}
-
-TEST_F(DptWbMqttBuilderTest, getConfigNameTest)
-{
-    auto name = DptWbMqttBuilder->GetDptConfigName(knx::object::TDatapointId{5});
-    ASSERT_TRUE(name);
-    EXPECT_EQ("5.xxx_8-Bit_Unsigned_Value", *name);
-}
-
-TEST_F(DptWbMqttBuilderTest, getConfigNameNegTest)
-{
-    auto name = DptWbMqttBuilder->GetDptConfigName(knx::object::TDatapointId{5000});
-    EXPECT_FALSE(name);
-}
-
-TEST_F(DptWbMqttBuilderTest, getDefaultConfigNameTest)
-{
-    auto name = DptWbMqttBuilder->GetDptConfigName(knx::object::TDptWbMqttBuilder::DefaultDatapointId);
-    ASSERT_TRUE(name);
-    EXPECT_EQ("Raw_Value", *name);
 }

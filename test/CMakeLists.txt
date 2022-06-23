@@ -33,6 +33,9 @@ add_executable(${PROJECT_NAME}_test ${TEST_LIST}
         ../src/knxgroupobject/datapointutils.cpp
         ../src/knxutils.cpp
         ../src/knxgroupobjectcontroller.cpp
+        ../src/knxgroupobject/basedptconfig.cpp
+        ../src/knxgroupobject/dptjsonconfig.cpp
+        ../src/knxgroupobject/dptwbmqttconfig.cpp
         )
 
 target_link_libraries(${PROJECT_NAME}_test gtest gtest_main gmock wbmqtt1 pthread)
