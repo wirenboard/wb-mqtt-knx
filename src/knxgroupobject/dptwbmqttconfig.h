@@ -12,9 +12,9 @@ namespace knx
             explicit TDptWbMqttConfig();
 
         private:
-            const std::map<TDatapointId, std::string>& GetConfigNameMap() const override;
+            const TConfigNameMap& GetConfigNameMap() const override;
 
-            std::map<TDatapointId, std::string> DatapointConfigName;
+            TConfigNameMap DatapointConfigName;
         };
     }
 }

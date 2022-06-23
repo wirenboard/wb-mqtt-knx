@@ -22,7 +22,7 @@ namespace
                                                   "20.xxx_N8"};
 }
 
-const std::map<TDatapointId, std::string>& TDptWbMqttConfig::GetConfigNameMap() const
+const TBaseDptConfig::TConfigNameMap& TDptWbMqttConfig::GetConfigNameMap() const
 {
     return DatapointConfigName;
 }

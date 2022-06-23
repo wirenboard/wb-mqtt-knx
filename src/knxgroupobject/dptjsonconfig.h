@@ -12,8 +12,8 @@ namespace knx
             explicit TDptJsonConfig(const std::string& descriptorPath);
 
         private:
-            const std::map<TDatapointId, std::string>& GetConfigNameMap() const override;
-            std::map<TDatapointId, std::string> DatapointNameMap;
+            const TConfigNameMap& GetConfigNameMap() const override;
+            TConfigNameMap DatapointNameMap;
         };
     } // knx
 } // object

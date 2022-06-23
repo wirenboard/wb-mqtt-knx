@@ -21,7 +21,7 @@ TDptJsonConfig::TDptJsonConfig(const std::string& descriptorPath)
     }
 }
 
-const std::map<TDatapointId, std::string>& TDptJsonConfig::GetConfigNameMap() const
+const TBaseDptConfig::TConfigNameMap& TDptJsonConfig::GetConfigNameMap() const
 {
     return DatapointNameMap;
 }
