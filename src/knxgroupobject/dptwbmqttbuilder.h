@@ -13,7 +13,7 @@ namespace knx
         {
         public:
             explicit TDptWbMqttBuilder();
-            std::experimental::optional<PDpt> Create(const TDatapointId& datapointId) override;
+            PDpt Create(const TDatapointId& datapointId) override;
 
             static const TDatapointId DefaultDatapointId;
 

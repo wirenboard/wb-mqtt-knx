@@ -21,7 +21,7 @@ namespace knx
             /// \param descriptorPath Path to the JSON Datapoint Descriptor file
             explicit TDptJsonBuilder(const std::string& descriptorPath);
 
-            std::experimental::optional<PDpt> Create(const TDatapointId& datapointId) override;
+            PDpt Create(const TDatapointId& datapointId) override;
 
         private:
             Json::Value DescriptorRoot;

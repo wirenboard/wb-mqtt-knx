@@ -29,7 +29,7 @@ PGroupObject TGroupObjectMqttBuilder::Create(const TGroupObjectMqttParameter& pa
     if (MqttDeviceList.empty())
         return nullptr;
 
-    std::experimental::optional<PDpt> datapoint;
+    PDpt datapoint;
     TDatapointId datapointId;
     if (!datapointId.SetFromString(parameter.Type)) {
         return nullptr;
@@ -38,21 +38,21 @@ PGroupObject TGroupObjectMqttBuilder::Create(const TGroupObjectMqttParameter& pa
     std::regex hasJsonRegex("_JSON\\s*$");
     if (std::regex_search(parameter.Type, hasJsonRegex)) {
         datapoint = DptJsonBuilder.Create(datapointId);
-        if (!datapoint) {
+        if (datapoint == nullptr) {
             wb_throw(TKnxException,
                      "Can't create JSON datapoint id: " + datapointId.ToString() +
                          ". There is no matching descriptor in the descriptor file.");
         }
     } else {
         datapoint = DptWbMqttBuilder.Create(datapointId);
-        if (!datapoint) {
+        if (datapoint == nullptr) {
             wb_throw(TKnxException,
                      "Can't create WB-MQTT datapoint id: " + datapointId.ToString() +
                          ". Can not found Datapoint Name from Id");
         }
     }
 
-    return std::make_shared<knx::object::TGroupObjectMqtt>(*datapoint,
+    return std::make_shared<knx::object::TGroupObjectMqtt>(datapoint,
                                                            parameter.ControlId,
                                                            parameter.ControlTitle,
                                                            parameter.isReadOnly,

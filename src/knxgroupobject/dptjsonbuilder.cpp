@@ -57,10 +57,10 @@ namespace knx
             }
         }
 
-        std::experimental::optional<PDpt> TDptJsonBuilder::Create(const TDatapointId& datapointId)
+        PDpt TDptJsonBuilder::Create(const TDatapointId& datapointId)
         {
             if (DescriptorMap.find(datapointId.GetMain()) == DescriptorMap.end()) {
-                return std::experimental::nullopt;
+                return nullptr;
             }
 
             auto descriptor = DescriptorMap[datapointId.GetMain()];

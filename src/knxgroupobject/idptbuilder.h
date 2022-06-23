@@ -13,8 +13,8 @@ namespace knx
         public:
             /// Create a data point from ID
             /// \param datapointId datapoint Id for creating
-            /// \return optional pointer to the created datapoint. Or std::nullopt if datapoint not found
-            virtual std::experimental::optional<PDpt> Create(const TDatapointId& datapointId) = 0;
+            /// \return pointer to the created datapoint. Or nullptr if datapoint not found
+            virtual PDpt Create(const TDatapointId& datapointId) = 0;
 
             virtual ~IDptBuilder() = default;
         };

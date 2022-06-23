@@ -74,7 +74,7 @@ TDptWbMqttBuilder::TDptInstanceCreator TDptWbMqttBuilder::FindDptInstanceCreator
     return nullptr;
 }
 
-std::experimental::optional<PDpt> TDptWbMqttBuilder::Create(const TDatapointId& datapointId)
+PDpt TDptWbMqttBuilder::Create(const TDatapointId& datapointId)
 {
     auto item = FindDptInstanceCreator(datapointId);
 
@@ -82,7 +82,7 @@ std::experimental::optional<PDpt> TDptWbMqttBuilder::Create(const TDatapointId& 
         return item();
     }
 
-    return std::experimental::nullopt;
+    return nullptr;
 }
 
 TDptWbMqttBuilder::TDptWbMqttBuilder()
