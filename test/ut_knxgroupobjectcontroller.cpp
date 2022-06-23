@@ -154,6 +154,44 @@ TEST_F(KnxGroupObjectControllerTest, RecvTelegram)
     eventObserverStub.NotifyAll(knx::TKnxEvent::ReceivedTelegram, knxTelegram);
 }
 
+TEST_F(KnxGroupObjectControllerTest, RecvFeedbackTelegram)
+{
+    TEventObserverStub eventObserverStub;
+    TTickTimerObserverStub tickTimerObserverStub;
+
+    knx::TKnxGroupAddress address{"1/1/1"};
+    knx::TKnxGroupAddress feedbackAddress{"1/2/1"};
+    std::vector<uint8_t> payload = {10, 20};
+
+    knx::TTelegram knxFeedbackTelegram{};
+    knxFeedbackTelegram.SetReceiverAddress(feedbackAddress.GetEibAddress());
+    knxFeedbackTelegram.SetGroupAddressedFlag(true);
+    knxFeedbackTelegram.Tpdu().SetAPCI(knx::telegram::TApci::GroupValueWrite);
+    knxFeedbackTelegram.Tpdu().SetPayload(payload);
+
+    knx::TGroupObjectSettings goSettings;
+    goSettings.GroupAddress = address;
+    goSettings.ReadRequestAfterStart = false;
+    goSettings.FeedbackGroupAddress = feedbackAddress;
+
+    auto groupObjectMock = std::make_shared<TGroupObjectMock>();
+    EXPECT_CALL(*groupObjectMock, SetKnxSender(address, _)).Times(1);
+    EXPECT_CALL(*groupObjectMock, KnxNotify(_))
+        .WillOnce(Invoke([&knxFeedbackTelegram](const knx::object::TGroupObjectTransaction& transaction) {
+            EXPECT_EQ(knxFeedbackTelegram.GetReceiverAddress(), transaction.Address.GetEibAddress());
+            EXPECT_EQ(knxFeedbackTelegram.Tpdu().GetAPCI(), transaction.Apci);
+            EXPECT_EQ(knxFeedbackTelegram.Tpdu().GetPayload(), transaction.Payload);
+        }));
+
+    EXPECT_TRUE(Controller->AddGroupObject(groupObjectMock, goSettings));
+
+    eventObserverStub.Subscribe(Controller);
+    tickTimerObserverStub.Subscribe(Controller);
+
+    eventObserverStub.NotifyAll(knx::TKnxEvent::KnxdSocketConnected, knx::TTelegram{});
+    eventObserverStub.NotifyAll(knx::TKnxEvent::ReceivedTelegram, knxFeedbackTelegram);
+}
+
 TEST_F(KnxGroupObjectControllerTest, PollRead)
 {
     TEventObserverStub eventObserverStub;
