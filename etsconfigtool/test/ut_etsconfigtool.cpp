@@ -1,3 +1,5 @@
+#include "../../src/knxgroupobject/dptjsonconfig.h"
+#include "../../src/knxgroupobject/dptwbmqttconfig.h"
 #include "config.h"
 #include "etsconfigtool.h"
 #include "gmock/gmock.h"
@@ -10,9 +12,9 @@ class EtsConfigToolTest: public ::testing::Test
 protected:
     void SetUp() override
     {
-        Converter = std::make_unique<knx::tool::TEtsConfigTool>(DptWbMqttBuilder,
-                                                                DptJsonBuilder,
-                                                                knx::object::TDptWbMqttBuilder::DefaultDatapointId);
+        Converter = std::make_unique<knx::tool::TEtsConfigTool>(DptWbMqttConfig,
+                                                                DptJsonConfig,
+                                                                knx::object::TDptWbMqttConfig::DefaultDatapointId);
     }
 
     void TearDown() override
@@ -21,8 +23,8 @@ protected:
     std::string TestConfigDir = std::string(CMAKE_SOURCE_DIR) + "/etsconfigtool/test/config/";
     std::string SchemaPath = std::string(CMAKE_SOURCE_DIR) + "/wb-mqtt-knx.schema.json";
     std::unique_ptr<knx::tool::TEtsConfigTool> Converter;
-    knx::object::TDptJsonBuilder DptJsonBuilder{std::string(CMAKE_SOURCE_DIR) + "/wb-mqtt-knx-jsondpt.conf"};
-    knx::object::TDptWbMqttBuilder DptWbMqttBuilder;
+    knx::object::TDptJsonConfig DptJsonConfig{std::string(CMAKE_SOURCE_DIR) + "/wb-mqtt-knx-jsondpt.conf"};
+    knx::object::TDptWbMqttConfig DptWbMqttConfig;
 };
 
 TEST_F(EtsConfigToolTest, SaveConfig)

@@ -1,6 +1,4 @@
 #include "etsconfigtool.h"
-#include "../src/knxexception.h"
-#include "../src/knxgroupobject/dptwbmqttbuilder.h"
 #include <algorithm>
 #include <iostream>
 #include <unordered_map>
@@ -15,11 +13,11 @@ namespace
     constexpr auto DEFAULT_IS_CONTROL_READONLY = false;
 }
 
-TEtsConfigTool::TEtsConfigTool(const knx::object::IDptBuilder& mqttBuilder,
-                               const knx::object::IDptBuilder& jsonBuilder,
-                               const knx::object::TDatapointId& defaultId)
-    : MqttBuilder(mqttBuilder),
-      JsonBuilder(jsonBuilder),
+TEtsConfigTool::TEtsConfigTool(const object::TBaseDptConfig& mqttConfig,
+                               const object::TBaseDptConfig& jsonConfig,
+                               const object::TDatapointId& defaultId)
+    : MqttConfig(mqttConfig),
+      JsonConfig(jsonConfig),
       DefaultId(defaultId)
 {}
 
@@ -34,15 +32,15 @@ std::string TEtsConfigTool::DatapointTypeExportToConfig(const std::string& dpts)
             id.SetSub(std::stoi(firstDptsTokens.at(2)));
         }
 
-        auto datapoint = MqttBuilder.GetDptConfigName(id);
+        auto datapoint = MqttConfig.GetDptConfigName(id);
         if (datapoint) {
             return *datapoint;
         }
-        datapoint = JsonBuilder.GetDptConfigName(id);
+        datapoint = JsonConfig.GetDptConfigName(id);
         if (datapoint) {
             return *datapoint;
         }
-        return *MqttBuilder.GetDptConfigName(object::TDptWbMqttBuilder::DefaultDatapointId);
+        return *MqttConfig.GetDptConfigName(DefaultId);
     } catch (const std::out_of_range& oor) {
         std::cerr << "DatapointTypeExportToConfig( " << dpts << " ): Out of Range error: " << oor.what() << '\n';
         return "";

@@ -1,7 +1,6 @@
 #pragma once
 
-#include "../../src/knxgroupobject/dptjsonbuilder.h"
-#include "../../src/knxgroupobject/dptwbmqttbuilder.h"
+#include "../../src/knxgroupobject/basedptconfig.h"
 #include "config.h"
 #include "mqttknxconfig.h"
 #include "tinyxml2.h"
@@ -16,11 +15,11 @@ namespace knx
         {
         public:
             /// Constructor
-            /// \param mqttBuilder mqtt datapoint builder
-            /// \param jsonBuilder json datapoint builder
+            /// \param mqttConfig mqtt datapoint config
+            /// \param jsonConfig json datapoint config
             /// \param defaultId default datapoint ID if a datapoint description not found
-            TEtsConfigTool(const object::IDptBuilder& mqttBuilder,
-                           const object::IDptBuilder& jsonBuilder,
+            TEtsConfigTool(const object::TBaseDptConfig& mqttConfig,
+                           const object::TBaseDptConfig& jsonConfig,
                            const object::TDatapointId& defaultId);
 
             /// Load ETS export
@@ -49,8 +48,8 @@ namespace knx
             void AddToControlConfig(tinyxml2::XMLElement* groupAddress,
                                     std::vector<knx::tool::TControlConfig>& controlList);
             TMqttKnxConfig Config;
-            const object::IDptBuilder& MqttBuilder;
-            const object::IDptBuilder& JsonBuilder;
+            const object::TBaseDptConfig& MqttConfig;
+            const object::TBaseDptConfig& JsonConfig;
             const object::TDatapointId DefaultId;
         };
     }
