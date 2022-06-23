@@ -13,8 +13,8 @@ namespace knx
         std::string ControlTitle;  ///< Control title
         bool IsReadOnly{false};    ///< MQTT Control read only flag
 
-        TKnxGroupAddress GroupAddress;                                      // Group address
-        std::experimental::optional<TKnxGroupAddress> FeedbackGroupAddress; // Feedback Group Address if exist
+        TKnxGroupAddress GroupAddress;                                      ///< Group address
+        std::experimental::optional<TKnxGroupAddress> FeedbackGroupAddress; ///< Feedback Group Address if exists
 
         bool ReadRequestAfterStart{false}; ///< Send a read request after the start of the knxd client
         std::chrono::milliseconds ReadRequestPollInterval{0}; ///< Period of sending a read request

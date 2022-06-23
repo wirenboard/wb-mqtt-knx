@@ -3,11 +3,6 @@
 #include "knxgroupaddress.h"
 #include "knxgroupobject/groupobjectsettings.h"
 #include "knxgroupobject/igroupobject.h"
-#include "knxtelegram.h"
-#include <experimental/optional>
-#include <map>
-#include <memory>
-#include <utility>
 
 namespace knx
 {

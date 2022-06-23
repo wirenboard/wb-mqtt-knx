@@ -1,6 +1,6 @@
 wb-mqtt-knx (1.6.0) unstable; urgency=medium
 
-  * Added processing group object feedback
+  * Added group object feedback message processing
 
  -- Roman Kochkin <roman.kochkin@wirenboard.ru>  Tue, 31 May 2022 20:27:00 +0300
 
