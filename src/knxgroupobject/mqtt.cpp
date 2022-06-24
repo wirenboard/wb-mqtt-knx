@@ -6,12 +6,11 @@
 using namespace knx::object;
 
 TGroupObjectMqtt::TGroupObjectMqtt(PDpt pDpt,
-                                   const std::string& controlId,
-                                   const std::string& controlTitle,
-                                   bool isReadOnly,
+                                   const knx::TGroupObjectSettings& settings,
                                    WBMQTT::PLocalDevice pMqttDevice,
                                    WBMQTT::TLogger& errorLogger)
     : Dpt(std::move(pDpt)),
+      Settings(settings),
       MqttLocalDevice(std::move(pMqttDevice)),
       ErrorLogger(errorLogger)
 {
@@ -24,11 +23,11 @@ TGroupObjectMqtt::TGroupObjectMqtt(PDpt pDpt,
         std::string fullControlId;
         std::string fullControlTitle;
         if (descriptorList.size() == 1) {
-            fullControlId = controlId;
-            fullControlTitle = controlTitle;
+            fullControlId = settings.ControlId;
+            fullControlTitle = settings.ControlTitle;
         } else {
-            fullControlId = controlId + "_" + fieldDescriptor.Id;
-            fullControlTitle = controlTitle + " ." + fieldDescriptor.Id;
+            fullControlId = settings.ControlId + "_" + fieldDescriptor.Id;
+            fullControlTitle = settings.ControlTitle + " ." + fieldDescriptor.Id;
         }
         auto control = MqttLocalDevice
                            ->CreateControl(tx,
@@ -38,7 +37,7 @@ TGroupObjectMqtt::TGroupObjectMqtt(PDpt pDpt,
                                                .SetType(fieldDescriptor.Type)
                                                .SetMin(fieldDescriptor.Min)
                                                .SetMax(fieldDescriptor.Max)
-                                               .SetReadonly(isReadOnly))
+                                               .SetReadonly(settings.IsReadOnly))
                            .GetValue();
         control->SetOnValueReceiveHandler(
             [index, this](WBMQTT::PControl pControl, const WBMQTT::TAny& value, const WBMQTT::PDriverTx&) {
@@ -70,7 +69,9 @@ void TGroupObjectMqtt::MqttNotify(WBMQTT::PControl& pControl, uint32_t index, co
 
     KnxSender->Send({SelfKnxAddress, telegram::TApci::GroupValueWrite, data});
 
-    pControl->SetValue(tx, WBMQTT::TAny(value)).Wait();
+    if (!Settings.FeedbackGroupAddress) {
+        pControl->SetValue(tx, WBMQTT::TAny(value)).Wait();
+    }
 }
 
 void TGroupObjectMqtt::KnxNotify(const TGroupObjectTransaction& transaction)

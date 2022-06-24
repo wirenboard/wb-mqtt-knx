@@ -24,19 +24,19 @@ void TGroupObjectMqttBuilder::LinkDevice(const std::string& id, const std::strin
             .GetValue());
 }
 
-PGroupObject TGroupObjectMqttBuilder::Create(const TGroupObjectMqttParameter& parameter)
+PGroupObject TGroupObjectMqttBuilder::Create(const TGroupObjectSettings& settings)
 {
     if (MqttDeviceList.empty())
         return nullptr;
 
     PDpt datapoint;
     TDatapointId datapointId;
-    if (!datapointId.SetFromString(parameter.Type)) {
+    if (!datapointId.SetFromString(settings.DatapointType)) {
         return nullptr;
     }
 
     std::regex hasJsonRegex("_JSON\\s*$");
-    if (std::regex_search(parameter.Type, hasJsonRegex)) {
+    if (std::regex_search(settings.DatapointType, hasJsonRegex)) {
         datapoint = DptJsonBuilder.Create(datapointId);
         if (datapoint == nullptr) {
             wb_throw(TKnxException,
@@ -52,12 +52,7 @@ PGroupObject TGroupObjectMqttBuilder::Create(const TGroupObjectMqttParameter& pa
         }
     }
 
-    return std::make_shared<knx::object::TGroupObjectMqtt>(datapoint,
-                                                           parameter.ControlId,
-                                                           parameter.ControlTitle,
-                                                           parameter.isReadOnly,
-                                                           MqttDeviceList.back(),
-                                                           ErrorLogger);
+    return std::make_shared<knx::object::TGroupObjectMqtt>(datapoint, settings, MqttDeviceList.back(), ErrorLogger);
 }
 
 void TGroupObjectMqttBuilder::RemoveUnusedControls()

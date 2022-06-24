@@ -89,9 +89,15 @@ bool TKnxGroupAddress::operator<(const TKnxGroupAddress& rhs) const
 {
     return GetEibAddress() < rhs.GetEibAddress();
 }
+
 bool TKnxGroupAddress::operator==(const TKnxGroupAddress& rhs) const
 {
     return ((MainGroup == rhs.MainGroup) && (MiddleGroup == rhs.MiddleGroup) && (SubGroup == rhs.SubGroup));
+}
+
+bool TKnxGroupAddress::operator!=(const TKnxGroupAddress& rhs) const
+{
+    return !(*this == rhs);
 }
 
 uint32_t TKnxGroupAddress::GetMainGroup() const

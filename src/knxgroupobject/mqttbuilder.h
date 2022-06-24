@@ -26,7 +26,7 @@ namespace knx
                                              WBMQTT::TLogger& errorLogger);
 
             void LinkDevice(const std::string& id, const std::string& name) override;
-            PGroupObject Create(const TGroupObjectMqttParameter& parameter) override;
+            PGroupObject Create(const TGroupObjectSettings& settings) override;
             void RemoveUnusedControls() override;
             void Clear() override;
 

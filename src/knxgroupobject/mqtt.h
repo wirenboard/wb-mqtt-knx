@@ -1,5 +1,6 @@
 #pragma once
 
+#include "groupobjectsettings.h"
 #include "idpt.h"
 #include "igroupobject.h"
 #include <utility>
@@ -22,9 +23,7 @@ namespace knx
             /// \param pMqttDevice wb-mqtt Device
             /// \param errorLogger error logger instance
             explicit TGroupObjectMqtt(PDpt pDpt,
-                                      const std::string& controlId,
-                                      const std::string& controlTitle,
-                                      bool isReadOnly,
+                                      const knx::TGroupObjectSettings& settings,
                                       WBMQTT::PLocalDevice pMqttDevice,
                                       WBMQTT::TLogger& errorLogger);
 
@@ -38,6 +37,7 @@ namespace knx
             TKnxGroupAddress SelfKnxAddress;
             PSenderGroupObject KnxSender;
             PDpt Dpt;
+            TGroupObjectSettings Settings;
             WBMQTT::PLocalDevice MqttLocalDevice;
             std::vector<WBMQTT::PControl> ControlList;
             std::mutex DptExchangeMutex;
