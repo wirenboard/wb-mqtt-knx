@@ -13,6 +13,7 @@ namespace knx
         class TDpt5: public TDptBaseU8
         {
         public:
+            TDatapointId GetId() const override;
             std::vector<DptDescriptorField> getDescriptor() const override;
         };
     }

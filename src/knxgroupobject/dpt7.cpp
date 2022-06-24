@@ -37,3 +37,8 @@ std::vector<WBMQTT::TAny> TDpt7::ToMqtt()
 {
     return {static_cast<double>(FieldUnsignedValue)};
 }
+
+TDatapointId TDpt7::GetId() const
+{
+    return TDatapointId{7};
+}

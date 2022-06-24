@@ -1,5 +1,5 @@
 #include "mqttbuilder.h"
-#include "datapointpool.h"
+#include "dptwbmqttbuilder.h"
 #include "mqtt.h"
 #include <regex>
 
@@ -7,9 +7,11 @@ using namespace knx::object;
 
 TGroupObjectMqttBuilder::TGroupObjectMqttBuilder(WBMQTT::PDeviceDriver pMqttDeviceDriver,
                                                  object::IDptBuilder& dptJsonBuilder,
+                                                 object::IDptBuilder& dptWbMqttBuilder,
                                                  WBMQTT::TLogger& errorLogger)
     : MqttDeviceDriver(std::move(pMqttDeviceDriver)),
       DptJsonBuilder(dptJsonBuilder),
+      DptWbMqttBuilder(dptJsonBuilder),
       ErrorLogger(errorLogger)
 {}
 
@@ -28,19 +30,26 @@ PGroupObject TGroupObjectMqttBuilder::Create(const TGroupObjectSettings& setting
         return nullptr;
 
     PDpt datapoint;
+    TDatapointId datapointId;
+    if (!datapointId.SetFromString(settings.DatapointType)) {
+        return nullptr;
+    }
 
     std::regex hasJsonRegex("_JSON\\s*$");
     if (std::regex_search(settings.DatapointType, hasJsonRegex)) {
-        TDatapointId datapointId;
-        if (!datapointId.SetFromString(settings.DatapointType)) {
-            return nullptr;
-        }
         datapoint = DptJsonBuilder.Create(datapointId);
         if (datapoint == nullptr) {
-            return nullptr;
+            wb_throw(TKnxException,
+                     "Can't create JSON datapoint id: " + datapointId.ToString() +
+                         ". There is no matching descriptor in the descriptor file.");
         }
     } else {
-        datapoint = DataPointPool::MakeDataPointByName(settings.DatapointType);
+        datapoint = DptWbMqttBuilder.Create(datapointId);
+        if (datapoint == nullptr) {
+            wb_throw(TKnxException,
+                     "Can't create WB-MQTT datapoint id: " + datapointId.ToString() +
+                         ". Can not found Datapoint Name from Id");
+        }
     }
 
     return std::make_shared<knx::object::TGroupObjectMqtt>(datapoint, settings, MqttDeviceList.back(), ErrorLogger);

@@ -1,3 +1,6 @@
+#include "../../src/knxgroupobject/dptjsonconfig.h"
+#include "../../src/knxgroupobject/dptwbmqttconfig.h"
+#include "config.h"
 #include "etsconfigtool.h"
 #include <getopt.h>
 #include <iostream>
@@ -50,7 +53,9 @@ int main(int argc, char** argv)
     TAppOptions appOptions;
     ParseCommandLine(argc, argv, appOptions);
 
-    knx::tool::TEtsConfigTool converter;
+    knx::object::TDptWbMqttConfig mqttConfig;
+    knx::object::TDptJsonConfig jsonConfig(DEFAULT_CONFIG_JSON_DATAPOINT_FILE_PATH);
+    knx::tool::TEtsConfigTool converter(mqttConfig, jsonConfig, knx::object::TDptWbMqttConfig::DefaultDatapointId);
 
     try {
         converter.LoadEtsExport(appOptions.EtsExportFilePath);

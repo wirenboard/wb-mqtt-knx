@@ -13,6 +13,7 @@ namespace knx
         class TDpt9: public IDpt
         {
         public:
+            TDatapointId GetId() const override;
             std::vector<DptDescriptorField> getDescriptor() const override;
 
             void FromMqtt(uint32_t controlIndex, const WBMQTT::TAny& value) override;

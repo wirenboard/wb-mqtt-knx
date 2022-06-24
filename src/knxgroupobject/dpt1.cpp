@@ -38,3 +38,8 @@ std::vector<WBMQTT::TAny> TDpt1::ToMqtt()
 {
     return {B};
 }
+
+TDatapointId TDpt1::GetId() const
+{
+    return TDatapointId{1};
+}

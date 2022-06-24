@@ -2,9 +2,12 @@
 enable_testing()
 aux_source_directory(./ TEST_LIST)
 aux_source_directory(./mock TEST_LIST)
-aux_source_directory(../../src/knxgroupobject TEST_LIST)
 
 add_executable(${PROJECT_NAME}_test ${TEST_LIST}
+        ../../src/knxgroupobject/datapointid.cpp
+        ../../src/knxgroupobject/basedptconfig.cpp
+        ../../src/knxgroupobject/dptjsonconfig.cpp
+        ../../src/knxgroupobject/dptwbmqttconfig.cpp
         ../src/etsconfigtool.cpp
         ../src/mqttknxconfig.cpp
         ../../src/knxgroupaddress.cpp

@@ -60,10 +60,9 @@ namespace knx
         PDpt TDptJsonBuilder::Create(const TDatapointId& datapointId)
         {
             if (DescriptorMap.find(datapointId.GetMain()) == DescriptorMap.end()) {
-                wb_throw(TKnxException,
-                         "Can't create JSON datapoint id: " + datapointId.ToString() +
-                             ". There is no matching descriptor in the descriptor file.");
+                return nullptr;
             }
+
             auto descriptor = DescriptorMap[datapointId.GetMain()];
 
             auto fieldJsonValue = descriptor["field"];
@@ -91,7 +90,7 @@ namespace knx
             for (const auto& field: encodedFieldList) {
                 sumSize += field.width;
             }
-            auto dptJson = std::make_shared<TDptJson>();
+            auto dptJson = std::make_shared<TDptJson>(datapointId);
             auto jsonFieldIterator = fieldJsonValue.begin();
 
             // This defines whether the first byte of the KNX payload can be filled.
@@ -112,6 +111,5 @@ namespace knx
             }
             return dptJson;
         }
-
     }
 }

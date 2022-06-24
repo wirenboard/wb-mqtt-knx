@@ -2,12 +2,21 @@
 #include "../src/knxgroupobject/dptbaseu8.h"
 #include "gtest/gtest.h"
 
+class DptBase8Wrapper: public knx::object::TDptBaseU8
+{
+public:
+    knx::object::TDatapointId GetId() const override
+    {
+        return knx::object::TDatapointId();
+    }
+};
+
 class DptBaseU8Test: public ::testing::Test
 {
 protected:
     void SetUp() override
     {
-        Dpt = std::make_unique<knx::object::TDptBaseU8>();
+        Dpt = std::make_unique<DptBase8Wrapper>();
     }
 
     void TearDown() override

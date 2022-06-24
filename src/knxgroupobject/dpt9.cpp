@@ -39,3 +39,8 @@ std::vector<WBMQTT::TAny> TDpt9::ToMqtt()
 {
     return {FieldFloatValue};
 }
+
+TDatapointId TDpt9::GetId() const
+{
+    return TDatapointId{9};
+}

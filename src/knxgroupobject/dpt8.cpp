@@ -40,3 +40,8 @@ std::vector<WBMQTT::TAny> TDpt8::ToMqtt()
 {
     return {static_cast<double>(FieldSignedValue)};
 }
+
+TDatapointId TDpt8::GetId() const
+{
+    return TDatapointId{8};
+}
