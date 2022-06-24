@@ -7,28 +7,45 @@ TKnxGroupObjectController::TKnxGroupObjectController(PSender<TTelegram> pSender,
       TickInterval(tickInterval)
 {}
 
-bool TKnxGroupObjectController::AddGroupObject(const knx::TKnxGroupAddress& groupAddress,
-                                               const object::PGroupObject& groupObject,
+bool TKnxGroupObjectController::AddGroupObject(const object::PGroupObject& groupObject,
                                                const TGroupObjectSettings& settings)
 {
-    if (groupObject && (GroupObjectList.find(groupAddress) == GroupObjectList.end())) {
-        groupObject->SetKnxSender(groupAddress, shared_from_this());
+    if (groupObject && (GroupObjectList.find(settings.GroupAddress) == GroupObjectList.end())) {
+        groupObject->SetKnxSender(settings.GroupAddress, shared_from_this());
 
-        auto pItem = std::make_unique<TGroupObjectListItem>();
+        auto pItem = std::make_shared<TGroupObjectListItem>();
         pItem->GroupObject = groupObject;
         pItem->Settings = settings;
         pItem->PollInterval = static_cast<uint32_t>(settings.ReadRequestPollInterval.count() / TickInterval.count());
         pItem->Timeout = static_cast<uint32_t>(settings.ReadResponseTimeout.count() / TickInterval.count());
         pItem->Counter = pItem->PollInterval;
 
-        return GroupObjectList.emplace(groupAddress, std::move(pItem)).second;
+        if (!GroupObjectList.emplace(settings.GroupAddress, pItem).second) {
+            return false;
+        }
+
+        if (pItem->Settings.FeedbackGroupAddress && *(pItem->Settings.FeedbackGroupAddress) != settings.GroupAddress) {
+            return GroupObjectList.emplace(*(pItem->Settings.FeedbackGroupAddress), pItem).second;
+        }
+
+        return true;
     }
     return false;
 }
 
 bool TKnxGroupObjectController::RemoveGroupObject(const TKnxGroupAddress& address)
 {
-    return GroupObjectList.erase(address);
+    auto groupObjectIterator = GroupObjectList.find(address);
+    if (groupObjectIterator != GroupObjectList.end()) {
+        auto item = groupObjectIterator->second;
+        if (item->Settings.FeedbackGroupAddress) {
+            GroupObjectList.erase(*(item->Settings.FeedbackGroupAddress));
+        }
+        GroupObjectList.erase(address);
+        return true;
+    }
+
+    return false;
 }
 
 void TKnxGroupObjectController::Notify(const TKnxEvent& event, const TTelegram& knxTelegram)
