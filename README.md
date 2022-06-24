@@ -82,7 +82,7 @@ $ mosquitto_pub -t '/devices/knx/controls/data/on' -m "g:9/7/55 GroupValueWrite 
 
 Имеет структуру:
 
-``` json
+``` jsonc
 {
     // Версия конфигурации. На данный момент используется версия 1
     "configVersion": 1,
