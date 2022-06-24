@@ -120,6 +120,13 @@ TEST_F(EtsConfigToolTest, CheckConfig)
     }
 }
 
+TEST_F(EtsConfigToolTest, CheckConfigWithoutDtp)
+{
+    EXPECT_NO_THROW(Converter->LoadEtsExport(TestConfigDir + "ets_export_3level_style.xml"));
+    Json::Value root = Converter->GetWbMqttConfig();
+    EXPECT_EQ("Raw_Value", root["devices"][2]["controls"][0]["dataPointType"].asString());
+}
+
 TEST_F(EtsConfigToolTest, MqttJsonConfig)
 {
     EXPECT_NO_THROW(Converter->LoadEtsExport(TestConfigDir + "ets_export_wbmqtt_json_default.xml"));

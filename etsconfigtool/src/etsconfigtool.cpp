@@ -53,7 +53,7 @@ void TEtsConfigTool::AddToControlConfig(tinyxml2::XMLElement* groupAddress,
     auto name = groupAddress->Attribute("Name");
     auto address = groupAddress->Attribute("Address");
     auto dpts = groupAddress->Attribute("DPTs");
-    if ((name != nullptr) && (address != nullptr) && (dpts != nullptr)) {
+    if ((name != nullptr) && (address != nullptr)) {
         TControlConfig control;
         knx::TKnxGroupAddress knxGroupAddress(address);
         auto groupAddressStr = knxGroupAddress.ToString();
@@ -61,7 +61,13 @@ void TEtsConfigTool::AddToControlConfig(tinyxml2::XMLElement* groupAddress,
         control.Id = std::string("control") + groupAddressStr;
         control.Title = name;
         control.GroupAddress = knxGroupAddress;
-        control.DatapointType = DatapointTypeExportToConfig(dpts);
+        if (dpts != nullptr) {
+            control.DatapointType = DatapointTypeExportToConfig(dpts);
+        } else {
+            std::cout << "Warning: missing datapoint type for '" << control.Id << "', default ('Raw_Value') is assigned"
+                      << std::endl;
+            control.DatapointType = *MqttConfig.GetDptConfigName(DefaultId);
+        }
         control.ReadOnly = DEFAULT_IS_CONTROL_READONLY;
         if (!control.DatapointType.empty()) {
             controlList.push_back(control);
