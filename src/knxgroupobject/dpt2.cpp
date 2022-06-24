@@ -42,3 +42,8 @@ std::vector<WBMQTT::TAny> TDpt2::ToMqtt()
 {
     return {FieldC, FieldV};
 }
+
+TDatapointId TDpt2::GetId() const
+{
+    return TDatapointId{2};
+}

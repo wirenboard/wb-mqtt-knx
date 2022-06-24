@@ -1,3 +1,5 @@
+#include "../../src/knxgroupobject/dptjsonconfig.h"
+#include "../../src/knxgroupobject/dptwbmqttconfig.h"
 #include "config.h"
 #include "etsconfigtool.h"
 #include "gmock/gmock.h"
@@ -9,13 +11,20 @@ class EtsConfigToolTest: public ::testing::Test
 {
 protected:
     void SetUp() override
-    {}
+    {
+        Converter = std::make_unique<knx::tool::TEtsConfigTool>(DptWbMqttConfig,
+                                                                DptJsonConfig,
+                                                                knx::object::TDptWbMqttConfig::DefaultDatapointId);
+    }
 
     void TearDown() override
     {}
 
     std::string TestConfigDir = std::string(CMAKE_SOURCE_DIR) + "/etsconfigtool/test/config/";
     std::string SchemaPath = std::string(CMAKE_SOURCE_DIR) + "/wb-mqtt-knx.schema.json";
+    std::unique_ptr<knx::tool::TEtsConfigTool> Converter;
+    knx::object::TDptJsonConfig DptJsonConfig{std::string(CMAKE_SOURCE_DIR) + "/wb-mqtt-knx-jsondpt.conf"};
+    knx::object::TDptWbMqttConfig DptWbMqttConfig;
 };
 
 TEST_F(EtsConfigToolTest, SaveConfig)
@@ -24,10 +33,9 @@ TEST_F(EtsConfigToolTest, SaveConfig)
     EXPECT_NE(mkstemp(tempConfigFilePath), -1);
     std::string tempConfigFilePathStr = tempConfigFilePath;
 
-    knx::tool::TEtsConfigTool converter;
-    converter.LoadEtsExport(TestConfigDir + "ets_export_3level_style.xml");
+    Converter->LoadEtsExport(TestConfigDir + "ets_export_3level_style.xml");
 
-    converter.SaveWbMqttConfig(tempConfigFilePathStr);
+    Converter->SaveWbMqttConfig(tempConfigFilePathStr);
 
     auto configRoot = WBMQTT::JSON::Parse(tempConfigFilePathStr);
     unlink(tempConfigFilePathStr.c_str());
@@ -39,44 +47,38 @@ TEST_F(EtsConfigToolTest, SaveConfig)
 
 TEST_F(EtsConfigToolTest, LoadEtsExport3Level)
 {
-    knx::tool::TEtsConfigTool converter;
-    converter.LoadEtsExport(TestConfigDir + "ets_export_3level_style.xml");
+    Converter->LoadEtsExport(TestConfigDir + "ets_export_3level_style.xml");
 
-    EXPECT_NO_THROW(converter.ValidateWbMqttConfig(SchemaPath));
+    EXPECT_NO_THROW(Converter->ValidateWbMqttConfig(SchemaPath));
 }
 
 TEST_F(EtsConfigToolTest, LoadEtsExport2Level)
 {
-    knx::tool::TEtsConfigTool converter;
-    converter.LoadEtsExport(TestConfigDir + "ets_export_2level_style.xml");
+    Converter->LoadEtsExport(TestConfigDir + "ets_export_2level_style.xml");
 
-    EXPECT_NO_THROW(converter.ValidateWbMqttConfig(SchemaPath));
+    EXPECT_NO_THROW(Converter->ValidateWbMqttConfig(SchemaPath));
 }
 
 TEST_F(EtsConfigToolTest, LoadEtsExportFreeLevel)
 {
-    knx::tool::TEtsConfigTool converter;
-    converter.LoadEtsExport(TestConfigDir + "ets_export_free_level_style.xml");
+    Converter->LoadEtsExport(TestConfigDir + "ets_export_free_level_style.xml");
 
-    EXPECT_NO_THROW(converter.ValidateWbMqttConfig(SchemaPath));
+    EXPECT_NO_THROW(Converter->ValidateWbMqttConfig(SchemaPath));
 }
 
 TEST_F(EtsConfigToolTest, LoadEtsExportConfigNotExist)
 {
-    knx::tool::TEtsConfigTool converter;
-    EXPECT_THROW(converter.LoadEtsExport(TestConfigDir + "ets_export_not_exist.xml"), knx::TKnxException);
+    EXPECT_THROW(Converter->LoadEtsExport(TestConfigDir + "ets_export_not_exist.xml"), knx::TKnxException);
 }
 
 TEST_F(EtsConfigToolTest, LoadEtsExportRootCorrupt)
 {
-    knx::tool::TEtsConfigTool converter;
-    EXPECT_THROW(converter.LoadEtsExport(TestConfigDir + "ets_export_root_corrupt.xml"), knx::TKnxException);
+    EXPECT_THROW(Converter->LoadEtsExport(TestConfigDir + "ets_export_root_corrupt.xml"), knx::TKnxException);
 }
 
 TEST_F(EtsConfigToolTest, LoadEtsExportNoRoot)
 {
-    knx::tool::TEtsConfigTool converter;
-    EXPECT_THROW(converter.LoadEtsExport(TestConfigDir + "ets_export_no_root.xml"), knx::TKnxException);
+    EXPECT_THROW(Converter->LoadEtsExport(TestConfigDir + "ets_export_no_root.xml"), knx::TKnxException);
 }
 
 TEST_F(EtsConfigToolTest, CheckConfig)
@@ -85,10 +87,9 @@ TEST_F(EtsConfigToolTest, CheckConfig)
                                                "ets_export_2level_style.xml",
                                                "ets_export_3level_style.xml"};
     for (const auto& configName: configNameList) {
-        knx::tool::TEtsConfigTool converter;
-        EXPECT_NO_THROW(converter.LoadEtsExport(TestConfigDir + configName));
+        EXPECT_NO_THROW(Converter->LoadEtsExport(TestConfigDir + configName));
 
-        Json::Value root = converter.GetWbMqttConfig();
+        Json::Value root = Converter->GetWbMqttConfig();
 
         EXPECT_EQ(root["configVersion"].asInt(), 1);
         EXPECT_EQ(root["debug"].asBool(), false);
@@ -121,8 +122,19 @@ TEST_F(EtsConfigToolTest, CheckConfig)
 
 TEST_F(EtsConfigToolTest, CheckConfigWithoutDtp)
 {
-    knx::tool::TEtsConfigTool converter;
-    EXPECT_NO_THROW(converter.LoadEtsExport(TestConfigDir + "ets_export_3level_style.xml"));
-    Json::Value root = converter.GetWbMqttConfig();
+    EXPECT_NO_THROW(Converter->LoadEtsExport(TestConfigDir + "ets_export_3level_style.xml"));
+    Json::Value root = Converter->GetWbMqttConfig();
     EXPECT_EQ("Raw_Value", root["devices"][2]["controls"][0]["dataPointType"].asString());
+}
+
+TEST_F(EtsConfigToolTest, MqttJsonConfig)
+{
+    EXPECT_NO_THROW(Converter->LoadEtsExport(TestConfigDir + "ets_export_wbmqtt_json_default.xml"));
+    Json::Value root = Converter->GetWbMqttConfig();
+
+    uint32_t i = 0;
+    for (const auto& el: {"1.xxx_B1", "21.001_StatusGen_JSON", "Raw_Value"}) {
+        EXPECT_EQ(el, root["devices"][0]["controls"][i]["dataPointType"].asString());
+        ++i;
+    }
 }

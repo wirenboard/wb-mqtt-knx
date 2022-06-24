@@ -1,5 +1,5 @@
 #include "mqttbuilder.h"
-#include "datapointpool.h"
+#include "dptwbmqttbuilder.h"
 #include "mqtt.h"
 #include <regex>
 
@@ -7,9 +7,11 @@ using namespace knx::object;
 
 TGroupObjectMqttBuilder::TGroupObjectMqttBuilder(WBMQTT::PDeviceDriver pMqttDeviceDriver,
                                                  object::IDptBuilder& dptJsonBuilder,
+                                                 object::IDptBuilder& dptWbMqttBuilder,
                                                  WBMQTT::TLogger& errorLogger)
     : MqttDeviceDriver(std::move(pMqttDeviceDriver)),
       DptJsonBuilder(dptJsonBuilder),
+      DptWbMqttBuilder(dptJsonBuilder),
       ErrorLogger(errorLogger)
 {}
 
@@ -22,33 +24,35 @@ void TGroupObjectMqttBuilder::LinkDevice(const std::string& id, const std::strin
             .GetValue());
 }
 
-PGroupObject TGroupObjectMqttBuilder::Create(const TGroupObjectMqttParameter& parameter)
+PGroupObject TGroupObjectMqttBuilder::Create(const TGroupObjectSettings& settings)
 {
     if (MqttDeviceList.empty())
         return nullptr;
 
     PDpt datapoint;
-
-    std::regex hasJsonRegex("_JSON\\s*$");
-    if (std::regex_search(parameter.Type, hasJsonRegex)) {
-        TDatapointId datapointId;
-        if (!datapointId.SetFromString(parameter.Type)) {
-            return nullptr;
-        }
-        datapoint = DptJsonBuilder.Create(datapointId);
-        if (datapoint == nullptr) {
-            return nullptr;
-        }
-    } else {
-        datapoint = DataPointPool::MakeDataPointByName(parameter.Type);
+    TDatapointId datapointId;
+    if (!datapointId.SetFromString(settings.DatapointType)) {
+        return nullptr;
     }
 
-    return std::make_shared<knx::object::TGroupObjectMqtt>(datapoint,
-                                                           parameter.ControlId,
-                                                           parameter.ControlTitle,
-                                                           parameter.isReadOnly,
-                                                           MqttDeviceList.back(),
-                                                           ErrorLogger);
+    std::regex hasJsonRegex("_JSON\\s*$");
+    if (std::regex_search(settings.DatapointType, hasJsonRegex)) {
+        datapoint = DptJsonBuilder.Create(datapointId);
+        if (datapoint == nullptr) {
+            wb_throw(TKnxException,
+                     "Can't create JSON datapoint id: " + datapointId.ToString() +
+                         ". There is no matching descriptor in the descriptor file.");
+        }
+    } else {
+        datapoint = DptWbMqttBuilder.Create(datapointId);
+        if (datapoint == nullptr) {
+            wb_throw(TKnxException,
+                     "Can't create WB-MQTT datapoint id: " + datapointId.ToString() +
+                         ". Can not found Datapoint Name from Id");
+        }
+    }
+
+    return std::make_shared<knx::object::TGroupObjectMqtt>(datapoint, settings, MqttDeviceList.back(), ErrorLogger);
 }
 
 void TGroupObjectMqttBuilder::RemoveUnusedControls()

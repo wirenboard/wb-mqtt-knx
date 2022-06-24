@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../../src/knxgroupobject/basedptconfig.h"
 #include "config.h"
 #include "mqttknxconfig.h"
 #include "tinyxml2.h"
@@ -13,6 +14,14 @@ namespace knx
         class TEtsConfigTool
         {
         public:
+            /// Constructor
+            /// \param mqttConfig mqtt datapoint config
+            /// \param jsonConfig json datapoint config
+            /// \param defaultId default datapoint ID if a datapoint description not found
+            TEtsConfigTool(const object::TBaseDptConfig& mqttConfig,
+                           const object::TBaseDptConfig& jsonConfig,
+                           const object::TDatapointId& defaultId);
+
             /// Load ETS export
             /// \param filePath ETS export xml file path
             /// \exception knx::TKnxException If the export file is missing or has an incorrect format
@@ -35,7 +44,13 @@ namespace knx
             void ParseGroupAddress(tinyxml2::XMLElement* mainGroup);
             void ParseGroupAddress(tinyxml2::XMLElement* mainGroup, tinyxml2::XMLElement* middleGroup);
 
+            std::string DatapointTypeExportToConfig(const std::string& dpts);
+            void AddToControlConfig(tinyxml2::XMLElement* groupAddress,
+                                    std::vector<knx::tool::TControlConfig>& controlList);
             TMqttKnxConfig Config;
+            const object::TBaseDptConfig& MqttConfig;
+            const object::TBaseDptConfig& JsonConfig;
+            const object::TDatapointId DefaultId;
         };
     }
 }

@@ -51,3 +51,31 @@ TEST_F(DatapointIdTest, fromStringNegTest)
     EXPECT_EQ(false, datapointId.SetFromString(""));
     EXPECT_EQ(false, datapointId.SetFromString(".eds_dsfsdf"));
 }
+
+TEST_F(DatapointIdTest, EqTest)
+{
+    knx::object::TDatapointId a{12};
+    knx::object::TDatapointId b{12};
+
+    EXPECT_TRUE(a == b);
+    b.SetMain(21);
+    EXPECT_FALSE(a == b);
+    b.SetMain(12);
+    b.SetSub(2);
+    EXPECT_FALSE(a == b);
+    a.SetSub(2);
+    EXPECT_TRUE(a == b);
+    a.SetSub(4);
+    EXPECT_FALSE(a == b);
+}
+
+TEST_F(DatapointIdTest, LessTest)
+{
+    knx::object::TDatapointId a{12};
+    knx::object::TDatapointId b{12, 10};
+    EXPECT_TRUE(a < b);
+    a.SetSub(9);
+    EXPECT_TRUE(a < b);
+    b.SetMain(10);
+    EXPECT_FALSE(a < b);
+}

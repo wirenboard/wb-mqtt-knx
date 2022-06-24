@@ -1,8 +1,20 @@
-wb-mqtt-knx (1.6.0) unstable; urgency=medium
+wb-mqtt-knx (1.8.0) unstable; urgency=medium
 
   * Added a default data point type to the ETS import tool
 
- -- Roman Kochkin <roman.kochkin@wirenboard.ru>  Thu, 02 Jun 2022 20:04:00 +0400
+ -- Roman Kochkin <roman.kochkin@wirenboard.ru>  Fri, 24 Jun 2022 13:08:00 +0300
+
+wb-mqtt-knx (1.7.0) unstable; urgency=medium
+
+  * Added support for JSON types to the ETS import tool
+
+ -- Roman Kochkin <roman.kochkin@wirenboard.ru>  Fri, 17 Jun 2022 00:41:00 +0300
+
+wb-mqtt-knx (1.6.0) unstable; urgency=medium
+
+  * Added group object feedback message processing
+
+ -- Roman Kochkin <roman.kochkin@wirenboard.ru>  Tue, 31 May 2022 20:27:00 +0300
 
 wb-mqtt-knx (1.5.0) unstable; urgency=medium
 

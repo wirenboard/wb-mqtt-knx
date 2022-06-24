@@ -47,9 +47,14 @@ TEST_F(ConfiguratorTest, CongigureController)
 
     std::vector<knx::TKnxGroupAddress> addressList{{1, 1, 100}, {1, 2}, {1, 2, 56}, {1, 2, 140}};
 
-    for (const auto& groupAddress: addressList) {
-        EXPECT_CALL(*goController, AddGroupObject(groupAddress, _, _)).Times(1);
-    }
+    uint32_t index = 0;
+    EXPECT_CALL(*goController, AddGroupObject(_, _))
+        .WillRepeatedly(Invoke([addressList, &index](const knx::object::PGroupObject& groupObject,
+                                                     const knx::TGroupObjectSettings& settings) {
+            EXPECT_EQ(addressList[index].ToString(), settings.GroupAddress.ToString());
+            ++index;
+            return true;
+        }));
 
     auto groupObjectMqttBuilder = std::make_shared<TGroupObjectMqttBuilderMock>();
 
@@ -59,7 +64,7 @@ TEST_F(ConfiguratorTest, CongigureController)
     EXPECT_CALL(*groupObjectMqttBuilder, Create(_)).Times(4);
     EXPECT_CALL(*groupObjectMqttBuilder, RemoveUnusedControls()).Times(2);
 
-    auto param = knx::object::TGroupObjectMqttParameter{"", "", ""};
+    knx::TGroupObjectSettings param;
 
     auto configurator = std::make_unique<knx::Configurator>(SourceDir + "/test/config/wb-mqtt-knx.conf",
                                                             SourceDir + "/wb-mqtt-knx.schema.json");

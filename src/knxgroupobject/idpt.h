@@ -1,5 +1,6 @@
 #pragma once
 
+#include "datapointid.h"
 #include "wblib/any.h"
 #include <memory>
 
@@ -25,6 +26,10 @@ namespace knx
         class IDpt
         {
         public:
+            /// Get Datapoint Id
+            /// \return Datapoint Id
+            virtual TDatapointId GetId() const = 0;
+
             /// Get a set of field descriptors for creating mqtt controls
             /// \return set of field descriptors
             virtual std::vector<DptDescriptorField> getDescriptor() const = 0;

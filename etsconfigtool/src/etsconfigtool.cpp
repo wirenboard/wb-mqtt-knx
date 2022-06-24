@@ -1,6 +1,4 @@
 #include "etsconfigtool.h"
-#include "../src/knxexception.h"
-#include "../src/knxgroupobject/datapointpool.h"
 #include <algorithm>
 #include <iostream>
 #include <unordered_map>
@@ -13,56 +11,66 @@ namespace
     constexpr auto DEFAULT_ENABLE_DEBUG = false;
     constexpr auto DEFAULT_ENABLE_LEGACY_KNX_DEVICE = false;
     constexpr auto DEFAULT_IS_CONTROL_READONLY = false;
+}
 
-    inline std::string DatapointTypeExportToConfigDefault()
-    {
-        return knx::object::DataPointPool::GetDataPointNameById(0, 0);
-    }
+TEtsConfigTool::TEtsConfigTool(const object::TBaseDptConfig& mqttConfig,
+                               const object::TBaseDptConfig& jsonConfig,
+                               const object::TDatapointId& defaultId)
+    : MqttConfig(mqttConfig),
+      JsonConfig(jsonConfig),
+      DefaultId(defaultId)
+{}
 
-    std::string DatapointTypeExportToConfig(const std::string& dpts)
-    {
-        uint32_t generalType;
-        uint32_t subType = 0;
-
-        try {
-            auto firstDpts = WBMQTT::StringSplit(dpts, ",").at(0);
-            auto firstDptsTokens = WBMQTT::StringSplit(firstDpts, "-");
-            generalType = std::stoi(firstDptsTokens.at(1));
-            if (firstDptsTokens.size() == 3) {
-                subType = std::stoi(firstDptsTokens.at(2));
-            }
-
-            return knx::object::DataPointPool::GetDataPointNameById(generalType, subType);
-        } catch (const std::out_of_range& oor) {
-            std::cerr << "DatapointTypeExportToConfig( " << dpts << " ): Out of Range error: " << oor.what() << '\n';
-            return "";
+std::string TEtsConfigTool::DatapointTypeExportToConfig(const std::string& dpts)
+{
+    try {
+        knx::object::TDatapointId id;
+        auto firstDpts = WBMQTT::StringSplit(dpts, ",").at(0);
+        auto firstDptsTokens = WBMQTT::StringSplit(firstDpts, "-");
+        id.SetMain(std::stoi(firstDptsTokens.at(1)));
+        if (firstDptsTokens.size() == 3) {
+            id.SetSub(std::stoi(firstDptsTokens.at(2)));
         }
-    }
 
-    void AddToControlConfig(tinyxml2::XMLElement* groupAddress, std::vector<knx::tool::TControlConfig>& controlList)
-    {
-        auto name = groupAddress->Attribute("Name");
-        auto address = groupAddress->Attribute("Address");
-        auto dpts = groupAddress->Attribute("DPTs");
-        if ((name != nullptr) && (address != nullptr)) {
-            TControlConfig control;
-            knx::TKnxGroupAddress knxGroupAddress(address);
-            auto groupAddressStr = knxGroupAddress.ToString();
-            std::replace(groupAddressStr.begin(), groupAddressStr.end(), '/', '_');
-            control.Id = std::string("control") + groupAddressStr;
-            control.Title = name;
-            control.GroupAddress = knxGroupAddress;
-            if (dpts != nullptr) {
-                control.DatapointType = DatapointTypeExportToConfig(dpts);
-            } else {
-                std::cout << "Warning: missing datapoint type for '" << control.Id
-                          << "', default ('Raw_Value') is assigned" << std::endl;
-                control.DatapointType = DatapointTypeExportToConfigDefault();
-            }
-            control.ReadOnly = DEFAULT_IS_CONTROL_READONLY;
-            if (!control.DatapointType.empty()) {
-                controlList.push_back(control);
-            }
+        auto datapoint = MqttConfig.GetDptConfigName(id);
+        if (datapoint) {
+            return *datapoint;
+        }
+        datapoint = JsonConfig.GetDptConfigName(id);
+        if (datapoint) {
+            return *datapoint;
+        }
+        return *MqttConfig.GetDptConfigName(DefaultId);
+    } catch (const std::out_of_range& oor) {
+        std::cerr << "DatapointTypeExportToConfig( " << dpts << " ): Out of Range error: " << oor.what() << '\n';
+        return "";
+    }
+}
+
+void TEtsConfigTool::AddToControlConfig(tinyxml2::XMLElement* groupAddress,
+                                        std::vector<knx::tool::TControlConfig>& controlList)
+{
+    auto name = groupAddress->Attribute("Name");
+    auto address = groupAddress->Attribute("Address");
+    auto dpts = groupAddress->Attribute("DPTs");
+    if ((name != nullptr) && (address != nullptr)) {
+        TControlConfig control;
+        knx::TKnxGroupAddress knxGroupAddress(address);
+        auto groupAddressStr = knxGroupAddress.ToString();
+        std::replace(groupAddressStr.begin(), groupAddressStr.end(), '/', '_');
+        control.Id = std::string("control") + groupAddressStr;
+        control.Title = name;
+        control.GroupAddress = knxGroupAddress;
+        if (dpts != nullptr) {
+            control.DatapointType = DatapointTypeExportToConfig(dpts);
+        } else {
+            std::cout << "Warning: missing datapoint type for '" << control.Id << "', default ('Raw_Value') is assigned"
+                      << std::endl;
+            control.DatapointType = *MqttConfig.GetDptConfigName(DefaultId);
+        }
+        control.ReadOnly = DEFAULT_IS_CONTROL_READONLY;
+        if (!control.DatapointType.empty()) {
+            controlList.push_back(control);
         }
     }
 }

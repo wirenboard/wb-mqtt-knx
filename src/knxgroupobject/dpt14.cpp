@@ -42,3 +42,8 @@ std::vector<WBMQTT::TAny> TDpt14::ToMqtt()
 {
     return {static_cast<double>(FieldFloatValue)};
 }
+
+TDatapointId TDpt14::GetId() const
+{
+    return TDatapointId{14};
+}

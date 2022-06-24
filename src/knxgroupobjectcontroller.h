@@ -22,9 +22,7 @@ namespace knx
         explicit TKnxGroupObjectController() = delete;
         explicit TKnxGroupObjectController(knx::PSender<TTelegram> pSender, std::chrono::milliseconds tickInterval);
 
-        bool AddGroupObject(const knx::TKnxGroupAddress& groupAddress,
-                            const object::PGroupObject& groupObject,
-                            const TGroupObjectSettings& settings) override;
+        bool AddGroupObject(const object::PGroupObject& groupObject, const TGroupObjectSettings& settings) override;
         bool RemoveGroupObject(const TKnxGroupAddress& address) override;
 
     private:
@@ -47,6 +45,6 @@ namespace knx
 
         PSender<TTelegram> Sender;
         std::chrono::milliseconds TickInterval;
-        std::map<TKnxGroupAddress, std::unique_ptr<TGroupObjectListItem>> GroupObjectList;
+        std::map<TKnxGroupAddress, std::shared_ptr<TGroupObjectListItem>> GroupObjectList;
     };
 }
