@@ -11,7 +11,7 @@ TGroupObjectMqttBuilder::TGroupObjectMqttBuilder(WBMQTT::PDeviceDriver pMqttDevi
                                                  WBMQTT::TLogger& errorLogger)
     : MqttDeviceDriver(std::move(pMqttDeviceDriver)),
       DptJsonBuilder(dptJsonBuilder),
-      DptWbMqttBuilder(dptJsonBuilder),
+      DptWbMqttBuilder(dptWbMqttBuilder),
       ErrorLogger(errorLogger)
 {}
 
