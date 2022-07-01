@@ -1,4 +1,5 @@
 #include "dptwbmqttconfig.h"
+#include "dptcommonconfig.h"
 #include <map>
 #include <vector>
 
@@ -6,7 +7,7 @@ using namespace knx::object;
 
 namespace
 {
-    const std::vector<std::string> DptsCatalog = {"Raw_Value", // Default value
+    const std::vector<std::string> DptsCatalog = {dptcommonconfig::RawValueString, // Default value
                                                   "1.xxx_B1",
                                                   "2.xxx_B2",
                                                   "3.xxx_B1U3",
@@ -30,8 +31,12 @@ const TBaseDptConfig::TConfigNameMap& TDptWbMqttConfig::GetConfigNameMap() const
 TDptWbMqttConfig::TDptWbMqttConfig()
 {
     for (const auto& dptConfigString: DptsCatalog) {
-        TDatapointId id{};
-        id.SetFromString(dptConfigString);
+        TDatapointId id;
+        if (dptConfigString != dptcommonconfig::RawValueString) {
+            id.SetFromString(dptConfigString);
+        } else {
+            id = dptcommonconfig::RawValueId;
+        }
         DatapointConfigName[id] = dptConfigString;
     }
 }

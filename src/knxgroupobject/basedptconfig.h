@@ -15,8 +15,6 @@ namespace knx
             /// \return optional datapoint name. Or std::nullopt if datapoint not found
             std::experimental::optional<std::string> GetDptConfigName(const TDatapointId& datapointId) const;
 
-            static const TDatapointId DefaultDatapointId;
-
             /// Virtual destructor
             virtual ~TBaseDptConfig() = default;
 

@@ -1,3 +1,4 @@
+#include "../../src/knxgroupobject/dptcommonconfig.h"
 #include "../../src/knxgroupobject/dptjsonconfig.h"
 #include "../../src/knxgroupobject/dptwbmqttconfig.h"
 #include "config.h"
@@ -14,7 +15,7 @@ protected:
     {
         Converter = std::make_unique<knx::tool::TEtsConfigTool>(DptWbMqttConfig,
                                                                 DptJsonConfig,
-                                                                knx::object::TDptWbMqttConfig::DefaultDatapointId);
+                                                                knx::object::dptcommonconfig::RawValueId);
     }
 
     void TearDown() override

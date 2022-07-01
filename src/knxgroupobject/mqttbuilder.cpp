@@ -1,4 +1,5 @@
 #include "mqttbuilder.h"
+#include "dptcommonconfig.h"
 #include "dptwbmqttbuilder.h"
 #include "mqtt.h"
 #include <regex>
@@ -31,7 +32,9 @@ PGroupObject TGroupObjectMqttBuilder::Create(const TGroupObjectSettings& setting
 
     PDpt datapoint;
     TDatapointId datapointId;
-    if (!datapointId.SetFromString(settings.DatapointType)) {
+    if (settings.DatapointType == dptcommonconfig::RawValueString) {
+        datapointId = dptcommonconfig::RawValueId;
+    } else if (!datapointId.SetFromString(settings.DatapointType)) {
         return nullptr;
     }
 

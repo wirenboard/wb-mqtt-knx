@@ -66,9 +66,9 @@ namespace knx
             bool operator<(const TDatapointId& rhs) const;
 
         private:
-            uint32_t Main{};
-            uint32_t Sub{};
-            bool HasSub{};
+            uint32_t Main{0};
+            uint32_t Sub{0};
+            bool HasSub{false};
         };
     }
 }
