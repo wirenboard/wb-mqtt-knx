@@ -1,4 +1,5 @@
 #include "../src/knxexception.h"
+#include "../src/knxgroupobject/dptcommonconfig.h"
 #include "../src/knxgroupobject/dptwbmqttconfig.h"
 #include "testutils.h"
 #include "gtest/gtest.h"
@@ -32,7 +33,7 @@ TEST_F(DptWbMqttConfigTest, getConfigNameNegTest)
 
 TEST_F(DptWbMqttConfigTest, getDefaultConfigNameTest)
 {
-    auto name = DptWbMqttConfig->GetDptConfigName(knx::object::TDptWbMqttConfig::DefaultDatapointId);
+    auto name = DptWbMqttConfig->GetDptConfigName(knx::object::dptcommonconfig::RawValueId);
     ASSERT_TRUE(name);
     EXPECT_EQ("Raw_Value", *name);
 }

@@ -1,3 +1,4 @@
+#include "../../src/knxgroupobject/dptcommonconfig.h"
 #include "../../src/knxgroupobject/dptjsonconfig.h"
 #include "../../src/knxgroupobject/dptwbmqttconfig.h"
 #include "config.h"
@@ -55,7 +56,7 @@ int main(int argc, char** argv)
 
     knx::object::TDptWbMqttConfig mqttConfig;
     knx::object::TDptJsonConfig jsonConfig(DEFAULT_CONFIG_JSON_DATAPOINT_FILE_PATH);
-    knx::tool::TEtsConfigTool converter(mqttConfig, jsonConfig, knx::object::TDptWbMqttConfig::DefaultDatapointId);
+    knx::tool::TEtsConfigTool converter(mqttConfig, jsonConfig, knx::object::dptcommonconfig::RawValueId);
 
     try {
         converter.LoadEtsExport(appOptions.EtsExportFilePath);

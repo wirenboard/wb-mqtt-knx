@@ -2,8 +2,6 @@
 
 using namespace knx::object;
 
-const TDatapointId TBaseDptConfig::DefaultDatapointId{0};
-
 std::experimental::optional<std::string> TBaseDptConfig::GetDptConfigName(const TDatapointId& datapointId) const
 {
     auto DatapointConfigName = GetConfigNameMap();
