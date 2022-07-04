@@ -149,7 +149,7 @@
         },
         "readPollInterval": {
           "type": "integer",
-          "title": "READ poll interval for Devices (ms)",
+          "title": "Group Object polling interval (ms)",
           "minimum": 0,
           "maximum": 100000,
           "default": 0,
@@ -157,7 +157,7 @@
         },
         "readPollTimeout": {
           "type": "integer",
-          "title": "READ poll timeout for Devices (ms)",
+          "title": "Timeout for a response to a polling request (ms)",
           "minimum": 0,
           "maximum": 100000,
           "default": 0,
@@ -268,8 +268,8 @@
       "Group Address": "Групповой Адрес",
       "Datapoint Type": "Тип данных",
       "Read only": "Только чтение",
-      "READ poll interval for Devices (ms)": "Интервал опроса группового адреса (мс)",
-      "READ poll timeout for Devices (ms)": "Максимальное время ожидания ответа на опрос (мс)",
+      "Group Object polling interval (ms)": "Интервал опроса Группового Объекта (мс)",
+      "Timeout for a response to a polling request (ms)": "Время ожидания ответа на запрос (мс)",
       "Feedback Group Address": "Групповой адрес для приёма статуса"
     }
   }
