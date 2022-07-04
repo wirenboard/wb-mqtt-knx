@@ -1,3 +1,9 @@
+wb-mqtt-knx (1.9.0) unstable; urgency=medium
+
+  *  Added Russian translation to the config schema
+
+ -- Roman Kochkin <roman.kochkin@wirenboard.ru>  Mon, 04 Jul 2022 13:22:00 +0300
+
 wb-mqtt-knx (1.8.2) unstable; urgency=medium
 
   * Fixed an issue where a raw value data point was not created
