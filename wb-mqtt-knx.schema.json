@@ -157,7 +157,7 @@
         },
         "readPollTimeout": {
           "type": "integer",
-          "title": "Timeout for a response to a polling request (ms)",
+          "title": "Poll responce timeout (ms)",
           "minimum": 0,
           "maximum": 100000,
           "default": 0,
@@ -209,7 +209,7 @@
     },
     "enableLegacyKnxDevice": {
       "type": "boolean",
-      "title": "enableLegacyKnxDevice_description",
+      "title": "Enable the KNX Gateway Device: knx/data",
       "default": true,
       "_format": "checkbox",
       "propertyOrder": 3
@@ -251,25 +251,24 @@
     "en": {
       "device_header_template": "{{self.deviceId}}",
       "group_object_header_template": "{{self.controlId}} ({{self.groupAddress}})",
-      "enableLegacyKnxDevice_description": "Enable the KNX Gateway Device: knx/data"
     },
     "ru": {
-      "KNX Group Objects Configuration": "Настройка групповых объектов KNX",
+      "KNX Group Objects Configuration": "Настройка Групповых объектов KNX",
       "Enable debug logging": "Включить отладочные сообщения",
-      "enableLegacyKnxDevice_description": "Включить устройство KNX моста: knx/data",
+      "Enable the KNX Gateway Device: knx/data": "Включить устройство KNX моста: knx/data",
       "List of Devices": "Список устройств",
       "Device": "Устройство",
       "Device ID": "Идентификатор устройства в MQTT",
       "Device Title": "Название устройства",
       "Group Object": "Групповой объект",
-      "List of Group Objects": "Список групповых объектов",
-      "Control ID": "Идентификатор Группового Объекта в MQTT",
-      "Group Object Title": "Название Группового Объекта",
-      "Group Address": "Групповой Адрес",
+      "List of Group Objects": "Список Групповых объектов",
+      "Control ID": "Идентификатор Группового объекта в MQTT",
+      "Group Object Title": "Название Группового объекта",
+      "Group Address": "Групповой адрес",
       "Datapoint Type": "Тип данных",
-      "Read only": "Только чтение",
-      "Group Object polling interval (ms)": "Интервал опроса Группового Объекта (мс)",
-      "Timeout for a response to a polling request (ms)": "Время ожидания ответа на запрос (мс)",
+      "Read only": "Только для чтения",
+      "Group Object polling interval (ms)": "Интервал опроса Группового объекта (мс)",
+      "Poll responce timeout (ms)": "Время ожидания ответа на запрос (мс)",
       "Feedback Group Address": "Групповой адрес для приёма статуса"
     }
   }
