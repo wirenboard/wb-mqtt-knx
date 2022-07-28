@@ -110,7 +110,8 @@ void TTpdu::SetRaw(std::vector<uint8_t>::const_iterator beginIt, std::vector<uin
     SetSequenceNumber((beginIt[0] >> 2) & 0x0F);
 
     if (CommunicationType == telegram::TCommunicationType::UDP ||
-        CommunicationType == telegram::TCommunicationType::NDP) {
+        CommunicationType == telegram::TCommunicationType::NDP)
+    {
         SetAPCI(static_cast<telegram::TApci>(((beginIt[0] & 0x03) << 2) | (beginIt[1] >> 6)));
         SetPayload(beginIt + 1, endIt);
     } else {

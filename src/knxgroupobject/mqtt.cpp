@@ -77,7 +77,8 @@ void TGroupObjectMqtt::MqttNotify(WBMQTT::PControl& pControl, uint32_t index, co
 void TGroupObjectMqtt::KnxNotify(const TGroupObjectTransaction& transaction)
 {
     if ((transaction.Apci == telegram::TApci::GroupValueWrite) ||
-        (transaction.Apci == telegram::TApci::GroupValueResponse)) {
+        (transaction.Apci == telegram::TApci::GroupValueResponse))
+    {
         std::vector<WBMQTT::TAny> mqttData;
 
         {

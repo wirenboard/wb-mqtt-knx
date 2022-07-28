@@ -68,7 +68,8 @@ namespace knx
                 uint32_t rawValuePosition = 0;
                 for (uint32_t i = (field.BitBeginPosition + field.JsonField.GetBitWidth() - 1);
                      i >= field.BitBeginPosition;
-                     --i) {
+                     --i)
+                {
                     if (field.JsonField.GetRawValue().test(rawValuePosition)) {
                         payload[i / 8] |= (1 << (7 - i % 8));
                     }
