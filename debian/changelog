@@ -1,3 +1,9 @@
+wb-mqtt-knx (1.9.1) unstable; urgency=medium
+
+  * Fix code formatting after clang-format update (15.0-20220704)
+
+ -- Nikita Maslov <nikita.maslov@wirenboard.ru>  Thu, 28 Jul 2022 21:47:25 +0300
+
 wb-mqtt-knx (1.9.0) unstable; urgency=medium
 
   *  Added Russian translation to the config schema
