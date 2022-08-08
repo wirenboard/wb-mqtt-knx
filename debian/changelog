@@ -1,4 +1,4 @@
-wb-mqtt-knx (1.10.0) unstable; urgency=medium
+wb-mqtt-knx (1.10.0) stable; urgency=medium
 
   * Added Debian bullseye-compatible dependencies
 
