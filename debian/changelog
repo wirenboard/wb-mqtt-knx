@@ -1,3 +1,9 @@
+wb-mqtt-knx (1.10.0) stable; urgency=medium
+
+  * Added Debian bullseye-compatible dependencies
+
+ -- Roman Kochkin <roman.kochkin@wirenboard.ru>  Mon, 08 Aug 2022 15:24:00 +0400
+
 wb-mqtt-knx (1.9.1) unstable; urgency=medium
 
   * Fix code formatting after clang-format update (15.0-20220704)
