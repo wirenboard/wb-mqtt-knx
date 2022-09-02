@@ -36,6 +36,7 @@ add_executable(${PROJECT_NAME}_test ${TEST_LIST}
         ../src/knxgroupobject/basedptconfig.cpp
         ../src/knxgroupobject/dptjsonconfig.cpp
         ../src/knxgroupobject/dptwbmqttconfig.cpp
+        ../src/knxindinvidualaddress.cpp
         )
 
 target_link_libraries(${PROJECT_NAME}_test gtest gtest_main gmock wbmqtt1 pthread)

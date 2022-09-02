@@ -21,7 +21,7 @@ include_directories("${PROJECT_BINARY_DIR}")
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-add_compile_options(-Wall -Werror -pedantic)
+add_compile_options(-Wall -Werror -pedantic -Wno-psabi)
 
 if (CMAKE_BUILD_TYPE MATCHES Debug)
     add_compile_options(-O0 -gdwarf-3 --coverage)

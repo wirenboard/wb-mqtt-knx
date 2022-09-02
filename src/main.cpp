@@ -19,9 +19,9 @@ namespace
     const auto KNX_DRIVER_STOP_TIMEOUT_S = std::chrono::seconds(60); // topic cleanup can take a lot of time
     const auto KNX_READ_TICK_PERIOD = std::chrono::milliseconds(50);
 
-    WBMQTT::TLogger ErrorLogger("ERROR: [knx] ", WBMQTT::TLogger::StdErr, WBMQTT::TLogger::RED);
-    WBMQTT::TLogger VerboseLogger("INFO: [knx] ", WBMQTT::TLogger::StdErr, WBMQTT::TLogger::WHITE, false);
-    WBMQTT::TLogger InfoLogger("INFO: [knx] ", WBMQTT::TLogger::StdErr, WBMQTT::TLogger::GREY);
+    WBMQTT::TLogger ErrorLogger("ERROR: ", WBMQTT::TLogger::StdErr, WBMQTT::TLogger::RED);
+    WBMQTT::TLogger DebugLogger("DEBUG: ", WBMQTT::TLogger::StdErr, WBMQTT::TLogger::WHITE, false);
+    WBMQTT::TLogger InfoLogger("INFO: ", WBMQTT::TLogger::StdErr, WBMQTT::TLogger::GREY);
 } // namespace
 
 int main(int argc, char** argv)
@@ -57,10 +57,10 @@ int main(int argc, char** argv)
 
 #ifdef NDEBUG
     if (verboseLevel > 0) {
-        VerboseLogger.SetEnabled(true);
+        DebugLogger.SetEnabled(true);
     }
 #else
-    VerboseLogger.SetEnabled(true);
+    DebugLogger.SetEnabled(true);
 #endif
 
     WBMQTT::TPromise<void> initialized;
@@ -91,7 +91,7 @@ int main(int argc, char** argv)
     try {
         knx::Configurator configurator(DEFAULT_CONFIG_FILE_PATH, DEFAULT_CONFIG_SCHEMA_FILE_PATH);
         if (configurator.IsDebugEnabled()) {
-            VerboseLogger.SetEnabled(true);
+            DebugLogger.SetEnabled(true);
         }
 
         auto mqttClient = WBMQTT::NewMosquittoMqttClient(mqttConfig);
@@ -109,15 +109,14 @@ int main(int argc, char** argv)
 
         mqttDriver->WaitForReady();
 
-        auto knxClientService =
-            std::make_shared<knx::TKnxClientService>(knxUrl, ErrorLogger, VerboseLogger, InfoLogger);
+        auto knxClientService = std::make_shared<knx::TKnxClientService>(knxUrl, ErrorLogger, DebugLogger, InfoLogger);
 
         std::shared_ptr<knx::TKnxLegacyDevice> knxLegacyDevice;
         if (configurator.IsKnxLegacyDeviceEnabled()) {
             knxLegacyDevice = std::make_shared<knx::TKnxLegacyDevice>(mqttDriver,
                                                                       knxClientService,
                                                                       ErrorLogger,
-                                                                      VerboseLogger,
+                                                                      DebugLogger,
                                                                       InfoLogger);
         }
         knx::TTickTimer tickTimer;
