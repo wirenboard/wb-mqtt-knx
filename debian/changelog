@@ -1,3 +1,10 @@
+wb-mqtt-knx (1.11.0) stable; urgency=medium
+
+  * More readable log output
+  * Fixed severity level for debug messages
+
+ -- Roman Kochkin <roman.kochkin@wirenboard.ru>  Fri, 02 Sep 2022 20:05:05 +0400
+
 wb-mqtt-knx (1.10.0) stable; urgency=medium
 
   * Added Debian bullseye-compatible dependencies
