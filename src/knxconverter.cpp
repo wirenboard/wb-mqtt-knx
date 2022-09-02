@@ -1,6 +1,7 @@
 #include "knxconverter.h"
 #include "knxexception.h"
 #include "knxgroupaddress.h"
+#include "knxindividualaddress.h"
 #include "knxutils.h"
 #include <algorithm>
 #include <array>
@@ -46,11 +47,10 @@ namespace
     std::string KnxSourceAddressToString(const TTelegram& telegram)
     {
         std::stringstream ss;
-        auto address = telegram.GetSourceAddress();
+        TKnxIndividualAddress sourceAddress{telegram.GetSourceAddress()};
 
         // Source address is always individual
-        ss << "i:" << (address >> 12) << "/" << ((address >> 8) & 0xf);
-        ss << "/" << (address & 0xff);
+        ss << "i:" << sourceAddress.ToString('/');
         return ss.str();
     }
 
@@ -63,12 +63,11 @@ namespace
         if (telegram.IsGroupAddressed()) {
             // group address
             TKnxGroupAddress groupAddress{receiverAddress};
-            ss << "g:" << groupAddress.GetMainGroup() << "/" << groupAddress.GetMiddleGroup();
-            ss << "/" << groupAddress.GetSubGroup();
+            ss << "g:" << groupAddress.ToString();
         } else {
             // individual address
-            ss << "i:" << (receiverAddress >> 12) << "/" << ((receiverAddress >> 8) & 0xf);
-            ss << "/" << (receiverAddress & 0xff);
+            TKnxIndividualAddress individualAddress{receiverAddress};
+            ss << "i:" << individualAddress.ToString('/');
         }
 
         return ss.str();
