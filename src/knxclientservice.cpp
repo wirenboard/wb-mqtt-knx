@@ -22,11 +22,17 @@ namespace
     constexpr auto SELECT_TIMEOUT_RETURN_VALUE = 0;
     constexpr auto SELECT_ERROR_RETURN_VALUE = -1;
 
-    std::string ToLog(const knx::TTelegram& telegram, bool toSend)
+    enum class LogType
+    {
+        RECEIVE,
+        SEND
+    };
+
+    std::string ToLog(const knx::TTelegram& telegram, LogType logType)
     {
         auto tpdu = telegram.Tpdu().GetRaw();
         std::stringstream ss;
-        if (!toSend) {
+        if (logType == LogType::RECEIVE) {
             ss << "from:" << knx::TKnxIndividualAddress(telegram.GetSourceAddress()).ToString() << " ";
         }
         ss << "to:" << knx::TKnxGroupAddress(telegram.GetReceiverAddress()).ToString() << " ";
@@ -74,7 +80,7 @@ namespace knx
             }
             if (sendResult != EIB_ERROR_RETURN_VALUE) {
                 if (DebugLogger.IsEnabled()) {
-                    DebugLogger.Log() << "Sent to knxd: " << ToLog(telegram, true);
+                    DebugLogger.Log() << "Sent to knxd: " << ToLog(telegram, LogType::SEND);
                 }
             } else {
                 HandleLoopError("Failed to send group telegram");
@@ -194,7 +200,7 @@ namespace knx
                 knxTelegram.Tpdu().SetRaw(tpduPayload);
 
                 if (DebugLogger.IsEnabled()) {
-                    DebugLogger.Log() << "Received from knxd: " << ToLog(knxTelegram, false);
+                    DebugLogger.Log() << "Received from knxd: " << ToLog(knxTelegram, LogType::RECEIVE);
                 }
                 NotifyAllSubscribers(TKnxEvent::ReceivedTelegram, knxTelegram);
             } catch (const TKnxException& e) {
