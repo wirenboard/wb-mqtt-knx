@@ -1,6 +1,8 @@
 #include "knxclientservice.h"
 #include "knxconnection.h"
 #include "knxexception.h"
+#include "knxgroupaddress.h"
+#include "knxindividualaddress.h"
 #include "wblib/utils.h"
 #include <cstring>
 #include <eibclient.h>
@@ -20,17 +22,25 @@ namespace
     constexpr auto SELECT_TIMEOUT_RETURN_VALUE = 0;
     constexpr auto SELECT_ERROR_RETURN_VALUE = -1;
 
-    std::string ToLog(const knx::TTelegram& telegram)
+    enum class LogType
+    {
+        RECEIVE,
+        SEND
+    };
+
+    std::string ToLog(const knx::TTelegram& telegram, LogType logType)
     {
         auto tpdu = telegram.Tpdu().GetRaw();
         std::stringstream ss;
-        ss << "S_EIB(" << std::to_string(telegram.GetSourceAddress()) << ") ";
-        ss << "D_EIB(" << std::to_string(telegram.GetReceiverAddress()) << ") ";
-        ss << "TPDU(";
+        if (logType == LogType::RECEIVE) {
+            ss << "from:" << knx::TKnxIndividualAddress(telegram.GetSourceAddress()).ToString() << " ";
+        }
+        ss << "to:" << knx::TKnxGroupAddress(telegram.GetReceiverAddress()).ToString() << " ";
+        ss << "tpdu(";
         ss << tpdu.size() << "):";
         ss << std::hex << std::noshowbase;
         for (unsigned char i: tpdu) {
-            ss << "0x" << std::setw(2) << std::setfill('0');
+            ss << std::setw(2) << std::setfill('0');
             ss << (unsigned)i << " ";
         }
         return ss.str();
@@ -70,7 +80,7 @@ namespace knx
             }
             if (sendResult != EIB_ERROR_RETURN_VALUE) {
                 if (DebugLogger.IsEnabled()) {
-                    DebugLogger.Log() << "Sent to knxd: " << ToLog(telegram);
+                    DebugLogger.Log() << "Sent to knxd: " << ToLog(telegram, LogType::SEND);
                 }
             } else {
                 HandleLoopError("Failed to send group telegram");
@@ -190,7 +200,7 @@ namespace knx
                 knxTelegram.Tpdu().SetRaw(tpduPayload);
 
                 if (DebugLogger.IsEnabled()) {
-                    DebugLogger.Log() << "Received from knxd: " << ToLog(knxTelegram);
+                    DebugLogger.Log() << "Received from knxd: " << ToLog(knxTelegram, LogType::RECEIVE);
                 }
                 NotifyAllSubscribers(TKnxEvent::ReceivedTelegram, knxTelegram);
             } catch (const TKnxException& e) {
