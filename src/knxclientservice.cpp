@@ -66,7 +66,7 @@ namespace knx
             return;
 
         if (!KnxdConnection->IsConnected())
-            HandleLoopError("Failed the knxd connection");
+            HandleCriticalError("Failed the knxd connection");
 
         if (telegram.IsGroupAddressed()) {
             auto tpduPayload = telegram.Tpdu().GetRaw();
@@ -83,46 +83,35 @@ namespace knx
                     DebugLogger.Log() << "Sent to knxd: " << ToLog(telegram, LogType::SEND);
                 }
             } else {
-                HandleLoopError("Failed to send group telegram");
+                ErrorLogger.Log() << "Failed to send group telegram";
             }
 
         } else {
-            HandleLoopError("Sending individual telegrams is not supported by knxd");
+            ErrorLogger.Log() << "Sending individual telegrams is not supported by knxd";
         }
     }
 
     void TKnxClientService::KnxdConnectProcessing()
     {
-        // The loop responsible for connecting to the knxd server
-        while (IsStarted) {
-            KnxdConnection = std::make_unique<TKnxConnection>(KnxServerUrl);
+        InfoLogger.Log() << "Connecting to knxd... URL: '" << KnxServerUrl << "'";
+        KnxdConnection = std::make_unique<TKnxConnection>(KnxServerUrl);
 
-            if (!KnxdConnection->IsConnected()) {
-                HandleLoopError("Failed to open KnxServerUrl: " + KnxServerUrl + ". Is knxd running?");
-
-                auto tick = std::chrono::microseconds(0);
-                while (IsStarted && (tick < CLIENT_RECONNECT_PERIOD)) {
-                    std::this_thread::sleep_for(IN_CONNECTION_REQUEST_TICK);
-                    tick += IN_CONNECTION_REQUEST_TICK;
-                }
-                continue;
-            }
-
-            InfoLogger.Log() << "KNX connection successful";
-
-            const int32_t eibOpenResult = EIBOpen_GroupSocket(KnxdConnection->GetEIBConnection(), 0);
-            if (eibOpenResult == EIB_ERROR_RETURN_VALUE) {
-                HandleLoopError("failed to open EIB GroupSocket connection");
-                continue;
-            }
-            NotifyAllSubscribers(TKnxEvent::KnxdSocketConnected, TTelegram{});
-            KnxdReceiveProcessing();
+        if (!KnxdConnection->IsConnected()) {
+            HandleCriticalError("Failed to open KnxServerUrl: " + KnxServerUrl + ". Is knxd running?");
         }
+
+        const int32_t eibOpenResult = EIBOpen_GroupSocket(KnxdConnection->GetEIBConnection(), 0);
+        if (eibOpenResult == EIB_ERROR_RETURN_VALUE) {
+            HandleCriticalError("failed to open EIB GroupSocket connection");
+        }
+
+        InfoLogger.Log() << "knxd connected successfully";
     }
 
-    void TKnxClientService::HandleLoopError(const std::string& what)
+    void TKnxClientService::HandleCriticalError(const std::string& what)
     {
-        ErrorLogger.Log() << "Error in KNX loop: " << what;
+        ErrorLogger.Log() << what;
+        wb_throw(knx::TKnxException, what);
     }
 
     void TKnxClientService::Start()
@@ -133,7 +122,10 @@ namespace knx
             wb_throw(knx::TKnxException, "Attempt to start already started driver");
         }
 
-        Worker = WBMQTT::MakeThread("KnxClient thread", {[this] { KnxdConnectProcessing(); }});
+        KnxdConnectProcessing();
+
+        Worker = WBMQTT::MakeThread("KnxClient thread", {[this] { KnxdReceiveProcessing(); }});
+        NotifyAllSubscribers(TKnxEvent::KnxdSocketConnected, TTelegram{});
     }
 
     void TKnxClientService::Stop()
@@ -154,8 +146,7 @@ namespace knx
     {
         const int32_t linuxFileDescriptor = EIB_Poll_FD(KnxdConnection->GetEIBConnection());
         if (linuxFileDescriptor == EIB_ERROR_RETURN_VALUE) {
-            HandleLoopError("Failed to get Poll fd");
-            return;
+            HandleCriticalError("Failed to get Poll fd");
         }
         // The loop responsible for receiving telegrams from knxd
         while (IsStarted) {
@@ -169,7 +160,7 @@ namespace knx
             if (selectResult == SELECT_TIMEOUT_RETURN_VALUE) {
                 continue;
             } else if (selectResult == SELECT_ERROR_RETURN_VALUE) {
-                HandleLoopError(std::string("Select failed: ") + std::strerror(errno));
+                HandleCriticalError(std::string("Select failed: ") + std::strerror(errno));
                 break;
             }
 
@@ -184,9 +175,8 @@ namespace knx
                                                       &srcEibAddress,
                                                       &destEibAddress);
             if (packetLen == EIB_ERROR_RETURN_VALUE) {
-                HandleLoopError(std::string("Failed to get a group TPDU: ") + std::strerror(errno));
                 NotifyAllSubscribers(TKnxEvent::KnxdSocketError, TTelegram{});
-                break;
+                HandleCriticalError(std::string("Failed to get a group TPDU: ") + std::strerror(errno));
             }
 
             tpduPayload.resize(packetLen);

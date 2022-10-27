@@ -40,7 +40,7 @@ namespace knx
         void KnxdConnectProcessing();
         void KnxdReceiveProcessing();
 
-        void HandleLoopError(const std::string& what);
+        void HandleCriticalError(const std::string& what);
 
         std::string KnxServerUrl;
 

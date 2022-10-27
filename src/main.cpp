@@ -15,7 +15,6 @@
 
 namespace
 {
-    const auto KNX_DRIVER_INIT_TIMEOUT_S = std::chrono::seconds(30);
     const auto KNX_DRIVER_STOP_TIMEOUT_S = std::chrono::seconds(60); // topic cleanup can take a lot of time
     const auto KNX_READ_TICK_PERIOD = std::chrono::milliseconds(50);
 
@@ -63,22 +62,11 @@ int main(int argc, char** argv)
     DebugLogger.SetEnabled(true);
 #endif
 
-    WBMQTT::TPromise<void> initialized;
-
     WBMQTT::SetThreadName(PROJECT_NAME);
-    WBMQTT::SignalHandling::Handle({SIGINT, SIGTERM, SIGHUP});
+    WBMQTT::SignalHandling::Handle({SIGINT, SIGTERM});
     WBMQTT::SignalHandling::OnSignals({SIGINT, SIGTERM}, [&] {
         WBMQTT::SignalHandling::Stop();
         InfoLogger.Log() << "wb-mqtt-knx service stopped";
-    });
-
-    /* if signal arrived before driver is initialized:
-    wait some time to initialize and then exit gracefully
-    else if timed out: exit with error
-*/
-    WBMQTT::SignalHandling::SetWaitFor(KNX_DRIVER_INIT_TIMEOUT_S, initialized.GetFuture(), [&] {
-        ErrorLogger.Log() << "Driver takes too long to initialize. Exiting.";
-        exit(1);
     });
 
     /* if handling of signal takes too much time: exit with error */
@@ -157,7 +145,6 @@ int main(int argc, char** argv)
         knxClientService->Start();
         tickTimer.Start();
 
-        initialized.Complete();
         WBMQTT::SignalHandling::Wait();
     } catch (std::exception& e) {
         ErrorLogger.Log() << e.what();
