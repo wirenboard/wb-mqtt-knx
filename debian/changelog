@@ -1,3 +1,9 @@
+wb-mqtt-knx (1.12.0) stable; urgency=medium
+
+  * Reduce service downtime
+
+ -- Roman Kochkin <roman.kochkin@wirenboard.ru>  Thu, 27 Oct 2022 10:57:36 +0400
+
 wb-mqtt-knx (1.11.0) stable; urgency=medium
 
   * More readable log output
