@@ -9,5 +9,7 @@ RestartSec=15
 User=root
 ExecStart=/usr/bin/wb-mqtt-knx
 
+RestartPreventExitStatus=2 3 4 5 6 7
+
 [Install]
 WantedBy=multi-user.target

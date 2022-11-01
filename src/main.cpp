@@ -18,6 +18,9 @@ namespace
     const auto KNX_DRIVER_STOP_TIMEOUT_S = std::chrono::seconds(60); // topic cleanup can take a lot of time
     const auto KNX_READ_TICK_PERIOD = std::chrono::milliseconds(50);
 
+    // https://refspecs.linuxbase.org/LSB_5.0.0/LSB-Core-generic/LSB-Core-generic/iniscrptact.html
+    constexpr auto EXIT_NOTCONFIGURED = 6;   // The program is not configured
+
     WBMQTT::TLogger ErrorLogger("ERROR: ", WBMQTT::TLogger::StdErr, WBMQTT::TLogger::RED);
     WBMQTT::TLogger DebugLogger("DEBUG: ", WBMQTT::TLogger::StdErr, WBMQTT::TLogger::WHITE, false);
     WBMQTT::TLogger InfoLogger("INFO: ", WBMQTT::TLogger::StdErr, WBMQTT::TLogger::GREY);
@@ -72,13 +75,22 @@ int main(int argc, char** argv)
     /* if handling of signal takes too much time: exit with error */
     WBMQTT::SignalHandling::SetOnTimeout(KNX_DRIVER_STOP_TIMEOUT_S, [&] {
         ErrorLogger.Log() << "Driver takes too long to stop. Exiting.";
-        exit(2);
+        exit(EXIT_FAILURE);
     });
     WBMQTT::SignalHandling::Start();
 
+    std::unique_ptr<knx::Configurator> pConfigurator;
+
     try {
-        knx::Configurator configurator(DEFAULT_CONFIG_FILE_PATH, DEFAULT_CONFIG_SCHEMA_FILE_PATH);
-        if (configurator.IsDebugEnabled()) {
+        pConfigurator = std::make_unique<knx::Configurator>(DEFAULT_CONFIG_FILE_PATH, DEFAULT_CONFIG_SCHEMA_FILE_PATH);
+    } catch (std::exception& e) {
+        ErrorLogger.Log() << e.what();
+        WBMQTT::SignalHandling::Stop();
+        exit(EXIT_NOTCONFIGURED);
+    }
+
+    try {
+        if (pConfigurator->IsDebugEnabled()) {
             DebugLogger.SetEnabled(true);
         }
 
@@ -100,7 +112,7 @@ int main(int argc, char** argv)
         auto knxClientService = std::make_shared<knx::TKnxClientService>(knxUrl, ErrorLogger, DebugLogger, InfoLogger);
 
         std::shared_ptr<knx::TKnxLegacyDevice> knxLegacyDevice;
-        if (configurator.IsKnxLegacyDeviceEnabled()) {
+        if (pConfigurator->IsKnxLegacyDeviceEnabled()) {
             knxLegacyDevice = std::make_shared<knx::TKnxLegacyDevice>(mqttDriver,
                                                                       knxClientService,
                                                                       ErrorLogger,
@@ -140,7 +152,7 @@ int main(int argc, char** argv)
         knxClientService->Subscribe(knxGroupObjectController);
         tickTimer.Subscribe(knxGroupObjectController);
 
-        configurator.ConfigureObjectController(*knxGroupObjectController, *groupObjectBuilder);
+        pConfigurator->ConfigureObjectController(*knxGroupObjectController, *groupObjectBuilder);
 
         knxClientService->Start();
         tickTimer.Start();
@@ -149,7 +161,7 @@ int main(int argc, char** argv)
     } catch (std::exception& e) {
         ErrorLogger.Log() << e.what();
         WBMQTT::SignalHandling::Stop();
-        exit(1);
+        exit(EXIT_FAILURE);
     }
 
     return 0;
