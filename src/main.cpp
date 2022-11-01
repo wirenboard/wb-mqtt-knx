@@ -19,7 +19,7 @@ namespace
     const auto KNX_READ_TICK_PERIOD = std::chrono::milliseconds(50);
 
     // https://refspecs.linuxbase.org/LSB_5.0.0/LSB-Core-generic/LSB-Core-generic/iniscrptact.html
-    constexpr auto EXIT_NOTCONFIGURED = 6;   // The program is not configured
+    constexpr auto EXIT_NOTCONFIGURED = 6; // The program is not configured
 
     WBMQTT::TLogger ErrorLogger("ERROR: ", WBMQTT::TLogger::StdErr, WBMQTT::TLogger::RED);
     WBMQTT::TLogger DebugLogger("DEBUG: ", WBMQTT::TLogger::StdErr, WBMQTT::TLogger::WHITE, false);
@@ -77,7 +77,6 @@ int main(int argc, char** argv)
         ErrorLogger.Log() << "Driver takes too long to stop. Exiting.";
         exit(EXIT_FAILURE);
     });
-    WBMQTT::SignalHandling::Start();
 
     std::unique_ptr<knx::Configurator> pConfigurator;
 
@@ -85,8 +84,7 @@ int main(int argc, char** argv)
         pConfigurator = std::make_unique<knx::Configurator>(DEFAULT_CONFIG_FILE_PATH, DEFAULT_CONFIG_SCHEMA_FILE_PATH);
     } catch (std::exception& e) {
         ErrorLogger.Log() << e.what();
-        WBMQTT::SignalHandling::Stop();
-        exit(EXIT_NOTCONFIGURED);
+        return EXIT_NOTCONFIGURED;
     }
 
     try {
@@ -154,15 +152,15 @@ int main(int argc, char** argv)
 
         pConfigurator->ConfigureObjectController(*knxGroupObjectController, *groupObjectBuilder);
 
+        WBMQTT::SignalHandling::Start();
+
         knxClientService->Start();
         tickTimer.Start();
-
         WBMQTT::SignalHandling::Wait();
     } catch (std::exception& e) {
         ErrorLogger.Log() << e.what();
-        WBMQTT::SignalHandling::Stop();
-        exit(EXIT_FAILURE);
+        return EXIT_FAILURE;
     }
 
-    return 0;
+    return EXIT_SUCCESS;
 }

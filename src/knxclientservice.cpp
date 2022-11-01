@@ -111,7 +111,7 @@ namespace knx
     void TKnxClientService::HandleCriticalError(const std::string& what)
     {
         ErrorLogger.Log() << what;
-        wb_throw(knx::TKnxException, what);
+        exit(EXIT_FAILURE);
     }
 
     void TKnxClientService::Start()
