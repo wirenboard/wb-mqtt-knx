@@ -63,7 +63,7 @@ namespace knx
                     break;
                 case EFieldType::UNSIGNED_INT:
                 case EFieldType::ENUM:
-                    Value = Json::Value(value.to_ullong() & ((1 << BitWidth) - 1));
+                    Value = Json::Value(static_cast<uint64_t>(value.to_ullong() & ((1 << BitWidth) - 1)));
                     break;
                 case EFieldType::INT:
                     if (BitWidth == 8) {
