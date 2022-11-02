@@ -152,10 +152,10 @@ int main(int argc, char** argv)
 
         pConfigurator->ConfigureObjectController(*knxGroupObjectController, *groupObjectBuilder);
 
-        WBMQTT::SignalHandling::Start();
-
         knxClientService->Start();
         tickTimer.Start();
+
+        WBMQTT::SignalHandling::Start();
         WBMQTT::SignalHandling::Wait();
     } catch (std::exception& e) {
         ErrorLogger.Log() << e.what();

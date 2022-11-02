@@ -6,6 +6,7 @@
 #include "wblib/utils.h"
 #include <cstring>
 #include <eibclient.h>
+#include <future>
 #include <iomanip>
 #include <sstream>
 #include <unistd.h>
@@ -13,9 +14,8 @@
 
 namespace
 {
-    constexpr auto CLIENT_RECONNECT_PERIOD = std::chrono::seconds(30);
     constexpr auto RECEIVER_LOOP_TIMEOUT = std::chrono::seconds(2);
-    constexpr auto IN_CONNECTION_REQUEST_TICK = std::chrono::seconds(1);
+    constexpr auto CONNECTION_THREAD_TIMEOUT = std::chrono::seconds(6);
 
     constexpr auto MAX_TELEGRAM_LENGTH = knx::TTelegram::SizeWithoutPayload + knx::TTpdu::MaxPayloadSize;
     constexpr auto EIB_ERROR_RETURN_VALUE = -1;
@@ -62,11 +62,9 @@ namespace knx
 
     void TKnxClientService::Send(const TTelegram& telegram)
     {
-        if (!IsStarted)
+        if (!IsStarted && !IsConnected) {
             return;
-
-        if (!KnxdConnection->IsConnected())
-            HandleCriticalError("Failed the knxd connection");
+        }
 
         if (telegram.IsGroupAddressed()) {
             auto tpduPayload = telegram.Tpdu().GetRaw();
@@ -105,7 +103,20 @@ namespace knx
             HandleCriticalError("failed to open EIB GroupSocket connection");
         }
 
+        IsConnected.store(true);
+
         InfoLogger.Log() << "knxd connected successfully";
+    }
+
+    void TKnxClientService::KnxdDisconnectProcessing()
+    {
+        IsConnected.store(false);
+        const int32_t eibOpenResult = EIBClose(KnxdConnection->GetEIBConnection());
+        if (eibOpenResult == EIB_ERROR_RETURN_VALUE) {
+            HandleCriticalError("failed to close EIB GroupSocket connection");
+        }
+
+        InfoLogger.Log() << "knxd disconnected successfully";
     }
 
     void TKnxClientService::HandleCriticalError(const std::string& what)
@@ -116,28 +127,38 @@ namespace knx
 
     void TKnxClientService::Start()
     {
+        std::lock_guard<std::mutex> lg(ActiveMutex);
+
         bool expectedIsStartedValue = false;
 
         if (!IsStarted.compare_exchange_strong(expectedIsStartedValue, true)) {
-            wb_throw(knx::TKnxException, "Attempt to start already started driver");
+            ErrorLogger.Log() << "Attempt to start already started driver";
+            return;
         }
 
-        KnxdConnectProcessing();
-
-        Worker = WBMQTT::MakeThread("KnxClient thread", {[this] { KnxdReceiveProcessing(); }});
-        NotifyAllSubscribers(TKnxEvent::KnxdSocketConnected, TTelegram{});
+        Worker = WBMQTT::MakeThread("KnxClient thread", {[this] {
+                                        KnxdConnectProcessing();
+                                        NotifyAllSubscribers(TKnxEvent::KnxdSocketConnected, TTelegram{});
+                                        KnxdReceiveProcessing();
+                                        KnxdDisconnectProcessing();
+                                    }});
     }
 
     void TKnxClientService::Stop()
     {
+        std::lock_guard<std::mutex> lg(ActiveMutex);
+
         bool expectedIsStartedValue = true;
 
         if (!IsStarted.compare_exchange_strong(expectedIsStartedValue, false)) {
-            wb_throw(knx::TKnxException, "Attempt to stop already stopped TKnxClientService");
+            ErrorLogger.Log() << "Attempt to stop already stopped TKnxClientService";
+            return;
         }
 
-        if (Worker->joinable()) {
-            Worker->join();
+        auto future = std::async(std::launch::async, &std::thread::join, Worker.get());
+        if (future.wait_for(CONNECTION_THREAD_TIMEOUT)
+            == std::future_status::timeout) {
+            ErrorLogger.Log() << "knxd connection stop timeout";
         }
         Worker.reset();
     }
