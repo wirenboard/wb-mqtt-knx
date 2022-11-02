@@ -156,8 +156,7 @@ namespace knx
         }
 
         auto future = std::async(std::launch::async, &std::thread::join, Worker.get());
-        if (future.wait_for(CONNECTION_THREAD_TIMEOUT)
-            == std::future_status::timeout) {
+        if (future.wait_for(CONNECTION_THREAD_TIMEOUT) == std::future_status::timeout) {
             ErrorLogger.Log() << "knxd connection stop timeout";
         }
         Worker.reset();

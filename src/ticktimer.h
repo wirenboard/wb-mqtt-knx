@@ -3,8 +3,8 @@
 #include "observer.h"
 #include <atomic>
 #include <chrono>
-#include <thread>
 #include <mutex>
+#include <thread>
 
 namespace knx
 {
