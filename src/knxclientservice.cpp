@@ -15,7 +15,7 @@
 namespace
 {
     constexpr auto RECEIVER_LOOP_TIMEOUT = std::chrono::seconds(2);
-    constexpr auto CONNECTION_THREAD_TIMEOUT = std::chrono::seconds(6);
+    constexpr auto CONNECTION_THREAD_STOP_TIMEOUT = std::chrono::seconds(6);
 
     constexpr auto MAX_TELEGRAM_LENGTH = knx::TTelegram::SizeWithoutPayload + knx::TTpdu::MaxPayloadSize;
     constexpr auto EIB_ERROR_RETURN_VALUE = -1;
@@ -156,7 +156,7 @@ namespace knx
         }
 
         auto future = std::async(std::launch::async, &std::thread::join, Worker.get());
-        if (future.wait_for(CONNECTION_THREAD_TIMEOUT) == std::future_status::timeout) {
+        if (future.wait_for(CONNECTION_THREAD_STOP_TIMEOUT) == std::future_status::timeout) {
             ErrorLogger.Log() << "knxd connection stop timeout";
         }
         Worker.reset();
