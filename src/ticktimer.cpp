@@ -1,11 +1,14 @@
 #include "ticktimer.h"
 #include "knxexception.h"
+#include "wblib/log.h"
 #include "wblib/utils.h"
 
 using namespace knx;
 
 void TTickTimer::Start()
 {
+    std::lock_guard<std::mutex> lg(ActiveMutex);
+
     bool expectedIsStartedValue = false;
 
     if (!IsStarted.compare_exchange_strong(expectedIsStartedValue, true)) {
@@ -17,12 +20,15 @@ void TTickTimer::Start()
 
 void TTickTimer::Stop()
 {
+    std::lock_guard<std::mutex> lg(ActiveMutex);
+
     bool expectedIsStartedValue = true;
     if (!IsStarted.compare_exchange_strong(expectedIsStartedValue, false)) {
-        wb_throw(knx::TKnxException, "Attempt to stop already stopped TTickTimer");
+        ::WBMQTT::Error.Log() << "Attempt to stop already stopped TTickTimer";
+        return;
     }
 
-    if (Worker->joinable()) {
+    if (Worker != nullptr && Worker->joinable()) {
         Worker->join();
     }
 }

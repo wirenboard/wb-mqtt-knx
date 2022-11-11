@@ -3,6 +3,7 @@
 #include "observer.h"
 #include <atomic>
 #include <chrono>
+#include <mutex>
 #include <thread>
 
 namespace knx
@@ -28,6 +29,7 @@ namespace knx
         void Stop();
 
     private:
+        std::mutex ActiveMutex;
         void Processing();
         std::atomic<bool> IsStarted{false};
         std::unique_ptr<std::thread> Worker;

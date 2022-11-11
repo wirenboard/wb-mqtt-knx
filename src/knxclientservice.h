@@ -38,15 +38,18 @@ namespace knx
         std::unique_ptr<knx::TKnxConnection> KnxdConnection;
 
         void KnxdConnectProcessing();
+        void KnxdDisconnectProcessing();
         void KnxdReceiveProcessing();
 
-        void HandleLoopError(const std::string& what);
+        void HandleCriticalError(const std::string& what);
 
         std::string KnxServerUrl;
 
         std::atomic<bool> IsStarted{false};
+        std::atomic<bool> IsConnected{false};
         std::unique_ptr<std::thread> Worker;
         std::mutex SendMutex;
+        std::mutex ActiveMutex;
 
         WBMQTT::TLogger& ErrorLogger;
         WBMQTT::TLogger& DebugLogger;

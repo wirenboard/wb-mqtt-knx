@@ -4,10 +4,12 @@ After=knxd.service wb-hwconf-manager.service
 
 [Service]
 Type=simple
-Restart=always
-RestartSec=1
+Restart=on-failure
+RestartSec=15
 User=root
 ExecStart=/usr/bin/wb-mqtt-knx
+
+RestartPreventExitStatus=2 3 4 5 6 7
 
 [Install]
 WantedBy=multi-user.target
