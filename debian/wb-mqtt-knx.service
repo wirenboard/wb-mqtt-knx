@@ -1,6 +1,6 @@
 [Unit]
 Description=Wiren Board MQTT KNX bridge
-After=knxd.service wb-hwconf-manager.service
+After=knxd.service wb-hwconf-manager.service mosquitto.service
 
 [Service]
 Type=simple

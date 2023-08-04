@@ -1,3 +1,9 @@
+wb-mqtt-knx (1.12.2) stable; urgency=medium
+
+  * Add service dependency from mosquitto. No functional changes
+
+ -- Aleksandr Kazadaev <aleksandr.kazadaev@wirenboard.com>  Wed, 02 Aug 2023 18:39:44 +0600
+
 wb-mqtt-knx (1.12.1) stable; urgency=medium
 
   * Add dependency from libwbmqtt1-4. No functional changes
