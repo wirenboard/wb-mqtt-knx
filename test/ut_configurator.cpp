@@ -35,9 +35,6 @@ TEST_F(ConfiguratorTest, GetIncorrectConfig)
 
 TEST_F(ConfiguratorTest, NoConfig)
 {
-    StrictMock<TKnxGroupObjectControllerMock> goController;
-    TGroupObjectMqttBuilderMock groupObjectMqttBuilder;
-
     EXPECT_THROW(std::make_unique<knx::Configurator>(".", SourceDir + "/wb-mqtt-knx.schema.json"), std::exception);
 }
 
