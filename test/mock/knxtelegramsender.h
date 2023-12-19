@@ -1,7 +1,5 @@
 #pragma once
 
-#pragma once
-
 #include "../../src/isender.h"
 #include "../../src/knxtelegram.h"
 #include "gmock/gmock.h"
