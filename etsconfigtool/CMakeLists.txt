@@ -21,7 +21,6 @@ target_include_directories(${PROJECT_NAME} PRIVATE include)
 target_link_libraries(${PROJECT_NAME} gcov tinyxml2 wbmqtt1)
 
 # Adding unit tests
-enable_testing()
 add_subdirectory(test)
 
 install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)
