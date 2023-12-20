@@ -11,8 +11,6 @@ execute_process (
         OUTPUT_VARIABLE DEB_VERSION
 )
 
-
-
 # add the binary tree to the search path for include files
 # so that we will find config.h
 include_directories("${PROJECT_BINARY_DIR}")
@@ -40,7 +38,7 @@ if (CMAKE_BUILD_TYPE MATCHES Debug)
 endif ()
 
 # Adding unit tests
-enable_testing()
+include (CTest)
 add_subdirectory(test)
 
 # Added ets.xml <-> wb-mqtt-knx.conf tool

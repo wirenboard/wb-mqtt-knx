@@ -87,3 +87,7 @@ cmake-build-*
 
 # Doxygen output files
 doc
+
+### direnv ###
+.direnv
+.envrc
