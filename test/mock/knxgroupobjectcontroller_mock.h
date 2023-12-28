@@ -2,7 +2,7 @@
 
 #include "../src/iknxgroupobjectcontroller.h"
 #include "../src/knxgroupaddress.h"
-#include "gmock/gmock.h"
+#include <gmock/gmock.h>
 
 class TKnxGroupObjectControllerMock: public knx::IKnxGroupObjectController
 {

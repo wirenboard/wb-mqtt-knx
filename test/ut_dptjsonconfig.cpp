@@ -2,7 +2,7 @@
 #include "../src/knxgroupobject/dptjsonconfig.h"
 #include "config.h"
 #include "testutils.h"
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 class DptJsonConfigTest: public ::testing::Test
 {
