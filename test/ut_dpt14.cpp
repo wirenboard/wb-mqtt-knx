@@ -1,6 +1,6 @@
 #include "../src/knxexception.h"
 #include "../src/knxgroupobject/dpt14.h"
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 class Dpt14Test: public ::testing::Test
 {
@@ -15,11 +15,11 @@ protected:
 
     std::unique_ptr<knx::object::TDpt14> Dpt;
     std::vector<std::pair<float, std::vector<uint8_t>>> Samples = {{0, {0x00, 0x00, 0x00, 0x00, 0x00}},
-                                                                   {2147483647, {0x00, 0x4F, 0x00, 0x00, 0x00}},
-                                                                   {1147483647, {0x00, 0x4E, 0x88, 0xCA, 0x6C}},
-                                                                   {-1134343442, {0x00, 0xCE, 0x87, 0x39, 0x6A}},
-                                                                   {-2147483648, {0x00, 0xCF, 0x00, 0x00, 0x00}},
-                                                                   {-1, {0x00, 0xBF, 0x80, 0x00, 0x00}},
+                                                                   {2147483647.0, {0x00, 0x4F, 0x00, 0x00, 0x00}},
+                                                                   {1147483647.0, {0x00, 0x4E, 0x88, 0xCA, 0x6C}},
+                                                                   {-1134343442.0, {0x00, 0xCE, 0x87, 0x39, 0x6A}},
+                                                                   {-2147483648.0, {0x00, 0xCF, 0x00, 0x00, 0x00}},
+                                                                   {-1.0, {0x00, 0xBF, 0x80, 0x00, 0x00}},
                                                                    {-0.0012346, {0x00, 0xBA, 0xA1, 0xD2, 0x4D}}};
 };
 

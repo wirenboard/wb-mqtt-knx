@@ -3,8 +3,8 @@
 #include "../../src/knxgroupobject/dptwbmqttconfig.h"
 #include "config.h"
 #include "etsconfigtool.h"
-#include "gmock/gmock.h"
-#include "gtest/gtest.h"
+#include <gmock/gmock.h>
+#include <gtest/gtest.h>
 
 using namespace testing;
 

@@ -61,8 +61,6 @@ TEST_F(ConfiguratorTest, CongigureController)
     EXPECT_CALL(*groupObjectMqttBuilder, Create(_)).Times(4);
     EXPECT_CALL(*groupObjectMqttBuilder, RemoveUnusedControls()).Times(2);
 
-    knx::TGroupObjectSettings param;
-
     auto configurator = std::make_unique<knx::Configurator>(SourceDir + "/test/config/wb-mqtt-knx.conf",
                                                             SourceDir + "/wb-mqtt-knx.schema.json");
 

@@ -1,7 +1,7 @@
 #include "../src/knxexception.h"
 #include "../src/knxgroupobject/dptjson.h"
 #include "testutils.h"
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 class DptJsonTest: public ::testing::Test
 {

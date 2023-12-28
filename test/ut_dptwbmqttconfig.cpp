@@ -2,7 +2,7 @@
 #include "../src/knxgroupobject/dptcommonconfig.h"
 #include "../src/knxgroupobject/dptwbmqttconfig.h"
 #include "testutils.h"
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 class DptWbMqttConfigTest: public ::testing::Test
 {

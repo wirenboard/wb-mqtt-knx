@@ -4,7 +4,7 @@
 #include "../src/ticktimer.h"
 #include "mock/groupobject_mock.h"
 #include "mock/knxtelegramsender.h"
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 #include <utility>
 
 using namespace ::testing;

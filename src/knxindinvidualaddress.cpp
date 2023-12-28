@@ -8,8 +8,6 @@ namespace
     constexpr auto LINE_MAX = 15U;
     constexpr auto DEVICE_ADDRESS_MAX = 255U;
 
-    constexpr auto EIB_ADDRESS_MAX = 0xFFFFU;
-
     constexpr auto ERROR_MESSAGE = "Invalid KNX Individual Address: ";
 }
 

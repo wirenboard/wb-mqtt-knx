@@ -34,7 +34,7 @@ namespace
                     encodedFieldList.push_back({fieldType, 1});
                 }
             } else {
-                encodedFieldList.push_back({fieldType, fieldSize});
+                encodedFieldList.push_back({fieldType, static_cast<uint32_t>(fieldSize)});
             }
             encodingStr = sm.suffix();
         }
