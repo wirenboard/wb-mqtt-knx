@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../../src/knxgroupobject/igroupobject.h"
-#include "gmock/gmock.h"
+#include <gmock/gmock.h>
 
 class TGroupObjectMock: public knx::object::IGroupObject
 {

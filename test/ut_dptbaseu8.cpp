@@ -1,6 +1,6 @@
 #include "../src/knxexception.h"
 #include "../src/knxgroupobject/dptbaseu8.h"
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 class DptBase8Wrapper: public knx::object::TDptBaseU8
 {

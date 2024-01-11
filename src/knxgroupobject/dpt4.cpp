@@ -34,7 +34,7 @@ void TDpt4::FromKnx(const std::vector<uint8_t>& payload)
 
 std::vector<uint8_t> TDpt4::ToKnx()
 {
-    return {0x00, FieldCharacterValue};
+    return {0x00, static_cast<uint8_t>(FieldCharacterValue)};
 }
 
 std::vector<WBMQTT::TAny> TDpt4::ToMqtt()

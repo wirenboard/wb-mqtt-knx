@@ -3,7 +3,7 @@
 #include "../../src/knxgroupobject/groupobjectsettings.h"
 #include "../../src/knxgroupobject/igroupobject.h"
 #include "../../src/knxgroupobject/imqttbuilder.h"
-#include "gmock/gmock.h"
+#include <gmock/gmock.h>
 
 class TGroupObjectMqttBuilderMock: public knx::object::IGroupObjectMqttBuilder
 {

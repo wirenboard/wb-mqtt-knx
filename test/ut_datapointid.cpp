@@ -1,7 +1,7 @@
 #include "../src/knxexception.h"
 #include "../src/knxgroupobject/dptjsonbuilder.h"
 #include "config.h"
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 class DatapointIdTest: public ::testing::Test
 {

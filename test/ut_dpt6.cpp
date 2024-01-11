@@ -1,6 +1,6 @@
 #include "../src/knxexception.h"
 #include "../src/knxgroupobject/dpt6.h"
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 class Dpt6Test: public ::testing::Test
 {

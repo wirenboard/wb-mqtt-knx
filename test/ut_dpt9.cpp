@@ -1,6 +1,6 @@
 
 #include "../src/knxgroupobject/dpt9.h"
-#include "gtest/gtest.h"
+#include <gtest/gtest.h>
 
 class Dpt9Test: public ::testing::Test
 {
