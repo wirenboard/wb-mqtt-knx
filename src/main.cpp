@@ -15,6 +15,8 @@
 
 namespace
 {
+    const auto DEFAULT_KNX_URL = "ip:localhost:6720";
+
     const auto KNX_DRIVER_STOP_TIMEOUT_S = std::chrono::seconds(60); // topic cleanup can take a lot of time
     const auto KNX_READ_TICK_PERIOD = std::chrono::milliseconds(50);
 
@@ -24,46 +26,115 @@ namespace
     WBMQTT::TLogger ErrorLogger("ERROR: ", WBMQTT::TLogger::StdErr, WBMQTT::TLogger::RED);
     WBMQTT::TLogger DebugLogger("DEBUG: ", WBMQTT::TLogger::StdErr, WBMQTT::TLogger::WHITE, false);
     WBMQTT::TLogger InfoLogger("INFO: ", WBMQTT::TLogger::StdErr, WBMQTT::TLogger::GREY);
+
+    void PrintUsage()
+    {
+        std::cout << "Usage: " << PROJECT_NAME << " [options]" << std::endl
+                  << "Options:" << std::endl
+                  << "  -d       level     enable debuging output:" << std::endl
+                  << "                       1 - knx only;" << std::endl
+                  << "                       2 - mqtt only;" << std::endl
+                  << "                       3 - both;" << std::endl
+                  << "                       negative values - silent mode (-1, -2, -3))" << std::endl
+                  << "  -c       config    config file (default: " << DEFAULT_CONFIG_FILE_PATH << ")" << std::endl
+                  << "  -p       port      MQTT broker port (default: 1883)" << std::endl
+                  << "  -H       IP        MQTT broker IP (default: localhost)" << std::endl
+                  << "  -u       user      MQTT user (optional)" << std::endl
+                  << "  -P       password  MQTT user password (optional)" << std::endl
+                  << "  -T       prefix    MQTT topic prefix (optional)" << std::endl
+                  << "  -k       url       KNX url (default: " << DEFAULT_KNX_URL << ")" << std::endl;
+    }
+
+    void SetDebugLevel(const char* optarg)
+    {
+        try {
+            auto debugLevel = std::stoi(optarg);
+            switch (debugLevel) {
+                case 0:
+                    return;
+                case -1:
+                    InfoLogger.SetEnabled(false);
+                    return;
+                case -2:
+                    WBMQTT::Info.SetEnabled(false);
+                    return;
+                case -3:
+                    WBMQTT::Info.SetEnabled(false);
+                    InfoLogger.SetEnabled(false);
+                    return;
+                case 1:
+                    DebugLogger.SetEnabled(true);
+                    return;
+                case 2:
+                    WBMQTT::Debug.SetEnabled(true);
+                    return;
+                case 3:
+                    WBMQTT::Debug.SetEnabled(true);
+                    DebugLogger.SetEnabled(true);
+                    return;
+            }
+        } catch (...) {
+        }
+        std::cout << "Invalid -d parameter value " << optarg << std::endl;
+        PrintUsage();
+        exit(2);
+    }
+
+    void ParseCommadLine(int argc,
+                         char* argv[],
+                         WBMQTT::TMosquittoMqttConfig& mqttConfig,
+                         std::string& customConfig,
+                         std::string& knxUrl)
+    {
+        int c;
+        while ((c = getopt(argc, argv, "d:c:p:H:u:P:T:k:")) != -1) {
+            switch (c) {
+                case 'd':
+                    SetDebugLevel(optarg);
+                    break;
+                case 'c':
+                    customConfig = optarg;
+                    break;
+                case 'p':
+                    mqttConfig.Port = std::stoi(optarg);
+                    break;
+                case 'H':
+                    mqttConfig.Host = optarg;
+                    break;
+                case 'T':
+                    mqttConfig.Prefix = optarg;
+                    break;
+                case 'u':
+                    mqttConfig.User = optarg;
+                    break;
+                case 'P':
+                    mqttConfig.Password = optarg;
+                    break;
+                case 'k':
+                    knxUrl = optarg;
+                    break;
+                default:
+                    PrintUsage();
+                    exit(2); // EXIT_INVALIDARGUMENT
+            }
+        }
+
+        if (optind < argc) {
+            for (int index = optind; index < argc; ++index) {
+                std::cout << "Skipping unknown argument " << argv[index] << std::endl;
+            }
+        }
+    }
 } // namespace
 
 int main(int argc, char** argv)
 {
     WBMQTT::TMosquittoMqttConfig mqttConfig;
-    std::string knxUrl = "ip:localhost:6720";
-    mqttConfig.Host = "localhost";
-    mqttConfig.Port = 1883;
+    std::string configFilename(DEFAULT_CONFIG_FILE_PATH);
+    std::string knxUrl(DEFAULT_KNX_URL);
     mqttConfig.Id = PROJECT_NAME;
 
-    int c;
-    int verboseLevel = 0;
-    while ((c = getopt(argc, argv, "vdp:H:k:")) != -1) {
-        switch (c) {
-            case 'v':
-                verboseLevel++;
-                break;
-            case 'd':
-                break;
-            case 'p':
-                mqttConfig.Port = std::stoi(optarg);
-                break;
-            case 'H':
-                mqttConfig.Host = optarg;
-                break;
-            case 'k':
-                knxUrl = optarg;
-                break;
-            default:
-                break;
-        }
-    }
-
-#ifdef NDEBUG
-    if (verboseLevel > 0) {
-        DebugLogger.SetEnabled(true);
-    }
-#else
-    DebugLogger.SetEnabled(true);
-#endif
+    ParseCommadLine(argc, argv, mqttConfig, configFilename, knxUrl);
 
     WBMQTT::SetThreadName(PROJECT_NAME);
     WBMQTT::SignalHandling::Handle({SIGINT, SIGTERM});
@@ -81,7 +152,7 @@ int main(int argc, char** argv)
     std::unique_ptr<knx::Configurator> pConfigurator;
 
     try {
-        pConfigurator = std::make_unique<knx::Configurator>(DEFAULT_CONFIG_FILE_PATH, DEFAULT_CONFIG_SCHEMA_FILE_PATH);
+        pConfigurator = std::make_unique<knx::Configurator>(configFilename, DEFAULT_CONFIG_SCHEMA_FILE_PATH);
     } catch (std::exception& e) {
         ErrorLogger.Log() << e.what();
         return EXIT_NOTCONFIGURED;

@@ -1,3 +1,12 @@
+wb-mqtt-knx (1.12.6) stable; urgency=medium
+
+  * Add help printout
+  * Add -u/-P/-T mqtt arguments
+  * Add -c argument to specify config file
+  * Fix debug logging level setting
+
+ -- Nikolay Korotkiy <nikolay.korotkiy@wirenboard.com>  Tue, 30 Jan 2024 13:01:00 +0400
+
 wb-mqtt-knx (1.12.5) stable; urgency=medium
 
   * Add arm64 build, no functional changes
