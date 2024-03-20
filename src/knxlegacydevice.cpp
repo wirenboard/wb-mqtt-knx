@@ -7,7 +7,11 @@ using namespace knx;
 namespace
 {
     constexpr auto DEVICE_ID = "knx";
+    constexpr auto DEVICE_TITLE = "KNX gateway";
+    constexpr auto DEVICE_TITLE_RU = "Шлюз KNX";
     constexpr auto CONTROL_ID = "data";
+    constexpr auto CONTROL_TITLE = "Message";
+    constexpr auto CONTROL_TITLE_RU = "Сообщение";
     constexpr auto CONTROL_TYPE = "text";
 } // namespace
 
@@ -25,14 +29,20 @@ TKnxLegacyDevice::TKnxLegacyDevice(WBMQTT::PDeviceDriver pMqttDriver,
 
     auto tx = DeviceDriver->BeginTx();
 
-    LocalDevice =
-        tx->CreateDevice(WBMQTT::TLocalDeviceArgs{}.SetId(DEVICE_ID).SetIsVirtual(true).SetDoLoadPrevious(false))
-            .GetValue();
+    LocalDevice = tx->CreateDevice(WBMQTT::TLocalDeviceArgs{}
+                                       .SetId(DEVICE_ID)
+                                       .SetTitle(DEVICE_TITLE, "en")
+                                       .SetTitle(DEVICE_TITLE_RU, "ru")
+                                       .SetIsVirtual(true)
+                                       .SetDoLoadPrevious(false))
+                      .GetValue();
 
     Control = LocalDevice
                   ->CreateControl(tx,
                                   WBMQTT::TControlArgs{}
                                       .SetId(CONTROL_ID)
+                                      .SetTitle(CONTROL_TITLE, "en")
+                                      .SetTitle(CONTROL_TITLE_RU, "ru")
                                       .SetType(CONTROL_TYPE)
                                       .SetError("")
                                       .SetOrder(0)
