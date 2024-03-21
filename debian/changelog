@@ -1,3 +1,9 @@
+wb-mqtt-knx (1.12.7) stable; urgency=medium
+
+  * Add device title translations
+
+ -- Nikolay Korotkiy <nikolay.korotkiy@wirenboard.com>  Wed, 20 Mar 2024 10:21:00 +0400
+
 wb-mqtt-knx (1.12.6) stable; urgency=medium
 
   * Add help printout
