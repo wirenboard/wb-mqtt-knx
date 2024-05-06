@@ -172,12 +172,12 @@ namespace knx
 
         auto duration = std::chrono::duration_cast<std::chrono::microseconds>(RECEIVER_LOOP_TIMEOUT);
 
-        struct timeval tv;
-        tv.tv_sec = duration.count() / 1000000;
-        tv.tv_usec = duration.count() % 1000000;
-
         // The loop responsible for receiving telegrams from knxd
         while (IsStarted) {
+            struct timeval tv;
+            tv.tv_sec = duration.count() / 1000000;
+            tv.tv_usec = duration.count() % 1000000;
+
             fd_set set;
             FD_ZERO(&set);
             FD_SET(linuxFileDescriptor, &set);
