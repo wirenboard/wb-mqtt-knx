@@ -1,3 +1,9 @@
+wb-mqtt-knx (1.12.8) stable; urgency=medium
+
+  * Fix crash on arm64
+
+ -- Nikolay Korotkiy <nikolay.korotkiy@wirenboard.com>  Mon, 06 May 2024 11:45:00 +0400
+
 wb-mqtt-knx (1.12.7) stable; urgency=medium
 
   * Add device title translations
