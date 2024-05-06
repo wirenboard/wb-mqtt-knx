@@ -1,19 +1,11 @@
-KNX to MQTT gateway (C++)
-=========================
-
-Зависимости
------------
-
-* libwbmqtt1-3 (>= 3.2.0)
-* knxd-tools (>= 0.14.51-1)
-* knxd (>= 0.14.51-1)
+# KNX to MQTT gateway (C++)
 
 ## KNX gateway
 
 Пересылает телеграммы из MQTT в KNX и обратно.
 
 Чтобы отправить групповую телеграмму в KNX необходимо отправить подготовленное сообщение в MQTT топик:
-```
+```sh
 mosquitto_pub -t '/devices/knx/controls/data/on' -m "g:${DstAddr} ${APCI} ${Data}"
 ```
 
@@ -41,7 +33,7 @@ i:${SrcAddr} g:${DstAddr} ${APCI} ${Data}
 * `GroupValueWrite`
 
 Пример MQTT лога:
-```
+```sh
 $ mosquitto_pub -t '/devices/knx/controls/data/on' -m "g:9/7/55 GroupValueRead"
 
 /devices/knx/controls/data/on g:9/7/55 GroupValueRead
@@ -71,9 +63,9 @@ $ mosquitto_pub -t '/devices/knx/controls/data/on' -m "g:9/7/55 GroupValueWrite 
 
 * Для каждого поля данных в MQTT создаётся контрол c соответствующим типом (switch, value, text).
   Все поддерживаемые типы датапоинтов описаны в:
-  <https://github.com/wirenboard/wb-mqtt-knx/blob/master/datapointformat.md>
+  [datapointformat.md](datapointformat.md)
 * Для определённого типа датапоинта создаётся текстовое поле в котором пересылаются JSON объекты.
-  <https://github.com/wirenboard/wb-mqtt-knx/blob/master/jsondatapoint.md>
+  [jsondatapoint.md](jsondatapoint.md)
 
 Групповые адреса группируются в логические устройства MQTT согласно конфигу.
 
@@ -165,7 +157,9 @@ $ mosquitto_pub -t '/devices/knx/controls/data/on' -m "g:9/7/55 GroupValueWrite 
 
 Использование:
 
-`$ wb-knx-ets-tool ETS_CONFIG WB_MQTT_KNX_CONFIG`
+```sh
+$ wb-knx-ets-tool ETS_CONFIG WB_MQTT_KNX_CONFIG
+```
 
 , где
 * `ETS_CONFIG` - XML файл экспорта групповых объектов
