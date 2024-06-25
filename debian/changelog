@@ -1,3 +1,9 @@
+wb-mqtt-knx (1.13.0) stable; urgency=medium
+
+  * Use unix socket to connect to knxd by default
+
+ -- Nikolay Korotkiy <nikolay.korotkiy@wirenboard.com>  Tue, 25 Jun 2024 11:30:00 +0400
+
 wb-mqtt-knx (1.12.8) stable; urgency=medium
 
   * Fix crash on arm64
