@@ -15,7 +15,7 @@
 
 namespace
 {
-    const auto DEFAULT_KNX_URL = "ip:localhost:6720";
+    const auto DEFAULT_KNX_URL = "local:/var/run/knx";
 
     const auto KNX_DRIVER_STOP_TIMEOUT_S = std::chrono::seconds(60); // topic cleanup can take a lot of time
     const auto KNX_READ_TICK_PERIOD = std::chrono::milliseconds(50);
