@@ -1,3 +1,9 @@
+wb-mqtt-knx (1.13.1) stable; urgency=medium
+
+  * Add dependency from libwbmqtt1-5. No functional changes
+
+ -- Nikolay Korotkiy <nikolay.korotkiy@wirenboard.com> Tue, 17 Sep 2024 13:50:00 +0400
+
 wb-mqtt-knx (1.13.0) stable; urgency=medium
 
   * Use unix socket to connect to knxd by default
