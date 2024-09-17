@@ -5,7 +5,7 @@ Priority: optional
 Standards-Version: 3.9.2
 Build-Depends: debhelper (>= 10),
                pkg-config,
-               libwbmqtt1-4-dev,
+               libwbmqtt1-5-dev,
                knxd-dev (>= 0.14.51-1),
                knxd-tools (>= 0.14.51-1),
                libtinyxml2-dev,
