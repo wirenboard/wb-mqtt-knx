@@ -18,7 +18,7 @@ add_executable(${PROJECT_NAME} ${SRC_FILES_LIST}
 
 target_include_directories(${PROJECT_NAME} PRIVATE include)
 
-target_link_libraries(${PROJECT_NAME} gcov tinyxml2 wbmqtt1)
+target_link_libraries(${PROJECT_NAME} tinyxml2 wbmqtt1)
 
 # Adding unit tests
 add_subdirectory(test)

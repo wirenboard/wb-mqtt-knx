@@ -23,6 +23,7 @@ add_compile_options(-Wall -Werror -pedantic)
 
 if (CMAKE_BUILD_TYPE MATCHES Debug)
     add_compile_options(-O0 -gdwarf-3 --coverage)
+    add_link_options(--coverage)
 else ()
     add_compile_options(-O2 -DNDEBUG)
 endif ()
@@ -32,10 +33,6 @@ aux_source_directory(src/knxgroupobject SRC_LIST)
 
 add_executable(${PROJECT_NAME} ${SRC_LIST})
 target_link_libraries(${PROJECT_NAME} wbmqtt1 eibclient pthread)
-
-if (CMAKE_BUILD_TYPE MATCHES Debug)
-    target_link_libraries(${PROJECT_NAME} gcov)
-endif ()
 
 # Adding unit tests
 include (CTest)

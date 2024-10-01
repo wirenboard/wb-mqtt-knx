@@ -40,8 +40,4 @@ add_executable(${PROJECT_NAME}_test ${TEST_LIST}
 
 target_link_libraries(${PROJECT_NAME}_test gtest gtest_main gmock wbmqtt1 pthread)
 
-if (CMAKE_BUILD_TYPE MATCHES Debug)
-    target_link_libraries(${PROJECT_NAME}_test gcov)
-endif ()
-
 add_test(${PROJECT_NAME}_test ${PROJECT_NAME}_test)

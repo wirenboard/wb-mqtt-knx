@@ -18,8 +18,4 @@ target_include_directories(${PROJECT_NAME}_test PRIVATE ../include)
 
 target_link_libraries(${PROJECT_NAME}_test gtest gtest_main gmock pthread tinyxml2 wbmqtt1)
 
-if (CMAKE_BUILD_TYPE MATCHES Debug)
-    target_link_libraries(${PROJECT_NAME}_test gcov)
-endif ()
-
 add_test(${PROJECT_NAME}_test ${PROJECT_NAME}_test)

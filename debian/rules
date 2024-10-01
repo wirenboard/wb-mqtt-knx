@@ -3,5 +3,11 @@
 %:
 	dh $@ --parallel
 
+override_dh_auto_configure:
+	dh_auto_configure -- \
+		-DCMAKE_BUILD_TYPE=$(if $(findstring debug, $(DEB_BUILD_OPTIONS)),Debug,Release) \
+		-DCOV_FAIL_UNDER=$(patsubst cov-fail-under=%,%,$(filter cov-fail-under=%,$(DEB_BUILD_OPTIONS))) \
+		-DCOV_REPORT=$(patsubst cov-report=%,%,$(filter cov-report=%,$(DEB_BUILD_OPTIONS)))
+
 override_dh_installinit:
 	dh_installinit --noscripts
