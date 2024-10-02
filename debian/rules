@@ -1,13 +1,28 @@
 #!/usr/bin/make -f
 
+COV_FAIL_UNDER := $(patsubst cov-fail-under=%,%,$(filter cov-fail-under=%,$(DEB_BUILD_OPTIONS)))
+COV_REPORT     := $(patsubst cov-report=%,%,$(filter cov-report=%,$(DEB_BUILD_OPTIONS)))
+
+GCOVR_FLAGS := -s
+ifneq ($(COV_REPORT),)
+	GCOVR_FLAGS += --html $(COV_REPORT)
+endif
+ifneq ($(COV_FAIL_UNDER),)
+	GCOVR_FLAGS += --fail-under-line $(COV_FAIL_UNDER)
+endif
+
 %:
 	dh $@ --parallel
 
 override_dh_auto_configure:
 	dh_auto_configure -- \
-		-DCMAKE_BUILD_TYPE=$(if $(findstring debug, $(DEB_BUILD_OPTIONS)),Debug,Release) \
-		-DCOV_FAIL_UNDER=$(patsubst cov-fail-under=%,%,$(filter cov-fail-under=%,$(DEB_BUILD_OPTIONS))) \
-		-DCOV_REPORT=$(patsubst cov-report=%,%,$(filter cov-report=%,$(DEB_BUILD_OPTIONS)))
+		-DCMAKE_BUILD_TYPE=$(if $(findstring debug, $(DEB_BUILD_OPTIONS)),Debug,Release)
+
+override_dh_auto_test:
+	dh_auto_test
+ifneq (,$(findstring debug, $(DEB_BUILD_OPTIONS)))
+	gcovr $(GCOVR_FLAGS) .
+endif
 
 override_dh_installinit:
 	dh_installinit --noscripts
