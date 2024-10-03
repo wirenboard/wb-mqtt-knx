@@ -5,7 +5,7 @@ COV_REPORT     := $(patsubst cov-report=%,%,$(filter cov-report=%,$(DEB_BUILD_OP
 
 GCOVR_FLAGS := -s
 ifneq ($(COV_REPORT),)
-	GCOVR_FLAGS += --html $(COV_REPORT)
+	GCOVR_FLAGS += --html $(COV_REPORT).html -x $(COV_REPORT).xml
 endif
 ifneq ($(COV_FAIL_UNDER),)
 	GCOVR_FLAGS += --fail-under-line $(COV_FAIL_UNDER)
