@@ -58,6 +58,11 @@ void TKnxGroupObjectController::Notify(const TKnxEvent& event, const TTelegram& 
                 Send({address, telegram::TApci::GroupValueRead, {0}});
             }
         }
+    } else if (event == TKnxEvent::KnxdSocketError) {
+        for (auto& itemPair: GroupObjectList) {
+            auto& item = itemPair.second;
+            item->GroupObject->KnxNotifyEvent(TKnxEvent::KnxdSocketError);
+        }
     } else if (event != TKnxEvent::ReceivedTelegram) {
         return;
     }

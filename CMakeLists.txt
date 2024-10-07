@@ -52,3 +52,4 @@ install(FILES ${PROJECT_SOURCE_DIR}/wb-mqtt-knx.schema.json DESTINATION /usr/sha
 install(FILES ${PROJECT_SOURCE_DIR}/wb-mqtt-knx.conf DESTINATION /etc)
 install(FILES ${PROJECT_SOURCE_DIR}/wb-mqtt-knx-jsondpt.conf DESTINATION /usr/share/wb-mqtt-knx)
 install(FILES ${PROJECT_SOURCE_DIR}/wb-mqtt-knx.wbconfigs DESTINATION /etc/wb-configs.d RENAME 42wb-mqtt-knx)
+install(DIRECTORY DESTINATION /var/lib/wb-mqtt-knx)
