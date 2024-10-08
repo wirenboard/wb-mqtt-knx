@@ -148,11 +148,9 @@ TEST_F(KnxGroupObjectControllerTest, RecvTelegram)
             EXPECT_EQ(knxTelegram.Tpdu().GetAPCI(), transaction.Apci);
             EXPECT_EQ(knxTelegram.Tpdu().GetPayload(), transaction.Payload);
         }));
-    EXPECT_CALL(*groupObjectMock, KnxNotifyEvent(_)).WillOnce(Invoke([](const knx::TKnxEvent& event) {
-        EXPECT_EQ(event, knx::TKnxEvent::KnxdSocketConnected);
-    })).WillOnce(Invoke([](const knx::TKnxEvent& event) {
-        EXPECT_EQ(event, knx::TKnxEvent::ReceivedTelegram);
-    }));
+    EXPECT_CALL(*groupObjectMock, KnxNotifyEvent(_))
+        .WillOnce(Invoke([](const knx::TKnxEvent& event) { EXPECT_EQ(event, knx::TKnxEvent::KnxdSocketConnected); }))
+        .WillOnce(Invoke([](const knx::TKnxEvent& event) { EXPECT_EQ(event, knx::TKnxEvent::ReceivedTelegram); }));
     EXPECT_TRUE(Controller->AddGroupObject(groupObjectMock, goSettings));
 
     eventObserverStub.Subscribe(Controller);
@@ -190,15 +188,11 @@ TEST_F(KnxGroupObjectControllerTest, RecvFeedbackTelegram)
             EXPECT_EQ(knxFeedbackTelegram.Tpdu().GetAPCI(), transaction.Apci);
             EXPECT_EQ(knxFeedbackTelegram.Tpdu().GetPayload(), transaction.Payload);
         }));
-    EXPECT_CALL(*groupObjectMock, KnxNotifyEvent(_)).WillOnce(Invoke([](const knx::TKnxEvent& event) {
-        EXPECT_EQ(event, knx::TKnxEvent::KnxdSocketConnected);
-    })).WillOnce(Invoke([](const knx::TKnxEvent& event) {
-        EXPECT_EQ(event, knx::TKnxEvent::KnxdSocketConnected);
-    })).WillOnce(Invoke([](const knx::TKnxEvent& event) {
-        EXPECT_EQ(event, knx::TKnxEvent::ReceivedTelegram);
-    })).WillOnce(Invoke([](const knx::TKnxEvent& event) {
-        EXPECT_EQ(event, knx::TKnxEvent::ReceivedTelegram);
-    }));
+    EXPECT_CALL(*groupObjectMock, KnxNotifyEvent(_))
+        .WillOnce(Invoke([](const knx::TKnxEvent& event) { EXPECT_EQ(event, knx::TKnxEvent::KnxdSocketConnected); }))
+        .WillOnce(Invoke([](const knx::TKnxEvent& event) { EXPECT_EQ(event, knx::TKnxEvent::KnxdSocketConnected); }))
+        .WillOnce(Invoke([](const knx::TKnxEvent& event) { EXPECT_EQ(event, knx::TKnxEvent::ReceivedTelegram); }))
+        .WillOnce(Invoke([](const knx::TKnxEvent& event) { EXPECT_EQ(event, knx::TKnxEvent::ReceivedTelegram); }));
     EXPECT_TRUE(Controller->AddGroupObject(groupObjectMock, goSettings));
 
     eventObserverStub.Subscribe(Controller);
@@ -235,11 +229,9 @@ TEST_F(KnxGroupObjectControllerTest, PollRead)
             EXPECT_EQ(knxTelegram.Tpdu().GetAPCI(), transaction.Apci);
             EXPECT_EQ(knxTelegram.Tpdu().GetPayload(), transaction.Payload);
         }));
-    EXPECT_CALL(*groupObjectMock, KnxNotifyEvent(_)).WillOnce(Invoke([](const knx::TKnxEvent& event) {
-        EXPECT_EQ(event, knx::TKnxEvent::KnxdSocketConnected);
-    })).WillOnce(Invoke([](const knx::TKnxEvent& event) {
-        EXPECT_EQ(event, knx::TKnxEvent::ReceivedTelegram);
-    }));
+    EXPECT_CALL(*groupObjectMock, KnxNotifyEvent(_))
+        .WillOnce(Invoke([](const knx::TKnxEvent& event) { EXPECT_EQ(event, knx::TKnxEvent::KnxdSocketConnected); }))
+        .WillOnce(Invoke([](const knx::TKnxEvent& event) { EXPECT_EQ(event, knx::TKnxEvent::ReceivedTelegram); }));
     EXPECT_TRUE(Controller->AddGroupObject(groupObjectMock, goSettings));
     EXPECT_CALL(*TelegramSender, Send(_)).WillOnce(Invoke([](const knx::TTelegram& telegram) {
         EXPECT_EQ(telegram.Tpdu().GetAPCI(), knx::telegram::TApci::GroupValueRead);
@@ -283,13 +275,10 @@ TEST_F(KnxGroupObjectControllerTest, PollReadTimeout)
             EXPECT_EQ(knxTelegram.Tpdu().GetAPCI(), transaction.Apci);
             EXPECT_EQ(knxTelegram.Tpdu().GetPayload(), transaction.Payload);
         }));
-    EXPECT_CALL(*groupObjectMock, KnxNotifyEvent(_)).WillOnce(Invoke([](const knx::TKnxEvent& event) {
-        EXPECT_EQ(event, knx::TKnxEvent::KnxdSocketConnected);
-    })).WillOnce(Invoke([](const knx::TKnxEvent& event) {
-        EXPECT_EQ(event, knx::TKnxEvent::PollReadTimeoutError);
-    })).WillOnce(Invoke([](const knx::TKnxEvent& event) {
-        EXPECT_EQ(event, knx::TKnxEvent::ReceivedTelegram);
-    }));
+    EXPECT_CALL(*groupObjectMock, KnxNotifyEvent(_))
+        .WillOnce(Invoke([](const knx::TKnxEvent& event) { EXPECT_EQ(event, knx::TKnxEvent::KnxdSocketConnected); }))
+        .WillOnce(Invoke([](const knx::TKnxEvent& event) { EXPECT_EQ(event, knx::TKnxEvent::PollReadTimeoutError); }))
+        .WillOnce(Invoke([](const knx::TKnxEvent& event) { EXPECT_EQ(event, knx::TKnxEvent::ReceivedTelegram); }));
     EXPECT_TRUE(Controller->AddGroupObject(groupObjectMock, goSettings));
     EXPECT_CALL(*TelegramSender, Send(_)).WillOnce(Invoke([](const knx::TTelegram& telegram) {
         EXPECT_EQ(telegram.Tpdu().GetAPCI(), knx::telegram::TApci::GroupValueRead);
