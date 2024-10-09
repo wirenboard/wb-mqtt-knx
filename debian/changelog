@@ -1,3 +1,10 @@
+wb-mqtt-knx (1.13.3) stable; urgency=medium
+
+  * Set meta/error on knxd socket error
+  * Enable control value persistence
+
+ -- Nikolay Korotkiy <nikolay.korotkiy@wirenboard.com>  Mon, 08 Oct 2024 16:30:00 +0400
+
 wb-mqtt-knx (1.13.2) stable; urgency=medium
 
   * Add coverage report generation, no functional changes
@@ -220,4 +227,3 @@ wb-mqtt-knx (0.1) unstable; urgency=medium
   * Initial release.
 
  -- Yury Usishchev <y.usishchev@contactless.ru>  Thu, 1 Dec 2016 23:04:28 +0400
-

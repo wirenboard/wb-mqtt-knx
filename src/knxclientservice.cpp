@@ -121,8 +121,8 @@ namespace knx
 
     void TKnxClientService::HandleCriticalError(const std::string& what)
     {
-        ErrorLogger.Log() << what;
-        exit(EXIT_FAILURE);
+        IsConnected.store(false);
+        throw std::runtime_error(what);
     }
 
     void TKnxClientService::Start()
@@ -137,10 +137,16 @@ namespace knx
         }
 
         Worker = WBMQTT::MakeThread("KnxClient thread", {[this] {
-                                        KnxdConnectProcessing();
-                                        NotifyAllSubscribers(TKnxEvent::KnxdSocketConnected, TTelegram{});
-                                        KnxdReceiveProcessing();
-                                        KnxdDisconnectProcessing();
+                                        while (IsStarted) {
+                                            try {
+                                                KnxdConnectProcessing();
+                                                NotifyAllSubscribers(TKnxEvent::KnxdSocketConnected, TTelegram{});
+                                                KnxdReceiveProcessing();
+                                                KnxdDisconnectProcessing();
+                                            } catch (const std::runtime_error& e) {
+                                                ErrorLogger.Log() << e.what();
+                                            }
+                                        }
                                     }});
     }
 

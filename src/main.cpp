@@ -20,6 +20,8 @@ namespace
     const auto KNX_DRIVER_STOP_TIMEOUT_S = std::chrono::seconds(60); // topic cleanup can take a lot of time
     const auto KNX_READ_TICK_PERIOD = std::chrono::milliseconds(50);
 
+    const auto LIBWBMQTT_DB_FULL_FILE_PATH = "/var/lib/wb-mqtt-knx/libwbmqtt.db";
+
     // https://refspecs.linuxbase.org/LSB_5.0.0/LSB-Core-generic/LSB-Core-generic/iniscrptact.html
     constexpr auto EXIT_NOTCONFIGURED = 6; // The program is not configured
 
@@ -167,7 +169,8 @@ int main(int argc, char** argv)
         auto mqttDriver = WBMQTT::NewDriver(WBMQTT::TDriverArgs{}
                                                 .SetId(PROJECT_NAME)
                                                 .SetBackend(WBMQTT::NewDriverBackend(mqttClient))
-                                                .SetUseStorage(false)
+                                                .SetUseStorage(true)
+                                                .SetStoragePath(LIBWBMQTT_DB_FULL_FILE_PATH)
                                                 .SetReownUnknownDevices(true));
         mqttDriver->StartLoop();
 

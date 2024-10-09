@@ -21,7 +21,7 @@ void TGroupObjectMqttBuilder::LinkDevice(const std::string& id, const std::strin
     MqttDeviceList.push_back(
         MqttDeviceDriver->BeginTx()
             ->CreateDevice(
-                WBMQTT::TLocalDeviceArgs{}.SetId(id).SetTitle(name).SetIsVirtual(true).SetDoLoadPrevious(false))
+                WBMQTT::TLocalDeviceArgs{}.SetId(id).SetTitle(name).SetIsVirtual(true).SetDoLoadPrevious(true))
             .GetValue());
 }
 
