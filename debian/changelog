@@ -1,3 +1,9 @@
+wb-mqtt-knx (1.13.4) stable; urgency=medium
+
+  * Fix build with gcc14
+
+ -- Nikolay Korotkiy <nikolay.korotkiy@wirenboard.com>  Thu, 27 Mar 2025 16:30:00 +0400
+
 wb-mqtt-knx (1.13.3) stable; urgency=medium
 
   * Set meta/error on knxd socket error
