@@ -4,8 +4,8 @@ using namespace knx;
 
 namespace
 {
-    constexpr auto AREA_MAX = 15U;
-    constexpr auto LINE_MAX = 15U;
+    constexpr auto _AREA_MAX = 15U;
+    constexpr auto _LINE_MAX = 15U;
     constexpr auto DEVICE_ADDRESS_MAX = 255U;
 
     constexpr auto ERROR_MESSAGE = "Invalid KNX Individual Address: ";
@@ -38,7 +38,7 @@ TKnxIndividualAddress::TKnxIndividualAddress(eibaddr_t eibAddress)
 
 void TKnxIndividualAddress::Init(uint32_t area, uint32_t line, uint32_t deviceAddress)
 {
-    if ((area > AREA_MAX) || (line > LINE_MAX) || (deviceAddress > DEVICE_ADDRESS_MAX))
+    if ((area > _AREA_MAX) || (line > _LINE_MAX) || (deviceAddress > DEVICE_ADDRESS_MAX))
         wb_throw(knx::TKnxException,
                  ERROR_MESSAGE + std::to_string(area) + "." + std::to_string(line) + "." +
                      std::to_string(deviceAddress));
