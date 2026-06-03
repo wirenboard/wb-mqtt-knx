@@ -2,8 +2,8 @@ Source: wb-mqtt-knx
 Maintainer: Wiren Board team <info@wirenboard.com>
 Section: misc
 Priority: optional
-Standards-Version: 3.9.2
-Build-Depends: debhelper (>= 10),
+Standards-Version: 4.5.1
+Build-Depends: debhelper-compat (= 13),
                gcovr:all,
                libgtest-dev,
                libgmock-dev,
@@ -20,4 +20,3 @@ Depends: ${shlibs:Depends}, ${misc:Depends}, knxd-tools (>= 0.14.51-1), knxd (>=
 Breaks:
 Description: Wiren Board MQTT to KNX gateway
              wb-mqtt-knx service sends unprocessed knx telegrams to mqtt and receives from there
-

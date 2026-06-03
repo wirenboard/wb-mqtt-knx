@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.7)
+cmake_minimum_required(VERSION 3.10)
 
 project(wb-mqtt-knx)
 
@@ -16,7 +16,7 @@ execute_process (
 include_directories("${PROJECT_BINARY_DIR}")
 
 # specify the C++ standard
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 add_compile_options(-Wall -Werror -pedantic)
