@@ -1,3 +1,11 @@
+wb-mqtt-knx (1.15.0) stable; urgency=medium
+
+  * Exit with 7 when config has no devices and the legacy device is disabled, and on SIGTERM/SIGINT
+  * Pause between knxd connection attempts
+  * systemd unit: treat exit code 7 as success, RestartSec=1
+
+ -- Ekaterina Volkova <ekaterina.volkova@wirenboard.com>  Thu, 20 Aug 2026 13:18:25 +0000
+
 wb-mqtt-knx (1.14.0) stable; urgency=medium
 
   * Port for Debian 13

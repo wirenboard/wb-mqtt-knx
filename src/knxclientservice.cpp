@@ -9,12 +9,14 @@
 #include <future>
 #include <iomanip>
 #include <sstream>
+#include <thread>
 #include <unistd.h>
 #include <utility>
 
 namespace
 {
     constexpr auto RECEIVER_LOOP_TIMEOUT = std::chrono::seconds(2);
+    constexpr auto CONNECTION_RETRY_INTERVAL = std::chrono::seconds(1);
     constexpr auto CONNECTION_THREAD_STOP_TIMEOUT = std::chrono::seconds(6);
 
     constexpr auto MAX_TELEGRAM_LENGTH = knx::TTelegram::SizeWithoutPayload + knx::TTpdu::MaxPayloadSize;
@@ -145,6 +147,7 @@ namespace knx
                                                 KnxdDisconnectProcessing();
                                             } catch (const std::runtime_error& e) {
                                                 ErrorLogger.Log() << e.what();
+                                                std::this_thread::sleep_for(CONNECTION_RETRY_INTERVAL);
                                             }
                                         }
                                     }});

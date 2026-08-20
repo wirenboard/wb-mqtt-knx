@@ -33,6 +33,10 @@ namespace knx
         /// \return KNX Legacy Device is enable
         bool IsKnxLegacyDeviceEnabled();
 
+        /// Are there KNX devices in the config
+        /// \return At least one KNX device is defined
+        bool HasKnxDevices();
+
     private:
         Json::Value ConfigRoot;
         Json::Value SchemaRoot;

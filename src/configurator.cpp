@@ -54,3 +54,8 @@ bool Configurator::IsKnxLegacyDeviceEnabled()
 {
     return ConfigRoot["enableLegacyKnxDevice"].asBool();
 }
+
+bool Configurator::HasKnxDevices()
+{
+    return !ConfigRoot["devices"].empty();
+}

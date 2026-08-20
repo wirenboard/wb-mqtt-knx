@@ -5,11 +5,12 @@ After=knxd.service wb-hwconf-manager.service mosquitto.service
 [Service]
 Type=simple
 Restart=on-failure
-RestartSec=15
+RestartSec=1
 User=root
 ExecStart=/usr/bin/wb-mqtt-knx
 
-RestartPreventExitStatus=2 3 4 5 6 7
+RestartPreventExitStatus=2 3 4 5 6
+SuccessExitStatus=7
 
 [Install]
 WantedBy=multi-user.target

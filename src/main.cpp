@@ -24,6 +24,7 @@ namespace
 
     // https://refspecs.linuxbase.org/LSB_5.0.0/LSB-Core-generic/LSB-Core-generic/iniscrptact.html
     constexpr auto EXIT_NOTCONFIGURED = 6; // The program is not configured
+    constexpr auto EXIT_NOTRUNNING = 7;    // The program is not running (nothing to do)
 
     WBMQTT::TLogger ErrorLogger("ERROR: ", WBMQTT::TLogger::StdErr, WBMQTT::TLogger::RED);
     WBMQTT::TLogger DebugLogger("DEBUG: ", WBMQTT::TLogger::StdErr, WBMQTT::TLogger::WHITE, false);
@@ -160,6 +161,11 @@ int main(int argc, char** argv)
         return EXIT_NOTCONFIGURED;
     }
 
+    if (!pConfigurator->HasKnxDevices() && !pConfigurator->IsKnxLegacyDeviceEnabled()) {
+        InfoLogger.Log() << "No KNX devices defined in config and legacy KNX device is disabled. Nothing to do";
+        return EXIT_NOTRUNNING;
+    }
+
     try {
         if (pConfigurator->IsDebugEnabled()) {
             DebugLogger.SetEnabled(true);
@@ -236,5 +242,5 @@ int main(int argc, char** argv)
         return EXIT_FAILURE;
     }
 
-    return EXIT_SUCCESS;
+    return EXIT_NOTRUNNING;
 }
