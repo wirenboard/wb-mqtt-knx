@@ -62,9 +62,10 @@ namespace knx
                     Value = Json::Value(value.test(0));
                     break;
                 case EFieldType::UNSIGNED_INT:
-                case EFieldType::ENUM:
-                    Value = Json::Value(static_cast<uint64_t>(value.to_ullong() & ((1 << BitWidth) - 1)));
-                    break;
+                case EFieldType::ENUM: {
+                    const auto mask = (BitWidth >= 64) ? ~0ULL : ((1ULL << BitWidth) - 1ULL);
+                    Value = Json::Value(static_cast<uint64_t>(value.to_ullong() & mask));
+                } break;
                 case EFieldType::INT:
                     if (BitWidth == 8) {
                         Value = Json::Value(static_cast<int8_t>(value.to_ulong() & 0xFF));
@@ -109,10 +110,10 @@ namespace knx
                             str = str.substr(0, (KNX_CHAR_STRING_BIT_WIDTH / 8));
                         }
 
-                        value = TJsonFieldRawValue(str[0]);
+                        value = TJsonFieldRawValue(static_cast<uint8_t>(str[0]));
                         for (uint32_t i = 1; i < str.size(); ++i) {
                             value <<= 8;
-                            value |= TJsonFieldRawValue(str[i]);
+                            value |= TJsonFieldRawValue(static_cast<uint8_t>(str[i]));
                         }
                         value <<= KNX_CHAR_STRING_BIT_WIDTH - (str.size() * 8);
                         return value;
