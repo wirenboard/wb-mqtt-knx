@@ -4,6 +4,7 @@ Section: misc
 Priority: optional
 Standards-Version: 4.5.1
 Build-Depends: debhelper-compat (= 13),
+               pkg-config,
                libtinyxml2-dev,
                libwbmqtt1-5-dev,
                knxd-dev (>= 0.14.51-1),
