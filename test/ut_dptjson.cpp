@@ -113,6 +113,44 @@ TEST_F(DptJsonTest, toMqttStringFieldTest)
     EXPECT_EQ("Hello, world", jsonObject["stringField"].asString());
 }
 
+TEST_F(DptJsonTest, toMqttUnsigned32FieldTest)
+{
+    knx::object::TDptJsonField jsonUint32Field("uint32Field", knx::object::TDptJsonField::EFieldType::UNSIGNED_INT, 32);
+
+    // Bit position 8 is where TDptJsonBuilder places a "U32" encoding: the field is wider
+    // than 6 bits, so the first payload octet stays blank and the value starts at octet 1.
+    // That makes the payload 5 octets long, most significant octet first.
+    Dpt->AddField(jsonUint32Field, 8);
+
+    struct TUnsigned32Case
+    {
+        std::vector<uint8_t> Payload;
+        uint64_t ExpectedValue;
+    };
+
+    // Every case except the all-zero one decoded to 0 before the fix.
+    const std::vector<TUnsigned32Case> testCases = {
+        {{0x00, 0x00, 0x00, 0x00, 0x00}, 0x00000000},
+        {{0x00, 0x7F, 0xFF, 0xFF, 0xFF}, 0x7FFFFFFF}, // largest value with bit 31 clear
+        {{0x00, 0x80, 0x00, 0x00, 0x00}, 0x80000000}, // bit 31 on its own
+        {{0x00, 0xDE, 0xAD, 0xBE, 0xEF}, 0xDEADBEEF}, // bit 31 set among others
+        {{0x00, 0xFF, 0xFF, 0xFF, 0xFF}, 0xFFFFFFFF}  // every bit set
+    };
+
+    for (const auto& testCase: testCases) {
+        SCOPED_TRACE("expected value " + std::to_string(testCase.ExpectedValue));
+
+        Dpt->FromKnx(testCase.Payload);
+
+        auto jsonObject = testUtils::ParseJson(Dpt->ToMqtt()[0].As<std::string>());
+        EXPECT_EQ(testCase.ExpectedValue, jsonObject["uint32Field"].asUInt64());
+
+        // The value must also survive the way back, so that a full-width field is not
+        // truncated on its way to a KNX telegram.
+        EXPECT_EQ(testCase.Payload, Dpt->ToKnx());
+    }
+}
+
 TEST_F(DptJsonTest, stringFieldTestNeg)
 {
     ConfigureJsonDptString();
@@ -138,6 +176,33 @@ TEST_F(DptJsonTest, toKnxStringFieldTest)
     Dpt->FromMqtt(0, JsonSample);
 
     EXPECT_EQ(KnxPayload, Dpt->ToKnx());
+}
+
+TEST_F(DptJsonTest, toKnxNonAsciiStringFieldTest)
+{
+    knx::object::TDptJsonField jsonStringField("stringField", knx::object::TDptJsonField::EFieldType::CHAR, 112);
+
+    // A lone A112 field starts at octet 1, the way TDptJsonBuilder lays out DPT 16.
+    Dpt->AddField(jsonStringField, 8);
+
+    // "Kuche" with an umlaut, UTF-8 encoded as the web UI sends it: U+00FC is 0xC3 0xBC.
+    // The literal is split so the hex escape does not swallow the following 'c'.
+    const std::string utf8Text = "K\xC3\xBC"
+                                 "che";
+
+    // Blank first octet, then the text most significant octet first, zero padded to 14.
+    const std::vector<uint8_t> expectedPayload =
+        {0x00, 0x4B, 0xC3, 0xBC, 0x63, 0x68, 0x65, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
+
+    // MQTT -> KNX: the direction the signed char broke.
+    Dpt->FromMqtt(0, std::string{R"({"stringField":")"} + utf8Text + R"("})");
+    EXPECT_EQ(expectedPayload, Dpt->ToKnx());
+
+    // KNX -> MQTT: this direction extracts octets through to_ulong() and was never affected,
+    // but assert it too so the round trip stays lossless for non-ASCII text.
+    Dpt->FromKnx(expectedPayload);
+    auto jsonObject = testUtils::ParseJson(Dpt->ToMqtt()[0].As<std::string>());
+    EXPECT_EQ(utf8Text, jsonObject["stringField"].asString());
 }
 
 TEST_F(DptJsonTest, FromKnxToKnxTest)
