@@ -36,7 +36,9 @@ target_link_libraries(${PROJECT_NAME} wbmqtt1 eibclient pthread)
 
 # Adding unit tests
 include (CTest)
-add_subdirectory(test)
+if (BUILD_TESTING)
+    add_subdirectory(test)
+endif ()
 
 # Added ets.xml <-> wb-mqtt-knx.conf tool
 add_subdirectory(etsconfigtool)
