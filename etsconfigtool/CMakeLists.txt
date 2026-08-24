@@ -21,6 +21,8 @@ target_include_directories(${PROJECT_NAME} PRIVATE include)
 target_link_libraries(${PROJECT_NAME} tinyxml2 wbmqtt1)
 
 # Adding unit tests
-add_subdirectory(test)
+if (BUILD_TESTING)
+    add_subdirectory(test)
+endif ()
 
 install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin)

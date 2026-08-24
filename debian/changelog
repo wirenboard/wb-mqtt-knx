@@ -1,3 +1,12 @@
+wb-mqtt-knx (1.14.1) stable; urgency=medium
+
+  * Fix use-after-free and null dereference when sending a telegram while knxd is disconnected
+  * Fix double free of the knxd connection on service stop
+  * Fix 4-octet unsigned fields of JSON datapoints always reading as zero
+  * Fix non-ASCII characters corrupting JSON string fields
+
+ -- Nikolay Korotkiy <nikolay.korotkiy@wirenboard.com>  Thu, 20 Aug 2026 16:40:00 +0400
+
 wb-mqtt-knx (1.14.0) stable; urgency=medium
 
   * Port for Debian 13

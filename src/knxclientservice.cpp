@@ -62,7 +62,7 @@ namespace knx
 
     void TKnxClientService::Send(const TTelegram& telegram)
     {
-        if (!IsStarted && !IsConnected) {
+        if (!IsStarted || !IsConnected) {
             return;
         }
 
@@ -70,11 +70,12 @@ namespace knx
             auto tpduPayload = telegram.Tpdu().GetRaw();
             int32_t sendResult;
             {
-                std::lock_guard<std::mutex> lg(SendMutex);
-                sendResult = EIBSendGroup(KnxdConnection->GetEIBConnection(),
-                                          telegram.GetReceiverAddress(),
-                                          static_cast<int32_t>(tpduPayload.size()),
-                                          tpduPayload.data());
+                std::lock_guard<std::mutex> lg(ConnectionMutex);
+                sendResult = KnxdConnection ? EIBSendGroup(KnxdConnection->GetEIBConnection(),
+                                                           telegram.GetReceiverAddress(),
+                                                           static_cast<int32_t>(tpduPayload.size()),
+                                                           tpduPayload.data())
+                                            : EIB_ERROR_RETURN_VALUE;
             }
             if (sendResult != EIB_ERROR_RETURN_VALUE) {
                 if (DebugLogger.IsEnabled()) {
@@ -92,15 +93,21 @@ namespace knx
     void TKnxClientService::KnxdConnectProcessing()
     {
         InfoLogger.Log() << "Connecting to knxd... URL: '" << KnxServerUrl << "'";
-        KnxdConnection = std::make_unique<TKnxConnection>(KnxServerUrl);
 
-        if (!KnxdConnection->IsConnected()) {
+        auto connection = std::make_unique<TKnxConnection>(KnxServerUrl);
+
+        if (!connection->IsConnected()) {
             HandleCriticalError("Failed to open KnxServerUrl: " + KnxServerUrl + ". Is knxd running?");
         }
 
-        const int32_t eibOpenResult = EIBOpen_GroupSocket(KnxdConnection->GetEIBConnection(), 0);
+        const int32_t eibOpenResult = EIBOpen_GroupSocket(connection->GetEIBConnection(), 0);
         if (eibOpenResult == EIB_ERROR_RETURN_VALUE) {
             HandleCriticalError("failed to open EIB GroupSocket connection");
+        }
+
+        {
+            std::lock_guard<std::mutex> lg(ConnectionMutex);
+            KnxdConnection = std::move(connection);
         }
 
         IsConnected.store(true);
@@ -111,9 +118,10 @@ namespace knx
     void TKnxClientService::KnxdDisconnectProcessing()
     {
         IsConnected.store(false);
-        const int32_t eibOpenResult = EIBClose(KnxdConnection->GetEIBConnection());
-        if (eibOpenResult == EIB_ERROR_RETURN_VALUE) {
-            HandleCriticalError("failed to close EIB GroupSocket connection");
+
+        {
+            std::lock_guard<std::mutex> lg(ConnectionMutex);
+            KnxdConnection.reset();
         }
 
         InfoLogger.Log() << "knxd disconnected successfully";

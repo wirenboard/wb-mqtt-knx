@@ -1,5 +1,11 @@
 #!/usr/bin/make -f
 
+ifeq ($(filter nocheck,$(DEB_BUILD_PROFILES)),)
+BUILD_TESTING := ON
+else
+BUILD_TESTING := OFF
+endif
+
 COV_FAIL_UNDER := $(patsubst cov-fail-under=%,%,$(filter cov-fail-under=%,$(DEB_BUILD_OPTIONS)))
 COV_REPORT     := $(patsubst cov-report=%,%,$(filter cov-report=%,$(DEB_BUILD_OPTIONS)))
 
@@ -12,16 +18,21 @@ ifneq ($(COV_FAIL_UNDER),)
 endif
 
 %:
-	dh $@ --parallel
+	dh $@
 
 override_dh_auto_configure:
 	dh_auto_configure -- \
-		-DCMAKE_BUILD_TYPE=$(if $(findstring debug, $(DEB_BUILD_OPTIONS)),Debug,Release)
+		-DCMAKE_BUILD_TYPE=$(if $(findstring debug, $(DEB_BUILD_OPTIONS)),Debug,Release) \
+		-DBUILD_TESTING:BOOL=$(BUILD_TESTING)
 
 override_dh_auto_test:
+ifeq ($(BUILD_TESTING),ON)
 	dh_auto_test
 ifneq (,$(findstring debug, $(DEB_BUILD_OPTIONS)))
 	gcovr $(GCOVR_FLAGS) .
+endif
+else
+	@echo "Skipping tests: built with the nocheck profile"
 endif
 
 override_dh_installinit:
