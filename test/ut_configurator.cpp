@@ -46,12 +46,12 @@ TEST_F(ConfiguratorTest, CongigureController)
 
     uint32_t index = 0;
     EXPECT_CALL(*goController, AddGroupObject(_, _))
-        .WillRepeatedly(Invoke([addressList, &index](const knx::object::PGroupObject& groupObject,
-                                                     const knx::TGroupObjectSettings& settings) {
+        .WillRepeatedly([addressList, &index](const knx::object::PGroupObject& groupObject,
+                                              const knx::TGroupObjectSettings& settings) {
             EXPECT_EQ(addressList[index].ToString(), settings.GroupAddress.ToString());
             ++index;
             return true;
-        }));
+        });
 
     auto groupObjectMqttBuilder = std::make_shared<TGroupObjectMqttBuilderMock>();
 
