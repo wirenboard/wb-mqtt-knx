@@ -29,16 +29,18 @@ TGroupObjectMqtt::TGroupObjectMqtt(PDpt pDpt,
             fullControlId = settings.ControlId + "_" + fieldDescriptor.Id;
             fullControlTitle = settings.ControlTitle + " ." + fieldDescriptor.Id;
         }
-        auto control = MqttLocalDevice
-                           ->CreateControl(tx,
-                                           WBMQTT::TControlArgs{}
-                                               .SetId(fullControlId)
-                                               .SetTitle(fullControlTitle)
-                                               .SetType(fieldDescriptor.Type)
-                                               .SetMin(fieldDescriptor.Min)
-                                               .SetMax(fieldDescriptor.Max)
-                                               .SetReadonly(settings.IsReadOnly))
-                           .GetValue();
+        WBMQTT::TControlArgs controlArgs;
+        controlArgs.SetId(fullControlId)
+            .SetTitle(fullControlTitle)
+            .SetType(fieldDescriptor.Type)
+            .SetReadonly(settings.IsReadOnly);
+        if (fieldDescriptor.Min) {
+            controlArgs.SetMin(*fieldDescriptor.Min);
+        }
+        if (fieldDescriptor.Max) {
+            controlArgs.SetMax(*fieldDescriptor.Max);
+        }
+        auto control = MqttLocalDevice->CreateControl(tx, std::move(controlArgs)).GetValue();
         control->SetOnValueReceiveHandler(
             [index, this](WBMQTT::PControl pControl, const WBMQTT::TAny& value, const WBMQTT::PDriverTx&) {
                 MqttNotify(pControl, index, value);

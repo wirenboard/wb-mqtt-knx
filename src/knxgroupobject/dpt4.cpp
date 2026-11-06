@@ -7,7 +7,7 @@ using namespace knx::object;
 
 std::vector<DptDescriptorField> TDpt4::getDescriptor() const
 {
-    return {{"CharacterValue", "text", 0, 255}};
+    return {{"CharacterValue", "text"}};
 }
 
 void TDpt4::FromMqtt(uint32_t controlIndex, const WBMQTT::TAny& value)

@@ -16,7 +16,7 @@ namespace knx
 
         std::vector<DptDescriptorField> TDptJson::getDescriptor() const
         {
-            return {{"JSON", "text", 0, 255}};
+            return {{"JSON", "text"}};
         }
 
         void TDptJson::FromMqtt(uint32_t controlIndex, const WBMQTT::TAny& value)

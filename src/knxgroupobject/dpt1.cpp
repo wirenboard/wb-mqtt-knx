@@ -6,7 +6,7 @@ using namespace knx::object;
 
 std::vector<DptDescriptorField> TDpt1::getDescriptor() const
 {
-    std::vector<DptDescriptorField> descriptor = {{"b", "switch", 0, 1}};
+    std::vector<DptDescriptorField> descriptor = {{"b", "switch"}};
     return descriptor;
 }
 
