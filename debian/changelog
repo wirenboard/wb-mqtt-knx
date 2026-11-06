@@ -1,3 +1,9 @@
+wb-mqtt-knx (1.14.3) stable; urgency=medium
+
+  * Do not publish meta/min and meta/max for switch and text controls
+
+ -- Nikolay Korotkiy <nikolay.korotkiy@wirenboard.com>  Fri, 06 Nov 2026 12:00:00 +0400
+
 wb-mqtt-knx (1.14.2) stable; urgency=medium
 
   * Fix deprecated Invoke() usage, no functional changes

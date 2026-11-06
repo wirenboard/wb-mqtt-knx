@@ -33,6 +33,9 @@ TEST_F(DptWbMqttBuilderTest, createB1DptTest)
     auto descriptorB1 = dptB1->getDescriptor();
     EXPECT_EQ(1, descriptorB1.size());
     EXPECT_EQ("b", descriptorB1.front().Id);
+    EXPECT_EQ("switch", descriptorB1.front().Type);
+    EXPECT_FALSE(descriptorB1.front().Min.has_value());
+    EXPECT_FALSE(descriptorB1.front().Max.has_value());
 }
 
 TEST_F(DptWbMqttBuilderTest, createDptNegTest)

@@ -6,7 +6,7 @@ using namespace knx::object;
 
 std::vector<DptDescriptorField> TDpt3::getDescriptor() const
 {
-    return {{"c", "switch", 0, 1}, {"StepCode", "value", 0, 7}};
+    return {{"c", "switch"}, {"StepCode", "value", 0, 7}};
 }
 
 void TDpt3::FromMqtt(uint32_t controlIndex, const WBMQTT::TAny& value)

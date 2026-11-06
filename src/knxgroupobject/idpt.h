@@ -3,6 +3,7 @@
 #include "datapointid.h"
 #include "wblib/any.h"
 #include <memory>
+#include <optional>
 
 namespace knx
 {
@@ -11,10 +12,10 @@ namespace knx
         /// Description of the MQTT Control associated with KNX field
         struct DptDescriptorField
         {
-            std::string Id;   ///< Postfix ID for a MQTT control. Example: ControlId_DescriptorId
-            std::string Type; ///< Control value type
-            double Min;       ///< Minimum value for a control
-            double Max;       ///< Maximum value for a control
+            std::string Id;            ///< Postfix ID for a MQTT control. Example: ControlId_DescriptorId
+            std::string Type;          ///< Control value type
+            std::optional<double> Min; ///< Minimum value for a control, not published if not set
+            std::optional<double> Max; ///< Maximum value for a control, not published if not set
         };
 
         /// \brief A set of rules for converting KNX <-> MQTT messages
