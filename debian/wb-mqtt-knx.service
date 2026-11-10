@@ -1,6 +1,7 @@
 [Unit]
 Description=Wiren Board MQTT KNX bridge
 After=knxd.service wb-hwconf-manager.service mosquitto.service
+BindsTo=knxd.service
 
 [Service]
 Type=simple
@@ -12,4 +13,4 @@ ExecStart=/usr/bin/wb-mqtt-knx
 RestartPreventExitStatus=2 3 4 5 6 7
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=multi-user.target knxd.service
